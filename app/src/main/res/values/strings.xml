@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Authenticator</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="authenticator_description">Below is your authentication code, to enter when signing in to Cryptodash:</string>
+    <string name="title_activity_register_account">RegisterAccountActivity</string>
+</resources>

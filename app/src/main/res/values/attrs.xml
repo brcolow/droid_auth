@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="TimestepIntervalWheel">
+        <attr name="intervalInSeconds" format="integer" />
+        <attr name="secondsRemainingInInterval" format="integer" />
+    </declare-styleable>
+    <item
+        type="id"
+        name="register_account_frame" />
+</resources>

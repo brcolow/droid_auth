@@ -1,0 +1,32 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                android:paddingBottom="@dimen/activity_vertical_margin"
+                tools:context="net.cryptodirect.authenticator.SelectRegisterMethodFragment"
+                android:background="#212121"
+                android:gravity="top|center">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Scan QR Code"
+        android:id="@+id/scan_qr_code_button"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="150dp"
+        android:gravity="center_vertical"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Manual Entry"
+        android:id="@+id/manual_entry_button"
+        android:layout_below="@+id/scan_qr_code_button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="75dp"
+        android:gravity="center_vertical|center_horizontal"/>
+</RelativeLayout>

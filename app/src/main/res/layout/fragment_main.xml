@@ -1,0 +1,55 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivityFragment"
+    android:background="#212121"
+    android:id="@+id/main_layout"
+    tools:showIn="@layout/activity_main">
+
+    <TextView android:text="@string/authenticator_description" android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/authenticator_blurb"
+        android:textSize="24sp"
+        android:textColor="#f5f5f5"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/email_label"
+        android:text="myemail@test.com"
+        android:textSize="18sp"
+        android:textColor="#eeeeee"
+        android:layout_marginTop="36dp"
+        android:layout_marginLeft="21dp"
+        android:layout_below="@+id/authenticator_blurb"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="21dp"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:id="@+id/code_box"
+        android:focusable="false"
+        android:textSize="34sp"
+        android:textColor="#fafafa"
+        android:editable="false"
+        android:layout_marginTop="21dp"
+        android:background="#424242"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:textStyle="bold"
+        android:layout_below="@+id/email_label"
+        android:layout_centerHorizontal="true"
+        android:typeface="monospace"
+        android:textAlignment="center"
+        android:ems="4"
+        android:text="123456"
+        android:gravity="center_vertical|center_horizontal"
+        android:letterSpacing="0.1"/>
+
+</RelativeLayout>
