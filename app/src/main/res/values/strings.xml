@@ -14,4 +14,7 @@
     <string name="sample_key">Ne2WwwXegWzlHuD0eriSXx1EaxmQiEW8QMCRcn5RJ78=</string>
     <string name="information_correct">Correct</string>
     <string name="information_incorrect">Incorrect</string>
+    <string name="manual_entry_blurb">Enter your email address associated with your Cryptodash account and the provided key.</string>
+    <string name="okay">Okay</string>
+    <string name="email_hint">you@email.com</string>
 </resources>
