@@ -4,7 +4,4 @@
         <attr name="intervalInSeconds" format="integer" />
         <attr name="secondsRemainingInInterval" format="integer" />
     </declare-styleable>
-    <item
-        type="id"
-        name="register_account_frame" />
 </resources>

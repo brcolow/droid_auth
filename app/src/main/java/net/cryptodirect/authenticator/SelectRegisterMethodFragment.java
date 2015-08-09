@@ -12,22 +12,10 @@ import android.widget.Button;
  */
 public class SelectRegisterMethodFragment extends Fragment
 {
-    private Button scanQRCodeButton;
-    private Button manualEntryButton;
 
     public SelectRegisterMethodFragment()
     {
         // Required empty public constructor
-    }
-
-    public Button getScanRCodeButton()
-    {
-        return scanQRCodeButton;
-    }
-
-    public Button getManualEntryButton()
-    {
-        return manualEntryButton;
     }
 
     @Override
@@ -36,8 +24,6 @@ public class SelectRegisterMethodFragment extends Fragment
     {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_select_register_method, container, false);
-        scanQRCodeButton = (Button) view.findViewById(R.id.scan_qr_code_button);
-        manualEntryButton = (Button) view.findViewById(R.id.manual_entry_button);
         return view;
     }
 

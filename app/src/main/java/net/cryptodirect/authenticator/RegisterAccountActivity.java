@@ -3,60 +3,36 @@ package net.cryptodirect.authenticator;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 
-public class RegisterAccountActivity extends AppCompatActivity
+import com.google.zxing.BarcodeFormat;
+
+public class RegisterAccountActivity
+        extends AppCompatActivity
+        implements ScanQRCodeFragment.OnQRCodeScannedListener
 {
-    private SelectRegisterMethodFragment selectRegisterMethodFragment;
-    private static final int CONTENT_VIEW_ID = 10101010;
     private static final String TAG = RegisterAccountActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle state)
     {
         super.onCreate(state);
-        RelativeLayout relativeLayout = new RelativeLayout(this);
-        relativeLayout.setId(CONTENT_VIEW_ID);
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        selectRegisterMethodFragment = new SelectRegisterMethodFragment();
-        fragmentTransaction.add(CONTENT_VIEW_ID, selectRegisterMethodFragment, "select-method").commit();
-        setContentView(relativeLayout, new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-    }
-
-    @Override
-    protected void onStart()
-    {
-        super.onStart();
-        addClickListeners();
-    }
-
-    private void addClickListeners()
-    {
-        selectRegisterMethodFragment.getScanRCodeButton().setOnClickListener(new View.OnClickListener()
+        setContentView(R.layout.activity_register_account);
+        if (findViewById(R.id.register_account_fragment_container) != null)
         {
-            public void onClick(View v)
+            // However, if we're being restored from a previous state,
+            // then we don't need to do anything and should return or else
+            // we could end up with overlapping fragments.
+            if (state != null)
             {
-                Log.i(TAG, "View: " + v.toString());
-                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                ScanQRCodeFragment scanQRCodeFragment = new ScanQRCodeFragment();
-                fragmentTransaction.replace(CONTENT_VIEW_ID, scanQRCodeFragment, "qr-code").addToBackStack("select-to-qr").commit();
+                return;
             }
-        });
-
-        selectRegisterMethodFragment.getManualEntryButton().setOnClickListener(new View.OnClickListener()
-        {
-            public void onClick(View v)
-            {
-                Log.i(TAG, "View: " + v.toString());
-                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                ManualEntryFragment manualEntryFragment = new ManualEntryFragment();
-                fragmentTransaction.replace(CONTENT_VIEW_ID , manualEntryFragment, "manual-entry").addToBackStack("select-to-manual").commit();
-            }
-        });
+            SelectRegisterMethodFragment selectMethodFragment = new SelectRegisterMethodFragment();
+            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            fragmentTransaction.add(R.id.register_account_fragment_container,
+                    selectMethodFragment, "select-method")
+                    .commit();
+        }
     }
 
     @Override
@@ -70,5 +46,86 @@ public class RegisterAccountActivity extends AppCompatActivity
         {
             super.onBackPressed();
         }
+    }
+
+    /**
+     * The "QR Code" button is in the SelectRegisterMethodFragment
+     * @param view
+     */
+    public void handleScanQRCodeClicked(View view)
+    {
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        ScanQRCodeFragment scanQRCodeFragment = new ScanQRCodeFragment();
+        fragmentTransaction.replace(R.id.register_account_fragment_container,
+                scanQRCodeFragment, "qr-code")
+                .addToBackStack("select-to-qr")
+                .commit();
+    }
+
+    /**
+     * The "Manual Entry" button is in the SelectRegisterMethodFragment
+     * @param view
+     */
+    public void handleManualEntryClicked(View view)
+    {
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        ManualEntryFragment manualEntryFragment = new ManualEntryFragment();
+        fragmentTransaction.replace(R.id.register_account_fragment_container,
+                manualEntryFragment, "manual-entry")
+                .addToBackStack("select-to-manual")
+                .commit();
+    }
+
+    @Override
+    public void onQRCodeScanned(BarcodeFormat barcodeFormat, String scannedCode)
+    {
+        if (!barcodeFormat.equals(BarcodeFormat.QR_CODE))
+        {
+            throw new IllegalArgumentException("decoded barcode was not in QR code format");
+        }
+        if (!scannedCode.contains("|"))
+        {
+            throw new IllegalArgumentException("decoded QR code was not formatted correctly");
+        }
+
+        Bundle bundle = new Bundle();
+        bundle.putString("decoded_email", scannedCode.split("\\|")[0]);
+        bundle.putString("decoded_key", scannedCode.split("\\|")[1]);
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        RegisterAccountDataFragment registerAccountDataFragment = new RegisterAccountDataFragment();
+        registerAccountDataFragment.setArguments(bundle);
+        fragmentTransaction.replace(R.id.register_account_fragment_container,
+                registerAccountDataFragment, "register-account-data")
+                .addToBackStack("select-to-manual")
+                .commit();
+    }
+
+    /**
+     * The "Correct" button is in RegisterAccountDataFragment
+     * @param view
+     */
+    public void handleCorrectButtonClicked(View view)
+    {
+        // Here we could add a progress indicator that says "Verifying..."
+        // or something else...not sure...maybe we call a method on
+        // the RegisterAccountDataFragment that saves the data to
+        // internal storage, than just go back to the MainActivity, where
+        // it will find an account data, and will spawn that authenticator
+        // for it
+        getFragmentManager().findFragmentByTag("register-account-data");
+    }
+
+    /**
+     * The "Incorrect" button is in RegisterAccountDataFragment
+     * @param view
+     */
+    public void handleIncorrectButtonClicked(View view)
+    {
+        // information was incorrect, so go back to select method fragment
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.register_account_fragment_container,
+                getFragmentManager().findFragmentByTag("select-method"))
+                .addToBackStack("incorrect-to-select")
+                .commit();
     }
 }

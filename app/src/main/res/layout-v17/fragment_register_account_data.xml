@@ -1,0 +1,105 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             tools:context="net.cryptodirect.authenticator.RegisterAccountDataFragment"
+             android:background="#212121">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/register_account_data_blurb"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="false"
+        android:textColor="#f2f2f2"
+        android:textSize="22sp"
+        android:id="@+id/verify_information_textview"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="15dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/email"
+        android:id="@+id/account_email_textview"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="33dp"
+        android:layout_marginTop="95dp"
+        android:textColor="#f2f2f2"
+        android:textSize="20sp"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/email_field"
+        android:layout_marginTop="19dp"
+        android:background="#f4f4f4"
+        android:enabled="false"
+        android:minWidth="120dp"
+        android:maxWidth="320dp"
+        android:textColor="#212121"
+        android:textSize="20sp"
+        android:layout_below="@+id/account_email_textview"
+        android:layout_alignStart="@+id/account_email_textview"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:text="myemail@gmail.com"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/key"
+        android:id="@+id/key_textview"
+        android:textSize="20sp"
+        android:textColor="#f2f2f2"
+        android:layout_above="@+id/key_text_field"
+        android:layout_alignStart="@+id/email_field"
+        android:layout_marginBottom="18dp"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/key_text_field"
+        android:background="#f4f4f4"
+        android:enabled="false"
+        android:minWidth="120dp"
+        android:maxWidth="320dp"
+        android:textColor="#212121"
+        android:textSize="20sp"
+        android:layout_centerVertical="true"
+        android:layout_alignStart="@+id/key_textview"
+        android:text="@string/sample_key"
+        android:typeface="monospace"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/information_correct"
+        android:id="@+id/correct_button"
+        android:layout_marginTop="70dp"
+        android:layout_marginEnd="50dp"
+        android:layout_below="@+id/key_text_field"
+        android:layout_alignEnd="@+id/key_text_field"
+        android:layout_alignParentEnd="true"
+        android:onClick="handleCorrectButtonClicked"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/information_incorrect"
+        android:id="@+id/incorrect_button"
+        android:layout_alignTop="@+id/correct_button"
+        android:layout_marginStart="50dp"
+        android:layout_alignStart="@+id/key_text_field"
+        android:layout_alignParentStart="true"
+        android:onClick="handleIncorrectButtonClicked"
+        />
+
+</RelativeLayout>

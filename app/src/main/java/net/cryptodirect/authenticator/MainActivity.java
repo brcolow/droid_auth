@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -12,16 +11,20 @@ import net.danlew.android.joda.JodaTimeAndroid;
 
 import java.io.File;
 
-public class AuthenticatorActivity extends AppCompatActivity
+public class MainActivity extends AppCompatActivity
 {
     private static final String PREFS_FILE = "PrefsFile";
     private static final String ACCOUNTS_FILE = "AccountsFile";
-    private static final String TAG = AuthenticatorActivity.class.getSimpleName();
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle state)
     {
         super.onCreate(state);
+        if (state != null)
+        {
+            return;
+        }
         JodaTimeAndroid.init(this);
         SharedPreferences settings = getSharedPreferences(PREFS_FILE, 0);
         File file = getBaseContext().getFileStreamPath(ACCOUNTS_FILE);
