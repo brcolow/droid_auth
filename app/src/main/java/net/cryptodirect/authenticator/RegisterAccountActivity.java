@@ -106,13 +106,16 @@ public class RegisterAccountActivity
      */
     public void handleCorrectButtonClicked(View view)
     {
-        // Here we could add a progress indicator that says "Verifying..."
-        // or something else...not sure...maybe we call a method on
-        // the RegisterAccountDataFragment that saves the data to
-        // internal storage, than just go back to the MainActivity, where
-        // it will find an account data, and will spawn that authenticator
-        // for it
-        getFragmentManager().findFragmentByTag("register-account-data");
+        /*
+        if (more than one account)
+        {
+            setContentView(account_chooser_fragment) // should have set default button
+        }
+        else
+        {
+            // start MainActivity
+        }
+         */
     }
 
     /**

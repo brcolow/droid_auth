@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Authenticator</string>
+    <string name="app_name">Cryptodash Authenticator</string>
     <string name="action_settings">Settings</string>
     <string name="authenticator_description">Below is your authentication code, to enter when signing in to Cryptodash:</string>
     <string name="title_activity_register_account">Register Account</string>
@@ -17,4 +17,12 @@
     <string name="manual_entry_blurb">Enter your email address associated with your Cryptodash account and the provided key.</string>
     <string name="okay">Okay</string>
     <string name="email_hint">you@email.com</string>
+    <string name="register_new_account">Register New Account</string>
+
+    <!-- ACRA (Application Crash Reports for Android) related strings -->
+    <string name="crash_toast_text">An error has occurred - please consider reporting this.</string>
+    <string name="crash_dialog_title">Cryptodash Authenticator Error</string>
+    <string name="crash_dialog_text">Sorry, an unexpected error has occurred that we can't recover from. We would greatly
+    appreciate you reporting this error to us so that we can fix it.</string>
+    <string name="crash_dialog_ok_toast">Thank you for reporting the error!</string>
 </resources>

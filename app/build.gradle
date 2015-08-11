@@ -27,6 +27,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.2.1'
     compile 'net.danlew:android.joda:2.8.1'
     compile 'me.dm7.barcodescanner:zxing:1.8.2'
+    compile 'ch.acra:acra:4.6.2'
     testCompile 'junit:junit:4.12'
     testCompile "org.mockito:mockito-core:1.9.5"
 }
