@@ -1,20 +1,27 @@
 package net.cryptodirect.authenticator;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.google.zxing.BarcodeFormat;
 
 public class RegisterAccountActivity
         extends AppCompatActivity
-        implements ScanQRCodeFragment.OnQRCodeScannedListener
+        implements ScanQRCodeFragment.OnQRCodeScannedListener,
+        FragmentManager.OnBackStackChangedListener
 {
+    private volatile boolean currentFragmentIsScanQRCode = false;
     private static final String TAG = RegisterAccountActivity.class.getSimpleName();
 
     @Override
@@ -22,6 +29,7 @@ public class RegisterAccountActivity
     {
         super.onCreate(state);
         setContentView(R.layout.activity_register_account);
+        getFragmentManager().addOnBackStackChangedListener(this);
         if (findViewById(R.id.register_account_fragment_container) != null)
         {
             // However, if we're being restored from a previous state,
@@ -35,8 +43,26 @@ public class RegisterAccountActivity
             FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
             fragmentTransaction.add(R.id.register_account_fragment_container,
                     selectMethodFragment, "select-method")
+                    .addToBackStack("select-method")
                     .commit();
         }
+    }
+    @Override
+    public void onBackStackChanged()
+    {
+        Fragment f = getFragmentManager().findFragmentById(R.id.register_account_fragment_container);
+        currentFragmentIsScanQRCode = f instanceof ScanQRCodeFragment;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu)
+    {
+        if (!currentFragmentIsScanQRCode)
+        {
+            menu.clear();
+        }
+        super.onPrepareOptionsMenu(menu);
+        return true;
     }
 
     @Override
@@ -62,7 +88,7 @@ public class RegisterAccountActivity
         ScanQRCodeFragment scanQRCodeFragment = new ScanQRCodeFragment();
         fragmentTransaction.add(R.id.register_account_fragment_container,
                 scanQRCodeFragment, "qr-code")
-                .addToBackStack("select-to-qr")
+                .addToBackStack("qr-code")
                 .commit();
     }
 
@@ -76,7 +102,7 @@ public class RegisterAccountActivity
         ManualEntryFragment manualEntryFragment = new ManualEntryFragment();
         fragmentTransaction.add(R.id.register_account_fragment_container,
                 manualEntryFragment, "manual-entry")
-                .addToBackStack("select-to-manual")
+                .addToBackStack("manual-entry")
                 .commit();
     }
 
@@ -91,7 +117,15 @@ public class RegisterAccountActivity
         {
             throw new IllegalArgumentException("decoded QR code was not formatted correctly");
         }
-
+        try
+        {
+            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+            r.play();
+        }
+        catch (Exception e)
+        {
+        }
         Bundle bundle = new Bundle();
         bundle.putString("decoded_email", scannedCode.split("\\|")[0]);
         bundle.putString("decoded_key", scannedCode.split("\\|")[1]);
@@ -100,7 +134,7 @@ public class RegisterAccountActivity
         registerAccountDataFragment.setArguments(bundle);
         fragmentTransaction.add(R.id.register_account_fragment_container,
                 registerAccountDataFragment, "register-account-data")
-                .addToBackStack("select-to-manual")
+                .addToBackStack("register-account-data")
                 .commit();
     }
 
@@ -110,7 +144,6 @@ public class RegisterAccountActivity
      */
     public void handleCorrectButtonClicked(View view)
     {
-        Log.i(TAG, "Correct button clicked, starting MainActivity");
         EditText emailField = (EditText) findViewById(R.id.email_field);
         EditText keyTextField = (EditText) findViewById(R.id.key_text_field);
         if (emailField == null || keyTextField == null)
@@ -118,8 +151,6 @@ public class RegisterAccountActivity
             throw new IllegalStateException("email EditText or key EditText controls were null: ["
                     + emailField + ", " + keyTextField + "]");
         }
-        Log.i(TAG, "Got email field, contents: " + emailField.getText());
-        Log.i(TAG, "Got key field, contents: " + keyTextField.getText());
         AccountManager.getInstance().registerAccount(new Account(emailField.getText().toString(), keyTextField.getText().toString()), true);
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
@@ -132,10 +163,14 @@ public class RegisterAccountActivity
     public void handleIncorrectButtonClicked(View view)
     {
         // information was incorrect, so go back to select method fragment
+
+        getFragmentManager().popBackStack("select-method", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        SelectRegisterMethodFragment selectMethodFragment = new SelectRegisterMethodFragment();
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.register_account_fragment_container,
-                getFragmentManager().findFragmentByTag("select-method"))
-                .addToBackStack("incorrect-to-select")
+                selectMethodFragment, "select-method")
+                .addToBackStack("select-method")
                 .commit();
+
     }
 }

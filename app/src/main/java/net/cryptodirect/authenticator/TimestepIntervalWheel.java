@@ -4,20 +4,19 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
 import android.graphics.RectF;
-import android.util.Log;
 import android.view.View;
 
 /**
- * <p>A visual indication of how many seconds are left in the
+ * A visual indication of how many seconds are left in the
  * current timestep. For example, say the timestep is 30 seconds,
  * the initial epoch is the Unix epoch, and it is now 1438928300.
- * Then the circle will display:</p>
- * <br /><br />
+ * Then the circle will display:
+ * <p/>
  * 1438928300 / 30 = 47964276.7
  * Take fractional part: 0.7
  * 30 * 0.7 = 21
+ * <p/>
  * 21 seconds have elapsed in the current timestep interval, thus:
  * 30 - 21 = 9 seconds remain, so the TimestepIntervalWheel will be filled
  * (degree-wise) for 21/30ths of its diameter.
@@ -36,8 +35,6 @@ public class TimestepIntervalWheel extends View
     private int intervalInSeconds;
     private int secondsRemainingInInterval;
     private RectF enclosingSquare;
-    private int viewWidth;
-    private int viewHeight;
     private static final String TAG = TimestepIntervalWheel.class.getSimpleName();
 
     public TimestepIntervalWheel(Context context, int intervalInSeconds, int secondsRemainingInInterval)
@@ -75,8 +72,6 @@ public class TimestepIntervalWheel extends View
     {
         super.onSizeChanged(width, height, oldWidth, oldHeight);
 
-        viewWidth = width;
-        viewHeight = height;
         enclosingSquare = new RectF(
                 (Math.max(trackWidth, fillWidth) / 2) + (width / 2) - trackRadius / 2,
                 (Math.max(trackWidth, fillWidth) / 2) + (height / 2) - trackRadius / 2,
@@ -90,12 +85,9 @@ public class TimestepIntervalWheel extends View
     protected void onDraw(Canvas canvas)
     {
         super.onDraw(canvas);
-        Log.i(TAG, "Inside onDraw, secondsRemaining: " + secondsRemainingInInterval + " interval size: " + intervalInSeconds);
         canvas.drawArc(enclosingSquare, 0, 360, false, trackPaint);
         double chunkToRemovePercentage = 1d - ((double) secondsRemainingInInterval / (double) intervalInSeconds);
-        Log.i(TAG, "Chunk to remove percentage: " + chunkToRemovePercentage);
         int chunkToRemoveInDegrees = (int) (360d * chunkToRemovePercentage);
-        Log.i(TAG, "Drawing fill arc from angle: " + chunkToRemoveInDegrees + " to angle: " + 360);
         canvas.drawArc(enclosingSquare, 270, -360 + chunkToRemoveInDegrees, false, fillPaint);
         int textYPos = (int) ((canvas.getHeight() / 2) - ((numberPaint.descent() + numberPaint.ascent()) / 2)) ;
 

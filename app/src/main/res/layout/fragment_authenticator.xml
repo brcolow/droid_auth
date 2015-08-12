@@ -12,8 +12,8 @@
 
     <me.grantland.widget.AutofitTextView
         android:id="@+id/authenticator_blurb"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="@string/authenticator_description"
         android:textColor="#f5f5f5"
@@ -53,7 +53,6 @@
         android:maxLines="1"
         android:singleLine="true"
         android:text="123456"
-        android:textAlignment="center"
         android:textColor="#fafafa"
         android:textSize="34sp"
         android:textStyle="bold"

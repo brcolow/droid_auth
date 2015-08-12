@@ -36,13 +36,15 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            AccountManager.getInstance().initAccountManager();
+            AccountManager.getInstance().init();
         }
         catch (IOException | JSONException e)
         {
             ACRA.getErrorReporter().handleException(e);
             throw new RuntimeException(e);
         }
+
+        FontManager.getInstance().init(getApplicationContext());
 
         SharedPreferences settings = getSharedPreferences(PREFS_FILE, 0);
         if (settings.contains("default_account"))
@@ -143,7 +145,7 @@ public class MainActivity extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId())
         {
-            case R.id.register_account_fragment_container:
+            case R.id.action_register_new_account:
                 goToRegisterAccountActivity();
                 return true;
             default:

@@ -5,26 +5,22 @@ import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Allows the user to select either the Scan QR Code or
+ * Manual Entry methods of registering an account.
  */
 public class SelectRegisterMethodFragment extends Fragment
 {
 
     public SelectRegisterMethodFragment()
     {
-        // Required empty public constructor
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState)
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle state)
     {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_select_register_method, container, false);
-        return view;
+        return inflater.inflate(R.layout.fragment_select_register_method, container, false);
     }
 
 }

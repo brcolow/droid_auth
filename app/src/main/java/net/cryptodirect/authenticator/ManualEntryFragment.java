@@ -1,6 +1,5 @@
 package net.cryptodirect.authenticator;
 
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
@@ -9,12 +8,14 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Allows to the user to register an account by manually
+ * entering their email and key. Users would probably only
+ * use this if they are uncomfortable with QR codes (which
+ * should be alleviated by proper documentation) or if
+ * they have a broken camera.
  */
 public class ManualEntryFragment extends Fragment
 {
-    private static final String KEY_FONT_PATH = "fonts/Anonymous_Pro.ttf";
-
     public ManualEntryFragment()
     {
         // Required empty public constructor
@@ -25,14 +26,13 @@ public class ManualEntryFragment extends Fragment
     {
         View view = inflater.inflate(R.layout.fragment_manual_entry, container, false);
 
-        Typeface anonymousProTypeface = Typeface.createFromAsset(getActivity().getAssets(), KEY_FONT_PATH);
 
         TextView emailField = (TextView) view.findViewById(R.id.email_field);
         // we set the email field to anonymous pro for consistency with key text field
-        emailField.setTypeface(anonymousProTypeface);
+        emailField.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
 
         TextView keyTextField = (TextView) view.findViewById(R.id.key_text_field);
-        keyTextField.setTypeface(anonymousProTypeface);
+        keyTextField.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
 
         return view;
     }

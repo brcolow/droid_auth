@@ -12,7 +12,6 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -27,14 +26,19 @@ public class AccountManager
     private final Map<String, Account> accounts = new ConcurrentHashMap<>();
     private static FileOutputStream accountsFileOutputStream;
     private static FileInputStream accountsFileInputStream;
-    private AccountManager() {}
+    private static final String TAG = AccountManager.class.getSimpleName();
+
+    private AccountManager()
+    {
+
+    }
 
     public static AccountManager getInstance()
     {
         return INSTANCE;
     }
 
-    public void initAccountManager() throws IOException, JSONException
+    public synchronized void init() throws IOException, JSONException
     {
         File file = MainActivity.BASE_CONTEXT.getFileStreamPath(ACCOUNTS_FILE);
 
@@ -66,6 +70,7 @@ public class AccountManager
             Account account = new Account(
                     accountJsonObject.getString("email"),
                     accountJsonObject.getString("key"));
+
             accounts.put(accountJsonObject.getString("email"), account);
         }
     }

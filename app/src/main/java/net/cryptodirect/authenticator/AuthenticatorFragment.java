@@ -14,8 +14,8 @@ import android.widget.TextView;
 import net.cryptodirect.authenticator.crypto.TOTP;
 
 /**
- * The authenticator widget which displays the current TOTP password
- * and how long it is valid for, which is indicated by a circular time
+ * The authenticator widget which displays the current TOTP code
+ * and how much remaining time it is valid for indicated by a circular time
  * wheel {@code TimestepIntervalWheel}.
  */
 public class AuthenticatorFragment extends Fragment
@@ -54,6 +54,7 @@ public class AuthenticatorFragment extends Fragment
             ts = 30;
         }
 
+        Log.i(TAG, "Setting email label to: " + email);
         ((TextView) rootView.findViewById(R.id.email_label)).setText(email);
 
         // Set up TimestepIntervalWheel with current time

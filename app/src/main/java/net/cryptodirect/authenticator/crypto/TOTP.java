@@ -13,8 +13,6 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class TOTP
 {
-    //private static final DateTime UNIX_EPOCH = new DateTime(0);
-
     private static final int[] DIGITS_POWER
             = { 1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000 };
 

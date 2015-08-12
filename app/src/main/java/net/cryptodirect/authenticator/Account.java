@@ -1,7 +1,8 @@
 package net.cryptodirect.authenticator;
 
 /**
- * Created by brcolow on 8/9/2015.
+ * Represents a registered Cryptodash account, consisting of
+ * an email and secret key bytes to generate the TOTP codes.
  */
 public class Account
 {
