@@ -18,8 +18,7 @@
         </activity>
         <activity
             android:name=".RegisterAccountActivity"
-            android:label="@string/title_activity_register_account"
-            android:parentActivityName=".MainActivity">
+            android:label="@string/title_activity_register_account">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.cryptodirect.authenticator.MainActivity" />

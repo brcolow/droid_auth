@@ -125,8 +125,7 @@ public class ScanQRCodeFragment extends Fragment implements ZXingScannerView.Res
     @Override
     public void handleResult(Result rawResult)
     {
-        Toast.makeText(getActivity(), "Contents = " + rawResult.getText() +
-                ", Format = " + rawResult.getBarcodeFormat().toString(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), "Got QR code for email: " + rawResult.getText().split("\\|")[0], Toast.LENGTH_SHORT).show();
         listener.onQRCodeScanned(rawResult.getBarcodeFormat(), rawResult.getText());
     }
 

@@ -1,9 +1,13 @@
 package net.cryptodirect.authenticator;
 
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.google.zxing.BarcodeFormat;
 
@@ -56,7 +60,7 @@ public class RegisterAccountActivity
     {
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         ScanQRCodeFragment scanQRCodeFragment = new ScanQRCodeFragment();
-        fragmentTransaction.replace(R.id.register_account_fragment_container,
+        fragmentTransaction.add(R.id.register_account_fragment_container,
                 scanQRCodeFragment, "qr-code")
                 .addToBackStack("select-to-qr")
                 .commit();
@@ -70,7 +74,7 @@ public class RegisterAccountActivity
     {
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         ManualEntryFragment manualEntryFragment = new ManualEntryFragment();
-        fragmentTransaction.replace(R.id.register_account_fragment_container,
+        fragmentTransaction.add(R.id.register_account_fragment_container,
                 manualEntryFragment, "manual-entry")
                 .addToBackStack("select-to-manual")
                 .commit();
@@ -94,7 +98,7 @@ public class RegisterAccountActivity
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         RegisterAccountDataFragment registerAccountDataFragment = new RegisterAccountDataFragment();
         registerAccountDataFragment.setArguments(bundle);
-        fragmentTransaction.replace(R.id.register_account_fragment_container,
+        fragmentTransaction.add(R.id.register_account_fragment_container,
                 registerAccountDataFragment, "register-account-data")
                 .addToBackStack("select-to-manual")
                 .commit();
@@ -106,16 +110,19 @@ public class RegisterAccountActivity
      */
     public void handleCorrectButtonClicked(View view)
     {
-        /*
-        if (more than one account)
+        Log.i(TAG, "Correct button clicked, starting MainActivity");
+        EditText emailField = (EditText) findViewById(R.id.email_field);
+        EditText keyTextField = (EditText) findViewById(R.id.key_text_field);
+        if (emailField == null || keyTextField == null)
         {
-            setContentView(account_chooser_fragment) // should have set default button
+            throw new IllegalStateException("email EditText or key EditText controls were null: ["
+                    + emailField + ", " + keyTextField + "]");
         }
-        else
-        {
-            // start MainActivity
-        }
-         */
+        Log.i(TAG, "Got email field, contents: " + emailField.getText());
+        Log.i(TAG, "Got key field, contents: " + keyTextField.getText());
+        AccountManager.getInstance().registerAccount(new Account(emailField.getText().toString(), keyTextField.getText().toString()), true);
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 
     /**
@@ -126,7 +133,7 @@ public class RegisterAccountActivity
     {
         // information was incorrect, so go back to select method fragment
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.register_account_fragment_container,
+        fragmentTransaction.add(R.id.register_account_fragment_container,
                 getFragmentManager().findFragmentByTag("select-method"))
                 .addToBackStack("incorrect-to-select")
                 .commit();

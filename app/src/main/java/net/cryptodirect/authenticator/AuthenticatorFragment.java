@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import net.cryptodirect.authenticator.crypto.TOTP;
 
@@ -53,6 +54,8 @@ public class AuthenticatorFragment extends Fragment
             ts = 30;
         }
 
+        ((TextView) rootView.findViewById(R.id.email_label)).setText(email);
+
         // Set up TimestepIntervalWheel with current time
         double tc = TOTP.getTC(ts);
         // how far along we are percentage-wise of the cyclical range [0, TS], e.g. 0.25
@@ -90,7 +93,7 @@ public class AuthenticatorFragment extends Fragment
             {
                 // Update token display as we just entered new cycle
                 ((EditText) rootView.findViewById(R.id.code_box)).setText(TOTP.generateTOTPSha1(
-                                key.getBytes(StandardCharsets.US_ASCII), TOTP.getTC(ts), NUM_DIGITS));
+                        key.getBytes(StandardCharsets.US_ASCII), TOTP.getTC(ts), NUM_DIGITS));
             }
             handler.postDelayed(this, 1000);
         }

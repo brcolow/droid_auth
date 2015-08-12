@@ -22,7 +22,7 @@
     <!-- ACRA (Application Crash Reports for Android) related strings -->
     <string name="crash_toast_text">An error has occurred - please consider reporting this.</string>
     <string name="crash_dialog_title">Cryptodash Authenticator Error</string>
-    <string name="crash_dialog_text">Sorry, an unexpected error has occurred that we can't recover from. We would greatly
+    <string name="crash_dialog_text">Sorry, an unexpected error has occurred that we can\'t recover from. We would greatly
     appreciate you reporting this error to us so that we can fix it.</string>
     <string name="crash_dialog_ok_toast">Thank you for reporting the error!</string>
 </resources>

@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity
         catch (IOException | JSONException e)
         {
             ACRA.getErrorReporter().handleException(e);
+            throw new RuntimeException(e);
         }
 
         SharedPreferences settings = getSharedPreferences(PREFS_FILE, 0);
@@ -62,30 +64,30 @@ public class MainActivity extends AppCompatActivity
                         "Sorry about that - please register the account again.");
                 alertBuilder.setCancelable(true);
                 alertBuilder.setPositiveButton("Register Account",
-                        new DialogInterface.OnClickListener()
+                    new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int id)
                         {
-                            public void onClick(DialogInterface dialog, int id)
-                            {
-                                goToRegisterAccountActivity();
-                            }
-                        });
+                            goToRegisterAccountActivity();
+                        }
+                    });
                 alertBuilder.setNegativeButton("Not Now",
-                        new DialogInterface.OnClickListener()
+                    new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int id)
                         {
-                            public void onClick(DialogInterface dialog, int id)
-                            {
-                                dialog.cancel();
-                            }
-                        });
-
+                            dialog.cancel();
+                        }
+                    });
                 AlertDialog alertDialog = alertBuilder.create();
                 alertDialog.show();
             }
         }
         else
         {
+            Log.i(TAG, "There was no default account setting, so going by number of accounts");
+            Log.i(TAG, "Number of accounts: " + AccountManager.getInstance().getNumAccounts());
             // there is no default account setting
-            // FIXME reverse this condition when we get it working
             if (AccountManager.getInstance().getNumAccounts() > 0)
             {
                 // we have data for at least one account

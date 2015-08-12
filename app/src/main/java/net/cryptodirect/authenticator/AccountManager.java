@@ -1,8 +1,10 @@
 package net.cryptodirect.authenticator;
 
 import android.content.Context;
+import android.util.JsonWriter;
 import android.util.Log;
 
+import org.acra.ACRA;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -10,6 +12,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -22,6 +25,8 @@ public class AccountManager
     private static final AccountManager INSTANCE = new AccountManager();
     private static final String ACCOUNTS_FILE = "accounts.json";
     private final Map<String, Account> accounts = new ConcurrentHashMap<>();
+    private static FileOutputStream accountsFileOutputStream;
+    private static FileInputStream accountsFileInputStream;
     private AccountManager() {}
 
     public static AccountManager getInstance()
@@ -32,19 +37,19 @@ public class AccountManager
     public void initAccountManager() throws IOException, JSONException
     {
         File file = MainActivity.BASE_CONTEXT.getFileStreamPath(ACCOUNTS_FILE);
-        JSONObject accountsJsonObject;
 
-        if (!file.exists())
+        if (file.length() == 0)
         {
             // create accounts.json skeleton
-            FileOutputStream fos = MainActivity.BASE_CONTEXT.openFileOutput(ACCOUNTS_FILE, Context.MODE_PRIVATE);
-            OutputStreamWriter osw = new OutputStreamWriter(fos);
+            accountsFileOutputStream = MainActivity.BASE_CONTEXT.openFileOutput(ACCOUNTS_FILE, Context.MODE_PRIVATE);
+            OutputStreamWriter osw = new OutputStreamWriter(accountsFileOutputStream);
             String jsonSkeleton = "{ \"accounts\" : [] }";
             osw.write(jsonSkeleton);
+            osw.flush();
         }
 
-        FileInputStream fis = MainActivity.BASE_CONTEXT.openFileInput(ACCOUNTS_FILE);
-        InputStreamReader isr = new InputStreamReader(fis);
+        accountsFileInputStream = MainActivity.BASE_CONTEXT.openFileInput(ACCOUNTS_FILE);
+        InputStreamReader isr = new InputStreamReader(accountsFileInputStream);
         BufferedReader bufferedReader = new BufferedReader(isr);
         StringBuilder sb = new StringBuilder();
         String line;
@@ -53,7 +58,7 @@ public class AccountManager
             sb.append(line);
         }
 
-        accountsJsonObject = new JSONObject(sb.toString());
+        JSONObject accountsJsonObject = new JSONObject(sb.toString());
         JSONArray accountsJsonArray = accountsJsonObject.getJSONArray("accounts");
         for (int i = 0; i < accountsJsonArray.length(); i++)
         {
@@ -83,5 +88,54 @@ public class AccountManager
     public int getNumAccounts()
     {
         return accounts.size();
+    }
+
+    public boolean registerAccount(Account account, boolean overwriteExisting)
+    {
+        if (accounts.containsKey(account.getEmail()) && !overwriteExisting)
+        {
+            return false;
+        }
+        try
+        {
+            accounts.put(account.getEmail(), account);
+            if (accountsFileOutputStream == null)
+            {
+                accountsFileOutputStream = MainActivity.BASE_CONTEXT.openFileOutput(ACCOUNTS_FILE, Context.MODE_PRIVATE);
+            }
+            OutputStreamWriter osw = new OutputStreamWriter(accountsFileOutputStream, StandardCharsets.UTF_8);
+            JsonWriter jsonWriter = new JsonWriter(osw);
+            jsonWriter.beginObject();
+            jsonWriter.name("accounts");
+            writeAccountsArray(jsonWriter);
+            jsonWriter.endObject();
+            osw.flush();
+            jsonWriter.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+            ACRA.getErrorReporter().handleException(e);
+        }
+
+        return true;
+    }
+
+    private void writeAccountsArray(JsonWriter writer) throws IOException
+    {
+        writer.beginArray();
+        for (Account account : accounts.values())
+        {
+            writeAccount(writer, account);
+        }
+        writer.endArray();
+    }
+
+    private void writeAccount(JsonWriter writer, Account account) throws IOException
+    {
+        writer.beginObject();
+        writer.name("email").value(account.getEmail());
+        writer.name("key").value(account.getSecretKey());
+        writer.endObject();
     }
 }
