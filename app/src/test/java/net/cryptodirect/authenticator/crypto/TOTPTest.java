@@ -1,8 +1,9 @@
 package net.cryptodirect.authenticator.crypto;
 
+import net.cryptodirect.authenticator.StandardCharsets;
+
 import static org.junit.Assert.*;
 import org.junit.Test;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Based on test vectors provided in Table 1: TOTP Table of RFC 6238.

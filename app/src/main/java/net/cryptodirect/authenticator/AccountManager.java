@@ -2,7 +2,6 @@ package net.cryptodirect.authenticator;
 
 import android.content.Context;
 import android.util.JsonWriter;
-import android.util.Log;
 
 import org.acra.ACRA;
 import org.json.JSONArray;
@@ -139,8 +138,10 @@ public class AccountManager
     private void writeAccount(JsonWriter writer, Account account) throws IOException
     {
         writer.beginObject();
-        writer.name("email").value(account.getEmail());
-        writer.name("key").value(account.getSecretKey());
+        writer.name("email");
+        writer.value(account.getEmail());
+        writer.name("key");
+        writer.value(account.getSecretKey());
         writer.endObject();
     }
 }

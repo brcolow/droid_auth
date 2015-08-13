@@ -23,16 +23,15 @@ import android.view.View;
  */
 public class TimestepIntervalWheel extends View
 {
-    private int trackWidth = 3;
-    private int fillWidth = 12;
-    private int trackRadius = 320;
-    private int trackColor = Color.rgb(206, 208, 208);
-    private int fillColor = Color.rgb(25, 90, 114);
-    private int numberColor = Color.rgb(206, 208, 208);
+    private final int trackWidth = 3;
+    private final int fillWidth = 12;
+    private final int trackColor = Color.rgb(206, 208, 208);
+    private final int fillColor = Color.rgb(25, 90, 114);
+    private final int numberColor = Color.rgb(206, 208, 208);
     private Paint trackPaint;
     private Paint fillPaint;
     private Paint numberPaint;
-    private int intervalInSeconds;
+    private final int intervalInSeconds;
     private int secondsRemainingInInterval;
     private RectF enclosingSquare;
     private static final String TAG = TimestepIntervalWheel.class.getSimpleName();
@@ -72,6 +71,7 @@ public class TimestepIntervalWheel extends View
     {
         super.onSizeChanged(width, height, oldWidth, oldHeight);
 
+        int trackRadius = 320;
         enclosingSquare = new RectF(
                 (Math.max(trackWidth, fillWidth) / 2) + (width / 2) - trackRadius / 2,
                 (Math.max(trackWidth, fillWidth) / 2) + (height / 2) - trackRadius / 2,

@@ -18,9 +18,9 @@
         android:text="@string/authenticator_description"
         android:textColor="#f5f5f5"
         android:textSize="24sp"
-        android:gravity="left"
+        android:gravity="start"
         android:maxLines="2"
-        autofit:minTextSize="10sp"/>
+        autofit:minTextSize="18sp"/>
 
     <TextView
         android:id="@+id/email_label"
@@ -32,7 +32,6 @@
         android:layout_marginLeft="21dp"
         android:layout_marginStart="21dp"
         android:layout_marginTop="36dp"
-        android:text="myemail@test.com"
         android:textColor="#eeeeee"
         android:textSize="18sp"/>
 
@@ -44,15 +43,13 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="21dp"
         android:background="#424242"
-        android:editable="false"
+        android:inputType="none"
         android:ems="4"
         android:focusable="false"
         android:gravity="center_vertical|center_horizontal"
-        android:inputType="number"
         android:letterSpacing="0.1"
         android:maxLines="1"
         android:singleLine="true"
-        android:text="123456"
         android:textColor="#fafafa"
         android:textSize="34sp"
         android:textStyle="bold"

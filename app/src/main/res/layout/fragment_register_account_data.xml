@@ -13,7 +13,7 @@
         android:layout_alignParentLeft="false"
         android:layout_alignParentStart="false"
         android:textColor="#f2f2f2"
-        android:textSize="18dp"
+        android:textSize="18sp"
         android:id="@+id/verify_information_textview"
         android:layout_marginTop="20dp"
         android:layout_marginLeft="20dp"
@@ -48,10 +48,10 @@
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:ems="16"
-        android:text="myemail@gmail.com"
         android:paddingTop="2dp"
         android:paddingBottom="2dp"
-        android:layout_marginRight="40dp"/>
+        android:layout_marginRight="40dp"
+        android:layout_marginEnd="40dp"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -75,7 +75,6 @@
         android:maxWidth="320dp"
         android:textColor="#212121"
         android:textSize="20sp"
-        android:text="@string/sample_key"
         android:elegantTextHeight="true"
         android:typeface="monospace"
         android:paddingTop="2dp"

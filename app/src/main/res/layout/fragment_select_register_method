@@ -22,10 +22,10 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:textColor="#f2f2f2"
-        android:textSize="20sp"
+        android:textSize="32sp"
         android:gravity="left"
         android:maxLines="4"
-        autofit:minTextSize="10sp"/>
+        autofit:minTextSize="18sp"/>
 
     <Button
         android:layout_width="wrap_content"
@@ -34,9 +34,15 @@
         android:id="@+id/scan_qr_code_button"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="200dp"
-        android:gravity="center_vertical"
-        android:onClick="handleScanQRCodeClicked"/>
+        android:layout_marginTop="175dp"
+        android:gravity="center_vertical|center_horizontal"
+        android:onClick="handleScanQRCodeClicked"
+        android:clickable="true"
+        android:enabled="true"
+        android:height="65dp"
+        android:width="150dp"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
 
     <Button
         android:layout_width="wrap_content"
@@ -47,6 +53,12 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="75dp"
         android:gravity="center_vertical|center_horizontal"
-        android:onClick="handleManualEntryClicked"/>
+        android:onClick="handleManualEntryClicked"
+        android:clickable="true"
+        android:enabled="true"
+        android:height="65dp"
+        android:width="150dp"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
 
 </RelativeLayout>

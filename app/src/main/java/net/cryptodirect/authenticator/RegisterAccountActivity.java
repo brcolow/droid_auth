@@ -9,7 +9,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
@@ -117,15 +116,7 @@ public class RegisterAccountActivity
         {
             throw new IllegalArgumentException("decoded QR code was not formatted correctly");
         }
-        try
-        {
-            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
-            r.play();
-        }
-        catch (Exception e)
-        {
-        }
+
         Bundle bundle = new Bundle();
         bundle.putString("decoded_email", scannedCode.split("\\|")[0]);
         bundle.putString("decoded_key", scannedCode.split("\\|")[1]);

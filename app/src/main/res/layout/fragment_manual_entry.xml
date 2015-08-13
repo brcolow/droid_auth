@@ -1,11 +1,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             tools:context="net.cryptodirect.authenticator.ManualEntryFragment"
+                xmlns:tools="http://schemas.android.com/tools"
+                xmlns:autofit="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="net.cryptodirect.authenticator.ManualEntryFragment"
                 android:background="#212121">
 
-    <TextView
+    <me.grantland.widget.AutofitTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/manual_entry_blurb"
@@ -17,8 +18,12 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="18dp"
         android:textColor="#f2f2f2"
-        android:textSize="18dp"
+        android:textSize="20sp"
+        android:gravity="start"
+        android:maxLines="2"
+        autofit:minTextSize="14sp"
         android:layout_marginRight="32dp"
+        android:layout_marginEnd="32dp"
         android:layout_marginBottom="20dp"/>
 
     <EditText
@@ -28,10 +33,9 @@
         android:ems="16"
         android:id="@+id/email_field"
         android:textColor="#212121"
-        android:editable="true"
         android:enabled="true"
         android:background="#f4f4f4"
-        android:textSize="20dp"
+        android:textSize="20sp"
         android:hint="@string/email_hint"
         android:paddingTop="2dp"
         android:paddingBottom="2dp"
@@ -51,7 +55,7 @@
         android:text="@string/email"
         android:id="@+id/email_label"
         android:textColor="#f2f2f2"
-        android:textSize="20dp"
+        android:textSize="20sp"
         android:layout_below="@+id/textView2"
         android:layout_alignLeft="@+id/textView2"
         android:layout_alignStart="@+id/textView2"/>
@@ -75,7 +79,7 @@
         android:hint="@string/sample_key"
         android:elegantTextHeight="true"
         android:inputType="textUri|textMultiLine"
-        android:gravity="top|left|start"
+        android:gravity="top|start"
         android:layout_marginTop="33dp"
         android:layout_below="@+id/key_label"
         android:layout_alignLeft="@+id/key_label"
@@ -89,8 +93,8 @@
         android:text="@string/key"
         android:id="@+id/key_label"
         android:textColor="#f2f2f2"
-        android:textSize="20dp"
-        android:layout_marginTop="29dp"
+        android:textSize="20sp"
+        android:layout_marginTop="30dp"
         android:layout_below="@+id/email_field"
         android:layout_alignLeft="@+id/email_field"
         android:layout_alignStart="@+id/email_field"/>
