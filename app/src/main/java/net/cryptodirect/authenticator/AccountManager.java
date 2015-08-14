@@ -150,7 +150,7 @@ public class AccountManager
      * Allows to easily use the account data in a ListPreference, by returning
      * the pair of entries, and entry values.
      */
-    public CharSequence[] getListPreferenceValues()
+    public CharSequence[] getAccountEmails()
     {
         return accounts.keySet().toArray(new CharSequence[accounts.size()]);
     }

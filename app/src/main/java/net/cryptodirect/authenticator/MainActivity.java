@@ -18,7 +18,7 @@ import org.json.JSONException;
 
 import java.io.IOException;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends AppCompatActivity implements AccountChooserFragment.OnAccountChosenListener
 {
     public static Context BASE_CONTEXT;
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -186,5 +186,11 @@ public class MainActivity extends AppCompatActivity
     {
         Intent intent = new Intent(this, RegisterAccountActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void onAccountChosen(String chosenAccount)
+    {
+        addAuthenticatorFragment(chosenAccount, 30);
     }
 }
