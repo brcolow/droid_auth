@@ -43,12 +43,11 @@ public class SoundPoolManager
         }
 
         sounds.put("SCAN", soundPool.load(context, R.raw.scan, 1));
-        sounds.put("TICKTOCK", soundPool.load(context, R.raw.ticktock, 1));
+        //sounds.put("TICKTOCK", soundPool.load(context, R.raw.ticktock, 1));
     }
 
     public void playSound(String sound, boolean loop)
     {
-        Log.w(TAG, "PLAYING SOUND: " + sound + " LOOPING: " + loop);
         if (sounds.containsKey(sound.toUpperCase()))
         {
             playingSounds.put(sound, soundPool.play(sounds.get(sound.toUpperCase()), 1.0f, 1.0f, 1, (loop ? -1 : 0), 1.0f));
@@ -57,7 +56,6 @@ public class SoundPoolManager
 
     public void stopSound(String sound)
     {
-        Log.w(TAG, "STOPPING SOUND: " + sound);
         if (playingSounds.containsKey(sound.toUpperCase()))
         {
             soundPool.stop(playingSounds.get(sound.toUpperCase()));
