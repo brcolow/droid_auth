@@ -30,7 +30,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SCAN QR CODE"
+        android:text="@string/button.method.qrcode"
         android:id="@+id/scan_qr_code_button"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
@@ -41,13 +41,12 @@
         android:enabled="true"
         android:height="65dp"
         android:width="150dp"
-        android:textSize="16sp"
-        android:textStyle="bold"/>
+        android:textSize="16sp"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="MANUAL ENTRY"
+        android:text="@string/button.method.manual"
         android:id="@+id/manual_entry_button"
         android:layout_below="@+id/scan_qr_code_button"
         android:layout_centerHorizontal="true"
@@ -58,7 +57,6 @@
         android:enabled="true"
         android:height="65dp"
         android:width="150dp"
-        android:textSize="16sp"
-        android:textStyle="bold"/>
+        android:textSize="16sp"/>
 
 </RelativeLayout>

@@ -2,7 +2,6 @@ package net.cryptodirect.authenticator;
 
 import android.content.Context;
 import android.util.JsonWriter;
-import android.util.Pair;
 
 import org.acra.ACRA;
 import org.json.JSONArray;

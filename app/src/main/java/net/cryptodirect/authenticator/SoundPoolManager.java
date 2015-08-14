@@ -1,12 +1,9 @@
 package net.cryptodirect.authenticator;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Build;
-import android.util.Log;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,17 +22,11 @@ public class SoundPoolManager
     }
 
     @SuppressWarnings("deprecation")
-    @SuppressLint("NewApi")
     public synchronized void init(Context context)
     {
-        int currentApiVersion = android.os.Build.VERSION.SDK_INT;
-
-        if (currentApiVersion >= Build.VERSION_CODES.LOLLIPOP)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
         {
-            SoundPool.Builder builder = new SoundPool.Builder();
-            builder.setMaxStreams(4);
-            builder.setAudioAttributes(new AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).setUsage(AudioAttributes.USAGE_NOTIFICATION_COMMUNICATION_INSTANT).build());
-            soundPool = builder.build();
+            soundPool = SoundApiLevel21.initApiLevel21SoundPool();
         }
         else
         {

@@ -18,6 +18,8 @@
     <string name="okay">Okay</string>
     <string name="email_hint">you@email.com</string>
     <string name="register_new_account">Register New Account</string>
+    <string name="button.method.qrcode">Scan QR Code</string>
+    <string name="button.method.manual">Manual Entry</string>
 
     <!-- Settings related strings -->
     <string name="general_cat">General</string>

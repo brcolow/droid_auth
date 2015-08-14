@@ -2,7 +2,6 @@ package net.cryptodirect.authenticator;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.util.Log;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
