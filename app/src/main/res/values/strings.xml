@@ -19,6 +19,20 @@
     <string name="email_hint">you@email.com</string>
     <string name="register_new_account">Register New Account</string>
 
+    <!-- Settings related strings -->
+    <string name="general_cat">General</string>
+    <string name="skip_choose">Skip choosing account</string>
+    <string name="skip_choose_summ">When the default account is specified</string>
+    <string name="default_account">Default account</string>
+    <string name="default_account_summ">Go directly to this account\'s authenticator</string>
+    <string name="sound_effects_cat">Sound Effects</string>
+    <string name="play_scan_sound">Play scan sound effect</string>
+    <string name="play_scan_sound_summ">When a QR code is successfully scanned</string>
+    <string name="play_time_running_out_sound">Play clock-ticking sound</string>
+    <string name="play_time_running_out_sound_summ">When time is running out in current cycle</string>
+    <string name="time_running_out_start">Start clock-ticking sound</string>
+    <string name="time_running_out_start_summ">When X seconds remain in the current time cycle</string>
+d
     <!-- ACRA (Application Crash Reports for Android) related strings -->
     <string name="crash_toast_text">An error has occurred - please consider reporting this.</string>
     <string name="crash_dialog_title">Cryptodash Authenticator Error</string>

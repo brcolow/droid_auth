@@ -30,7 +30,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Scan QR Code"
+        android:text="SCAN QR CODE"
         android:id="@+id/scan_qr_code_button"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
@@ -47,7 +47,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Manual Entry"
+        android:text="MANUAL ENTRY"
         android:id="@+id/manual_entry_button"
         android:layout_below="@+id/scan_qr_code_button"
         android:layout_centerHorizontal="true"

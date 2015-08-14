@@ -136,4 +136,9 @@ public class TimestepIntervalWheel extends View
         postInvalidate();
         return newCycle;
     }
+
+    public int getSecondsRemainingInInterval()
+    {
+        return secondsRemainingInInterval;
+    }
 }

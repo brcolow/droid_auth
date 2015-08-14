@@ -2,6 +2,7 @@ package net.cryptodirect.authenticator;
 
 import android.content.Context;
 import android.util.JsonWriter;
+import android.util.Pair;
 
 import org.acra.ACRA;
 import org.json.JSONArray;
@@ -143,5 +144,14 @@ public class AccountManager
         writer.name("key");
         writer.value(account.getSecretKey());
         writer.endObject();
+    }
+
+    /**
+     * Allows to easily use the account data in a ListPreference, by returning
+     * the pair of entries, and entry values.
+     */
+    public CharSequence[] getListPreferenceValues()
+    {
+        return accounts.keySet().toArray(new CharSequence[accounts.size()]);
     }
 }

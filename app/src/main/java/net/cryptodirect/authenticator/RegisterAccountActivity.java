@@ -4,9 +4,6 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -49,6 +46,7 @@ public class RegisterAccountActivity
     @Override
     public void onBackStackChanged()
     {
+        // this is probably wrong but it works - most likely for the wrong reasons
         Fragment f = getFragmentManager().findFragmentById(R.id.register_account_fragment_container);
         currentFragmentIsScanQRCode = f instanceof ScanQRCodeFragment;
     }
@@ -67,7 +65,7 @@ public class RegisterAccountActivity
     @Override
     public void onBackPressed()
     {
-        if (getFragmentManager().getBackStackEntryCount() > 0)
+        if (getFragmentManager().getBackStackEntryCount() > 1)
         {
             getFragmentManager().popBackStack();
         }

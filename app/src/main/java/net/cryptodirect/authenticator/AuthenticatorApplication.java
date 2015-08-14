@@ -2,6 +2,8 @@ package net.cryptodirect.authenticator;
 
 import android.app.Application;
 
+import com.squareup.leakcanary.LeakCanary;
+
 import net.danlew.android.joda.JodaTimeAndroid;
 
 import org.acra.ACRA;
@@ -34,6 +36,7 @@ public class AuthenticatorApplication extends Application
     public void onCreate()
     {
         super.onCreate();
+        LeakCanary.install(this);
         ACRA.init(this);
         JodaTimeAndroid.init(this);
     }

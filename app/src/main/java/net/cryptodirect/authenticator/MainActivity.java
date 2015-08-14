@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -20,7 +21,6 @@ import java.io.IOException;
 public class MainActivity extends AppCompatActivity
 {
     public static Context BASE_CONTEXT;
-    private static final String PREFS_FILE = "PrefsFile";
     private static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
@@ -45,12 +45,14 @@ public class MainActivity extends AppCompatActivity
         }
 
         FontManager.getInstance().init(getApplicationContext());
+        SoundPoolManager.getInstance().init(getApplicationContext());
 
-        SharedPreferences settings = getSharedPreferences(PREFS_FILE, 0);
-        if (settings.contains("default_account"))
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+
+        if (!settings.getString("default_account", "").isEmpty() && settings.getBoolean("skip_choose", true))
         {
-            // the user has saved a default account preference - so try to go to its' authenticator
-            // widget immediately.
+            // the user has saved a default account preference and skip choose is set to true
             String defaultAccount = settings.getString("default_account", "");
             if (AccountManager.getInstance().accountExists(defaultAccount))
             {
@@ -132,7 +134,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -147,6 +148,9 @@ public class MainActivity extends AppCompatActivity
         {
             case R.id.action_register_new_account:
                 goToRegisterAccountActivity();
+                return true;
+            case R.id.action_settings:
+                addSettingsFragment();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -164,6 +168,17 @@ public class MainActivity extends AppCompatActivity
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.main_fragment_container,
                 authenticatorFragment, "authenticator")
+                .addToBackStack("authenticator")
+                .commit();
+    }
+
+    private void addSettingsFragment()
+    {
+        SettingsFragment settingsFragment = new SettingsFragment();
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.add(R.id.main_fragment_container,
+                settingsFragment, "settings")
+                .addToBackStack("settings")
                 .commit();
     }
 

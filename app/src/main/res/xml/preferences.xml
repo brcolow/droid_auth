@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory
+        android:key="general_cat"
+        android:title="@string/general_cat">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="skip_choose"
+            android:summary="@string/skip_choose_summ"
+            android:title="@string/skip_choose"/>
+        <ListPreference
+            android:key="default_account"
+            android:summary="%s"
+            android:title="@string/default_account"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="sound_effects_cat"
+        android:title="@string/sound_effects_cat">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="play_scan_sound"
+            android:summary="@string/play_scan_sound_summ"
+            android:title="@string/play_scan_sound"/>
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="play_time_running_out_sound"
+            android:summary="@string/play_time_running_out_sound_summ"
+            android:title="@string/play_time_running_out_sound"/>
+        <net.cryptodirect.authenticator.NumberPickerPreference
+            android:defaultValue="5"
+            android:dependency="play_time_running_out_sound"
+            android:key="time_running_out_start"
+            android:summary="@string/time_running_out_start_summ"
+            android:title="@string/time_running_out_start"
+            app:max="10"
+            app:maxExternal="time_running_out_start_max"
+            app:min="1"
+            />
+    </PreferenceCategory>
+</PreferenceScreen>

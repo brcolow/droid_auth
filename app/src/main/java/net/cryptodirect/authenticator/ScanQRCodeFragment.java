@@ -4,11 +4,13 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.view.MenuItemCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -41,9 +43,6 @@ public class ScanQRCodeFragment extends Fragment implements ZXingScannerView.Res
     private boolean autoFocus;
     private ZXingScannerView scannerView;
     private OnQRCodeScannedListener listener;
-    private SoundPool soundPool;
-    private AudioManager audioManager;
-    private int scanSoundId;
     private static final String FLASH_STATE = "FLASH_STATE";
     private static final String AUTO_FOCUS_STATE = "AUTO_FOCUS_STATE";
 
@@ -64,22 +63,6 @@ public class ScanQRCodeFragment extends Fragment implements ZXingScannerView.Res
     @SuppressLint("NewApi")
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle state)
     {
-        int currentApiVersion = android.os.Build.VERSION.SDK_INT;
-
-        if (currentApiVersion >= Build.VERSION_CODES.LOLLIPOP)
-        {
-            SoundPool.Builder builder = new SoundPool.Builder();
-            builder.setMaxStreams(4);
-            builder.setAudioAttributes(new AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).setUsage(AudioAttributes.USAGE_NOTIFICATION_COMMUNICATION_INSTANT).build());
-            soundPool = builder.build();
-        }
-        else
-        {
-            soundPool = new SoundPool(4, AudioManager.STREAM_NOTIFICATION, 0);
-        }
-        scanSoundId = soundPool.load(getActivity().getApplicationContext(), R.raw.scan, 1);
-        audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
-
         scannerView = new ZXingScannerView(getActivity());
         if (state != null)
         {
@@ -194,9 +177,11 @@ public class ScanQRCodeFragment extends Fragment implements ZXingScannerView.Res
     @Override
     public void handleResult(Result rawResult)
     {
-        float curVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-        float maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        soundPool.play(scanSoundId, curVolume / maxVolume, curVolume / maxVolume, 1, 0, 1f);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        if (prefs.getBoolean("play_scan_sound", true))
+        {
+            SoundPoolManager.getInstance().playSound("SCAN", false);
+        }
         Toast.makeText(getActivity(), "Got QR code for email: " + rawResult.getText().split("\\|")[0], Toast.LENGTH_SHORT).show();
         listener.onQRCodeScanned(rawResult.getBarcodeFormat(), rawResult.getText());
     }
