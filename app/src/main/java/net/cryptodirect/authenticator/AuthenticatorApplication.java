@@ -2,8 +2,6 @@ package net.cryptodirect.authenticator;
 
 import android.app.Application;
 
-import net.danlew.android.joda.JodaTimeAndroid;
-
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
@@ -35,6 +33,5 @@ public class AuthenticatorApplication extends Application
     {
         super.onCreate();
         ACRA.init(this);
-        JodaTimeAndroid.init(this);
     }
 }

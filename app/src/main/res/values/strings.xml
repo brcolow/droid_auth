@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Cryptodash Authenticator</string>
     <string name="action_settings">Settings</string>
+    <string name="action_about">About</string>
     <string name="authenticator_description">Below is your authentication code, to enter when signing in to Cryptodash:</string>
     <string name="title_activity_register_account">Register Account</string>
     <string name="flash_on">Flash [ON]</string>

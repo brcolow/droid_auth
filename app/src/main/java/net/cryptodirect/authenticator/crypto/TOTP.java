@@ -3,8 +3,6 @@ package net.cryptodirect.authenticator.crypto;
 import android.util.AndroidRuntimeException;
 import android.util.Log;
 
-import org.joda.time.DateTime;
-
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
 
@@ -31,7 +29,7 @@ public class TOTP
      */
     public static long getTC(int TS)
     {
-        return getTC((DateTime.now().getMillis() / 1000L), TS, 0);
+        return getTC((System.currentTimeMillis() / 1000L), TS, 0);
     }
 
     /**
@@ -141,7 +139,7 @@ public class TOTP
         }
         catch (GeneralSecurityException e)
         {
-            Log.e(TAG, "Could not execute HMAC-SHA1", e);
+            Log.e(TAG, "Could not execute HMAC-" + sha, e);
             throw new AndroidRuntimeException(e);
         }
     }

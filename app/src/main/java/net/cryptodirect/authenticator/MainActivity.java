@@ -6,17 +6,23 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import org.acra.ACRA;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 
 public class MainActivity extends AppCompatActivity implements AccountChooserFragment.OnAccountChosenListener
 {
@@ -129,6 +135,49 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
         {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu)
+    {
+        for (int  i =0; i < menu.size(); i++)
+        {
+            MenuItem mi = menu.getItem(i);
+            String title = mi.getTitle().toString();
+            Spannable newTitle = new SpannableString(title);
+            newTitle.setSpan(new ForegroundColorSpan(Color.WHITE), 0, newTitle.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            mi.setTitle(newTitle);
+        }
+        return true;
+    }
+
+    /**
+     * We override this method to add a nasty hack that forces
+     * action bar overflow dropdown menu list items to always
+     * display their icons.
+     *
+     * @see {@literal http://stackoverflow.com/a/30337653/3634630}
+     */
+    @Override
+    protected boolean onPrepareOptionsPanel(View view, Menu menu)
+    {
+        if (menu != null)
+        {
+            if (menu.getClass().getSimpleName().equals("MenuBuilder"))
+            {
+                try
+                {
+                    Method m = menu.getClass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
+                    m.setAccessible(true);
+                    m.invoke(menu, true);
+                }
+                catch (Exception e)
+                {
+                    Log.e(getClass().getSimpleName(), "onMenuOpened...unable to set icons for overflow menu", e);
+                }
+            }
+        }
+        return super.onPrepareOptionsPanel(view, menu);
     }
 
     @Override

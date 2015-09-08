@@ -1,8 +1,9 @@
 package net.cryptodirect.authenticator.crypto;
 
+import static org.junit.Assert.assertEquals;
+
 import net.cryptodirect.authenticator.StandardCharsets;
 
-import static org.junit.Assert.*;
 import org.junit.Test;
 
 /**
