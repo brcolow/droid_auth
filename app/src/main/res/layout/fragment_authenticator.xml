@@ -14,12 +14,12 @@
         android:id="@+id/authenticator_blurb"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="0dp"
+        android:gravity="start"
+        android:maxLines="2"
         android:text="@string/authenticator_description"
         android:textColor="#f5f5f5"
         android:textSize="24sp"
-        android:gravity="start"
-        android:maxLines="2"
         autofit:minTextSize="18sp"/>
 
     <TextView
@@ -43,10 +43,10 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="21dp"
         android:background="#424242"
-        android:inputType="none"
         android:ems="4"
         android:focusable="false"
         android:gravity="center_vertical|center_horizontal"
+        android:inputType="none"
         android:letterSpacing="0.1"
         android:maxLines="1"
         android:singleLine="true"

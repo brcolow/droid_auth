@@ -9,6 +9,12 @@
         android:title="@string/register_new_account"
         app:showAsAction="never"/>
     <item
+        android:id="@+id/action_test_device"
+        android:icon="@drawable/ic_flask_white_24dp"
+        android:orderInCategory="100"
+        android:title="@string/test_device"
+        app:showAsAction="never"/>
+    <item
         android:id="@+id/action_settings"
         android:icon="@drawable/ic_settings_white_24dp"
         android:orderInCategory="100"
