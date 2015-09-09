@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
                     {
                         public void onClick(DialogInterface dialog, int id)
                         {
-                            goToRegisterAccountActivity();
+                            startRegisterAccountActivity();
                         }
                     });
                 alertBuilder.setNegativeButton("Not Now",
@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
             else
             {
                 // we have no stored account data
-                goToRegisterAccountActivity();
+                startRegisterAccountActivity();
             }
         }
     }
@@ -196,11 +196,13 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
         switch (item.getItemId())
         {
             case R.id.action_register_new_account:
-                goToRegisterAccountActivity();
+                startRegisterAccountActivity();
                 return true;
             case R.id.action_settings:
-                addSettingsFragment();
+                showSettingsFragment();
                 return true;
+            case R.id.action_about:
+                showAboutFragment();
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -221,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
                 .commit();
     }
 
-    private void addSettingsFragment()
+    private void showSettingsFragment()
     {
         SettingsFragment settingsFragment = new SettingsFragment();
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
@@ -231,7 +233,17 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
                 .commit();
     }
 
-    private void goToRegisterAccountActivity()
+    private void showAboutFragment()
+    {
+        AboutFragment aboutFragment = new AboutFragment();
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.add(R.id.main_fragment_container,
+                aboutFragment, "about")
+                .addToBackStack("about")
+                .commit();
+    }
+
+    private void startRegisterAccountActivity()
     {
         Intent intent = new Intent(this, RegisterAccountActivity.class);
         startActivity(intent);
