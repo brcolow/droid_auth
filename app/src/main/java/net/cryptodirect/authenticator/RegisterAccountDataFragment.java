@@ -2,10 +2,12 @@ package net.cryptodirect.authenticator;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 /**
@@ -66,5 +68,17 @@ public class RegisterAccountDataFragment extends Fragment
         keyTextField.setText(getArguments().getString("decoded_key"));
 
         return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState)
+    {
+        super.onViewCreated(view, savedInstanceState);
+
+        Button correctButton = (Button) view.findViewById(R.id.correct_button);
+        Button incorrectButton = (Button) view.findViewById(R.id.incorrect_button);
+
+        correctButton.getCompoundDrawables()[0].setColorFilter(Utils.getIntFromRGB(46, 125, 50), PorterDuff.Mode.SRC_IN);
+        incorrectButton.getCompoundDrawables()[0].setColorFilter(Utils.getIntFromRGB(198, 40, 40), PorterDuff.Mode.SRC_IN);
     }
 }
