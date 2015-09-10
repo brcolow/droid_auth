@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="#212121"
+              android:orientation="vertical">
+
+    <Button
+        android:id="@+id/begin_tests_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:background="@android:drawable/dialog_holo_dark_frame"
+        android:padding="22dp"
+        android:text="@string/begin_tests"
+        android:textColor="#f3f3f3"
+        android:textSize="16sp"/>
+</LinearLayout>
