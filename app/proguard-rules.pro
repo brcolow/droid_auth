@@ -3,4 +3,4 @@
 
 # Keep all the ACRA classes
 -keep class org.acra.** { *; }
--keepclassmembers **.MenuBuilder { void setOptionalIconsVisible(boolean); }
+-keep class !android.support.v7.internal.view.menu.**,android.support.** {*;}
