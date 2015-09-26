@@ -7,10 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-
 public class HowItWorksFragment extends Fragment
 {
-    private static ViewPager pager;
+    private static ViewPagerCustomDuration pager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle state)
@@ -23,7 +22,8 @@ public class HowItWorksFragment extends Fragment
     public void onViewCreated(View view, Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        pager = (ViewPager) view.findViewById(R.id.view_pager);
+        pager = (ViewPagerCustomDuration) view.findViewById(R.id.view_pager);
+        pager.setScrollDurationFactor(5);
     }
 
     public ViewPager getViewPager()

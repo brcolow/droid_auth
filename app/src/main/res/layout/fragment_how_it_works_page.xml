@@ -69,7 +69,8 @@
         android:baselineAlignBottom="false"
         android:contentDescription="Next"
         android:src="@drawable/ic_keyboard_arrow_right_white_24dp"
-        android:textColor="#ffffff"/>
+        android:textColor="#ffffff"
+        android:onClick="handleNextPageButtonClicked"/>
 
     <LinearLayout
         android:layout_width="match_parent"
