@@ -23,7 +23,7 @@ public class HowItWorksFragment extends Fragment
     {
         super.onViewCreated(view, savedInstanceState);
         pager = (ViewPagerCustomDuration) view.findViewById(R.id.view_pager);
-        pager.setScrollDurationFactor(5);
+        pager.setScrollDurationFactor(10);
     }
 
     public ViewPager getViewPager()

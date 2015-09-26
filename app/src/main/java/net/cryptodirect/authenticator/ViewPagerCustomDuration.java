@@ -22,6 +22,7 @@ public class ViewPagerCustomDuration extends ViewPager
     {
         super(context);
         postInitViewPager();
+        this.setOffscreenPageLimit(2);
     }
 
     public ViewPagerCustomDuration(Context context, AttributeSet attrs)

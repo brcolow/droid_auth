@@ -23,12 +23,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 
 import org.acra.ACRA;
 import org.json.JSONException;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -164,6 +167,25 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
             mi.setTitle(newTitle);
         }
         return true;
+    }
+
+    @Override
+    public boolean onMenuOpened(int featureId, Menu menu) {
+        if (featureId == Window.FEATURE_ACTION_BAR && menu != null) {
+            if (menu.getClass().getSimpleName().equals("MenuBuilder")) {
+                try {
+                    Method m = menu.getClass().getDeclaredMethod(
+                            "setOptionalIconsVisible", Boolean.TYPE);
+                    m.setAccessible(true);
+                    m.invoke(menu, true);
+                } catch (NoSuchMethodException e) {
+                    Log.e(TAG, "onMenuOpened", e);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return super.onMenuOpened(featureId, menu);
     }
 
     /**
@@ -338,7 +360,7 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
         howItWorksFragment.getViewPager().setPageTransformer(false, new HowItWorksPageTransformer());
     }
 
-    private static final Map<Integer, HowItWorksPageFragment> pageMap = new ConcurrentHashMap<>(3);
+    private static final Map<Integer, HowItWorksPageFragment> pageMap = new LinkedHashMap<>(3);
 
     static
     {
@@ -380,15 +402,7 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
         @Override
         public Fragment getItem(int position)
         {
-            switch (position)
-            {
-                case 0:
-                case 1:
-                case 2:
-                    return pageMap.get(position);
-                default:
-                    return null;
-            }
+            return pageMap.get(position);
         }
 
         @Override
@@ -404,15 +418,9 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
         {
             // Log.e(TAG, String.valueOf("View: " + view.getId() + ": " + position));
             //ImageView imageView = (ImageView) view.findViewById(R.id.how_it_works_page_image);
-            if (position < -1) // [-Infinity,-1)
-            {
-                // This page is way off-screen to the left.
-                view.setAlpha(0);
-            }
-            else if (position <= 1) // [-1,1]
+            if (position >= -1 || position <= 1) // [-1,1]
             {
                 //view.setRotationY(position * -10);
-
                 if (position != 0f)
                 {
                     if (position < 0)
@@ -437,14 +445,8 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
                     }
                 }
             }
-            else // (1,+Infinity]
-            {
-                // This page is way off-screen to the right.
-                view.setAlpha(0);
-            }
         }
     }
-
     /**
      * The "Next" button is in HowItWorksPageFragment
      */
