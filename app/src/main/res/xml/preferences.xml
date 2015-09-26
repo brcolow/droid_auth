@@ -9,9 +9,9 @@
             android:key="skip_choose"
             android:summary="@string/skip_choose_summ"
             android:title="@string/skip_choose"/>
-        <ListPreference
+        <net.cryptodirect.authenticator.ListPreferenceWithSummary
+            android:defaultValue="@string/none"
             android:key="default_account"
-            android:summary="%s"
             android:title="@string/default_account"/>
     </PreferenceCategory>
 

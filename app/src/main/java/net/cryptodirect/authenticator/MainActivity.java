@@ -218,6 +218,10 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
                 return true;
             case R.id.action_about:
                 showAboutFragment();
+                return true;
+            case R.id.action_test_device:
+                showTestDeviceFragment();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -255,6 +259,16 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
         fragmentTransaction.add(R.id.main_fragment_container,
                 aboutFragment, "about")
                 .addToBackStack("about")
+                .commit();
+    }
+
+    private void showTestDeviceFragment()
+    {
+        TestDeviceFragment testDeviceFragment = new TestDeviceFragment();
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.add(R.id.main_fragment_container,
+                testDeviceFragment, "test-device")
+                .addToBackStack("test-device")
                 .commit();
     }
 
