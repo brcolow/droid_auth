@@ -1,34 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
                 xmlns:autofit="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@android:color/holo_green_dark"
                 tools:context="net.cryptodirect.authenticator.HowItWorksPageFragment">
+
     <ImageView
         android:id="@+id/how_it_works_page_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:src="@drawable/ic_qrcode_white_36dp"
-        android:layout_marginBottom="57dp"
         android:layout_above="@+id/how_it_works_page_text"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center"
+        android:minHeight="140dp"
+        android:minWidth="200dp"
+        android:src="@drawable/ic_qrcode_white_36dp"/>
 
     <me.grantland.widget.AutofitTextView
         android:id="@+id/how_it_works_page_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Cras sodales magna in dolor aliquet, eget scelerisque quam fermentum. In hac habitasse platea dictumst."
-        android:textColor="@color/whiteColor"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="26dp"
+        android:maxLines="10"
         android:padding="25dp"
+        android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi id elementum justo. Suspendisse ullamcorper arcu lorem, sit amet vestibulum risus aliquet sit amet. Fusce interdun nunc a placerat posuere. Praesent vitae aliquet magna. Phasellus at mauris dolor. Aliquam erat volutpat. Nam quis malesuada lorem, luctus auctor nibh. Etiam sit amet nibh scelerisque, sodales ligula et, ultrices tellus."
+        android:textColor="@color/whiteColor"
         android:textSize="22sp"
-        autofit:minTextSize="18sp"
-        android:maxLines="3"/>
+        autofit:minTextSize="17sp"/>
 
+    <View
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignBottom="@+id/how_it_works_page_text"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="27dp"
+        android:background="@android:color/darker_gray"/>
+
+    <Button
+        android:id="@+id/skip_button"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/how_it_works_page_image"
+        android:layout_toStartOf="@+id/how_it_works_page_image"
+        android:background="#00FFFFFF"
+        android:text="Skip"
+        android:textColor="#ffffff"/>
+
+    <ImageButton
+        android:id="@+id/next_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/skip_button"
+        android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
+        android:background="#00FFFFFF"
+        android:baselineAlignBottom="false"
+        android:contentDescription="Next"
+        android:src="@drawable/ic_keyboard_arrow_right_white_24dp"
+        android:textColor="#ffffff"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignTop="@+id/view"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <View
+            android:id="@+id/circle_one"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_marginRight="10dp"
+            android:alpha="0.2"
+            android:background="@drawable/circle"
+            android:backgroundTint="#000000"
+            android:backgroundTintMode="screen"/>
+
+        <View
+            android:id="@+id/circle_two"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_marginRight="10dp"
+            android:alpha="0.2"
+            android:background="@drawable/circle"
+            android:backgroundTint="#000000"
+            android:backgroundTintMode="screen"/>
+
+        <View
+            android:id="@+id/circle_three"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_marginRight="10dp"
+            android:alpha="0.2"
+            android:background="@drawable/circle"
+            android:backgroundTint="#000000"
+            android:backgroundTintMode="screen"/>
+    </LinearLayout>
 </RelativeLayout>

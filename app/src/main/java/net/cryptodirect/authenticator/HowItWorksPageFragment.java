@@ -20,11 +20,39 @@ public class HowItWorksPageFragment extends Fragment
     {
         View view = inflater.inflate(R.layout.fragment_how_it_works_page, container, false);
 
-        view.setId(getArguments().getInt("id"));
+        int id = getArguments().getInt("id");
+        view.setId(id);
 
         backgroundColor = Color.parseColor(getArguments().getString("backgroundColor"));
         view.setBackgroundColor(backgroundColor);
 
+        // TODO if this is page 3 (id 2) remove skip and ">" button and replace with [Done} button
+        View circle;
+        switch (id)
+        {
+            case 0:
+            {
+                circle = view.findViewById(R.id.circle_one);
+                break;
+            }
+            case 1:
+            {
+                circle = view.findViewById(R.id.circle_two);
+                break;
+            }
+            case 2:
+            {
+                circle = view.findViewById(R.id.circle_three);
+                break;
+            }
+            default:
+            {
+                // shouldn't happen
+                throw new IllegalStateException("unknown id for how it works page: " + id);
+            }
+        }
+
+        circle.setAlpha(0.75f);
         ImageView imageView = (ImageView) view.findViewById(R.id.how_it_works_page_image);
         imageView.setImageDrawable(ContextCompat.getDrawable(getActivity().getBaseContext(),
                 getArguments().getInt("drawable", R.drawable.ic_keyboard_white_36dp)));
