@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:autofit="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="#212121"
+              android:orientation="vertical"
+              tools:context="net.cryptodirect.authenticator.WelcomeFragment">
+
+    <me.grantland.widget.AutofitTextView
+        android:id="@+id/welcome_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="18dp"
+        android:gravity="start"
+        android:maxLines="5"
+        android:text="@string/welcome_blurb"
+        android:textColor="#f2f2f2"
+        android:textSize="20sp"
+        autofit:minTextSize="14sp"/>
+
+    <Button
+        android:id="@+id/register_account_button"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:background="@android:drawable/dialog_holo_dark_frame"
+        android:drawableLeft="@drawable/ic_person_add_white_24dp"
+        android:drawablePadding="5dp"
+        android:gravity="left|center_vertical"
+        android:padding="22dp"
+        android:text="@string/title_activity_register_account"
+        android:textColor="#f3f3f3"
+        android:textSize="16sp"
+        android:onClick="handleRegisterAccountClicked"/>
+
+    <Button
+        android:id="@+id/how_it_works_button"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:background="@android:drawable/dialog_holo_dark_frame"
+        android:drawableLeft="@drawable/ic_help_outline_white_24dp"
+        android:drawablePadding="5dp"
+        android:gravity="left|center_vertical"
+        android:padding="22dp"
+        android:text="@string/how_it_works"
+        android:textColor="#f3f3f3"
+        android:textSize="16sp"
+        android:onClick="handleHowItWorksClicked"/>
+</LinearLayout>

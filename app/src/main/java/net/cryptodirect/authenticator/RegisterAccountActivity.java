@@ -152,7 +152,6 @@ public class RegisterAccountActivity
     public void handleIncorrectButtonClicked(View view)
     {
         // information was incorrect, so go back to select method fragment
-
         getFragmentManager().popBackStack("select-method", FragmentManager.POP_BACK_STACK_INCLUSIVE);
         SelectRegisterMethodFragment selectMethodFragment = new SelectRegisterMethodFragment();
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
@@ -160,6 +159,5 @@ public class RegisterAccountActivity
                 selectMethodFragment, "select-method")
                 .addToBackStack("select-method")
                 .commit();
-
     }
 }

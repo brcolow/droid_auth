@@ -1,5 +1,6 @@
 package net.cryptodirect.authenticator;
 
+import android.animation.ArgbEvaluator;
 import android.app.AlertDialog;
 import android.app.FragmentTransaction;
 import android.content.Context;
@@ -9,6 +10,11 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -17,12 +23,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 
 import org.acra.ACRA;
 import org.json.JSONException;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MainActivity extends AppCompatActivity implements AccountChooserFragment.OnAccountChosenListener
 {
@@ -55,7 +64,9 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_USE_LOGO | ActionBar.DISPLAY_SHOW_TITLE);
 
+        getSupportActionBar().setIcon(R.drawable.ic_qrcode_white_36dp);
         if (!settings.getString("default_account", "").isEmpty() && settings.getBoolean("skip_choose", true))
         {
             // the user has saved a default account preference and skip choose is set to true
@@ -74,21 +85,21 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
                         "Sorry about that - please register the account again.");
                 alertBuilder.setCancelable(true);
                 alertBuilder.setPositiveButton("Register Account",
-                    new DialogInterface.OnClickListener()
-                    {
-                        public void onClick(DialogInterface dialog, int id)
+                        new DialogInterface.OnClickListener()
                         {
-                            startRegisterAccountActivity();
-                        }
-                    });
+                            public void onClick(DialogInterface dialog, int id)
+                            {
+                                startRegisterAccountActivity();
+                            }
+                        });
                 alertBuilder.setNegativeButton("Not Now",
-                    new DialogInterface.OnClickListener()
-                    {
-                        public void onClick(DialogInterface dialog, int id)
+                        new DialogInterface.OnClickListener()
                         {
-                            dialog.cancel();
-                        }
-                    });
+                            public void onClick(DialogInterface dialog, int id)
+                            {
+                                dialog.cancel();
+                            }
+                        });
                 AlertDialog alertDialog = alertBuilder.create();
                 alertDialog.show();
             }
@@ -119,7 +130,12 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
             else
             {
                 // we have no stored account data
-                startRegisterAccountActivity();
+                WelcomeFragment welcomeFragment = new WelcomeFragment();
+                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                fragmentTransaction.add(R.id.main_fragment_container,
+                        welcomeFragment, "welcome")
+                        .addToBackStack("welcome")
+                        .commit();
             }
         }
     }
@@ -140,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
     @Override
     public boolean onPrepareOptionsMenu(Menu menu)
     {
-        for (int  i =0; i < menu.size(); i++)
+        for (int i = 0; i < menu.size(); i++)
         {
             MenuItem mi = menu.getItem(i);
             String title = mi.getTitle().toString();
@@ -253,5 +269,123 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
     public void onAccountChosen(String chosenAccount)
     {
         addAuthenticatorFragment(chosenAccount, 30);
+    }
+
+    /**
+     * The "Register Account" button is in WelcomeFragment
+     *
+     * @param view
+     */
+    public void handleRegisterAccountClicked(View view)
+    {
+        startRegisterAccountActivity();
+    }
+
+    /**
+     * The "How it Works" button is in WelcomeFragment
+     *
+     * @param view
+     */
+    public void handleHowItWorksClicked(View view)
+    {
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        HowItWorksFragment howItWorksFragment = new HowItWorksFragment();
+        fragmentTransaction.add(R.id.main_fragment_container,
+                howItWorksFragment, "how-it-works")
+                .addToBackStack("how-it-works")
+                .commit();
+
+        getFragmentManager().executePendingTransactions();
+
+        howItWorksFragment.getViewPager().setAdapter(new HowItWorksPagerAdapter(getSupportFragmentManager()));
+        howItWorksFragment.getViewPager().setPageTransformer(false, new HowItWorksPageTransformer());
+    }
+
+    private static final Map<Integer, HowItWorksPageFragment> pageMap = new ConcurrentHashMap<>();
+
+    static
+    {
+        pageMap.put(0 , HowItWorksPageFragment.newInstance(0,
+                "#EC407A",
+                R.drawable.ic_qrcode_white_36dp,
+                "Register your Cryptodash account by scanning the provided QR code."));
+
+        pageMap.put(1 , HowItWorksPageFragment.newInstance(1,
+                "#5C6BC0",
+                R.drawable.ic_keyboard_white_36dp,
+                "When prompted for the code while logging in to Cryptodash, use the provided code."));
+
+        pageMap.put(2, HowItWorksPageFragment.newInstance(2,
+                "#43A047",
+                R.drawable.ic_restore_white_48dp,
+                "This is a one-time code with a life-span of 30 seconds. After" +
+                " 30 seconds is up, a new code is required to successfully login."));
+    }
+
+    private class HowItWorksPagerAdapter extends FragmentPagerAdapter
+    {
+        public HowItWorksPagerAdapter(FragmentManager fragmentManager)
+        {
+            super(fragmentManager);
+        }
+
+        @Override
+        public Fragment getItem(int position)
+        {
+            return pageMap.get(position);
+        }
+
+        @Override
+        public int getCount()
+        {
+            return pageMap.size();
+        }
+    }
+
+    private class HowItWorksPageTransformer implements ViewPager.PageTransformer
+    {
+        public void transformPage(View view, float position)
+        {
+            // Log.e(TAG, String.valueOf("View: " + view.getId() + ": " + position));
+            //ImageView imageView = (ImageView) view.findViewById(R.id.how_it_works_page_image);
+            if (position < -1) // [-Infinity,-1)
+            {
+                // This page is way off-screen to the left.
+                view.setAlpha(0);
+            }
+            else if (position <= 1) // [-1,1]
+            {
+                view.setRotationY(position * -10);
+
+                if (position != 0f)
+                {
+                    if (position < 0)
+                    {
+                        if (pageMap.get(view.getId() + 1) != null)
+                        {
+                            int color = (Integer) new ArgbEvaluator().evaluate(Math.abs(position),
+                                    pageMap.get(view.getId()).getBackgroundColor(),
+                                    pageMap.get(view.getId() + 1).getBackgroundColor());
+                            view.setBackgroundColor(color);
+                        }
+                    }
+                    else
+                    {
+                        if (pageMap.get(view.getId() - 1) != null)
+                        {
+                            int color = (Integer) new ArgbEvaluator().evaluate(Math.abs(position),
+                                    pageMap.get(view.getId()).getBackgroundColor(),
+                                    pageMap.get(view.getId() - 1).getBackgroundColor());
+                            view.setBackgroundColor(color);
+                        }
+                    }
+                }
+            }
+            else // (1,+Infinity]
+            {
+                // This page is way off-screen to the right.
+                view.setAlpha(0);
+            }
+        }
     }
 }
