@@ -1,9 +1,10 @@
 package net.cryptodirect.authenticator;
 
 import android.app.Activity;
-import android.app.Fragment;
+import android.content.Context;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,12 +18,12 @@ import android.widget.TextView;
  * account key with an associated email address in internal
  * storage so that the account data is persisted.
  */
-public class RegisterAccountDataFragment extends Fragment
+public class LinkAccountDataFragment extends Fragment
 {
     // we display the key in Base64 - so we need a good font for this purpose
     // i.e. O and 0 are distinguished from each other
 
-    public RegisterAccountDataFragment()
+    public LinkAccountDataFragment()
     {
 
     }
@@ -36,10 +37,14 @@ public class RegisterAccountDataFragment extends Fragment
     }
 
     @Override
-    public void onAttach(Activity activity)
+    public void onAttach(Context context)
     {
-        super.onAttach(activity);
-        activity.invalidateOptionsMenu();
+        super.onAttach(context);
+
+        if (context instanceof Activity)
+        {
+            ((Activity) context).invalidateOptionsMenu();
+        }
     }
 
     @Override
@@ -51,11 +56,11 @@ public class RegisterAccountDataFragment extends Fragment
 
         if (!getArguments().containsKey("decoded_key"))
         {
-            throw new IllegalArgumentException("RegisterAccountDataFragment was not given decoded key");
+            throw new IllegalArgumentException("LinkAccountDataFragment was not given decoded key");
         }
         if (!getArguments().containsKey("decoded_email"))
         {
-            throw new IllegalArgumentException("RegisterAccountDataFragment was not given decoded email");
+            throw new IllegalArgumentException("LinkAccountDataFragment was not given decoded email");
         }
 
         TextView emailField = (TextView) view.findViewById(R.id.email_field);

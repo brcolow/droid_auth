@@ -1,31 +1,33 @@
 package net.cryptodirect.authenticator;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
 
 import com.google.zxing.BarcodeFormat;
 
-public class RegisterAccountActivity
+public class LinkAccountActivity
         extends AppCompatActivity
         implements ScanQRCodeFragment.OnQRCodeScannedListener,
         FragmentManager.OnBackStackChangedListener
 {
     private volatile boolean currentFragmentIsScanQRCode = false;
-    private static final String TAG = RegisterAccountActivity.class.getSimpleName();
+    private static final String TAG = LinkAccountActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle state)
     {
         super.onCreate(state);
         setContentView(R.layout.activity_register_account);
-        getFragmentManager().addOnBackStackChangedListener(this);
+        getSupportFragmentManager().addOnBackStackChangedListener(this);
         if (findViewById(R.id.register_account_fragment_container) != null)
         {
             // However, if we're being restored from a previous state,
@@ -36,7 +38,7 @@ public class RegisterAccountActivity
                 return;
             }
             SelectRegisterMethodFragment selectMethodFragment = new SelectRegisterMethodFragment();
-            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.add(R.id.register_account_fragment_container,
                     selectMethodFragment, "select-method")
                     .addToBackStack("select-method")
@@ -47,7 +49,7 @@ public class RegisterAccountActivity
     public void onBackStackChanged()
     {
         // this is probably wrong but it works - most likely for the wrong reasons
-        Fragment f = getFragmentManager().findFragmentById(R.id.register_account_fragment_container);
+        Fragment f = getSupportFragmentManager().findFragmentById(R.id.register_account_fragment_container);
         currentFragmentIsScanQRCode = f instanceof ScanQRCodeFragment;
     }
 
@@ -65,13 +67,18 @@ public class RegisterAccountActivity
     @Override
     public void onBackPressed()
     {
-        if (getFragmentManager().getBackStackEntryCount() > 1)
+        Log.e(TAG, "Back stack entry count: " + getFragmentManager().getBackStackEntryCount());
+        Log.e(TAG, "support Back stack entry count: " + getSupportFragmentManager().getBackStackEntryCount());
+
+        super.onBackPressed();
+        if (getSupportFragmentManager().getBackStackEntryCount() >= 1)
         {
             getFragmentManager().popBackStack();
         }
         else
         {
-            super.onBackPressed();
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
         }
     }
 
@@ -81,7 +88,7 @@ public class RegisterAccountActivity
      */
     public void handleScanQRCodeClicked(View view)
     {
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         ScanQRCodeFragment scanQRCodeFragment = new ScanQRCodeFragment();
         fragmentTransaction.add(R.id.register_account_fragment_container,
                 scanQRCodeFragment, "qr-code")
@@ -95,7 +102,7 @@ public class RegisterAccountActivity
      */
     public void handleManualEntryClicked(View view)
     {
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         ManualEntryFragment manualEntryFragment = new ManualEntryFragment();
         fragmentTransaction.add(R.id.register_account_fragment_container,
                 manualEntryFragment, "manual-entry")
@@ -118,17 +125,17 @@ public class RegisterAccountActivity
         Bundle bundle = new Bundle();
         bundle.putString("decoded_email", scannedCode.split("\\|")[0]);
         bundle.putString("decoded_key", scannedCode.split("\\|")[1]);
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        RegisterAccountDataFragment registerAccountDataFragment = new RegisterAccountDataFragment();
-        registerAccountDataFragment.setArguments(bundle);
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        LinkAccountDataFragment linkAccountDataFragment = new LinkAccountDataFragment();
+        linkAccountDataFragment.setArguments(bundle);
         fragmentTransaction.add(R.id.register_account_fragment_container,
-                registerAccountDataFragment, "register-account-data")
+                linkAccountDataFragment, "register-account-data")
                 .addToBackStack("register-account-data")
                 .commit();
     }
 
     /**
-     * The "Correct" button is in RegisterAccountDataFragment
+     * The "Correct" button is in LinkAccountDataFragment
      * @param view
      */
     public void handleCorrectButtonClicked(View view)
@@ -146,7 +153,7 @@ public class RegisterAccountActivity
     }
 
     /**
-     * The "Incorrect" button is in RegisterAccountDataFragment
+     * The "Incorrect" button is in LinkAccountDataFragment
      * @param view
      */
     public void handleIncorrectButtonClicked(View view)
@@ -154,7 +161,7 @@ public class RegisterAccountActivity
         // information was incorrect, so go back to select method fragment
         getFragmentManager().popBackStack("select-method", FragmentManager.POP_BACK_STACK_INCLUSIVE);
         SelectRegisterMethodFragment selectMethodFragment = new SelectRegisterMethodFragment();
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.register_account_fragment_container,
                 selectMethodFragment, "select-method")
                 .addToBackStack("select-method")

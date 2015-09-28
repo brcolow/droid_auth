@@ -20,12 +20,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".RegisterAccountActivity"
-            android:label="@string/title_activity_register_account">
+            android:name=".LinkAccountActivity"
+            android:label="@string/title_activity_register_account"
+            android:parentActivityName="net.cryptodirect.authenticator.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.REGISTER_ACCOUNT"/>
                 <category android:name="android.intent.category.ACCOUNT"/>
             </intent-filter>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="net.cryptodirect.authenticator.MainActivity" />
         </activity>
         <activity
             android:name="org.acra.CrashReportDialog"

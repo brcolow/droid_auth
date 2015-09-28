@@ -1,8 +1,8 @@
 package net.cryptodirect.authenticator;
 
 import android.app.Fragment;
-import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +23,20 @@ public class HowItWorksFragment extends Fragment
     {
         super.onViewCreated(view, savedInstanceState);
         pager = (ViewPagerCustomDuration) view.findViewById(R.id.view_pager);
+        if (android.os.Build.VERSION.SDK_INT >= 17)
+        {
+            // using child fragment manager here makes it so that when one
+            // clicks on "How it Works", then clicks back button, then clicks
+            // "How it Works" again, the how it works view pager works correctly.
+            // Without child fragment manager, the view pager only works the first
+            // time it is launched from the button click.
+            pager.setAdapter(new HowItWorksPagerAdapter(getChildFragmentManager()));
+        }
+        else
+        {
+            pager.setAdapter(new HowItWorksPagerAdapter(getFragmentManager()));
+        }
+
         pager.setScrollDurationFactor(10);
     }
 

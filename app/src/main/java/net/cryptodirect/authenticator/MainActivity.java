@@ -2,7 +2,8 @@ package net.cryptodirect.authenticator;
 
 import android.animation.ArgbEvaluator;
 import android.app.AlertDialog;
-import android.app.FragmentTransaction;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,9 +11,6 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -30,15 +28,28 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
-public class MainActivity extends AppCompatActivity implements AccountChooserFragment.OnAccountChosenListener
+/**
+ * The main activity of the authenticator application. This activity is the first
+ * activity that the application enters on startup. Currently this activity is used
+ * for everything except account linking
+ */
+public class MainActivity
+        extends AppCompatActivity
+        implements AccountChooserFragment.OnAccountChosenListener, FragmentManager.OnBackStackChangedListener, DialogInterface.OnCancelListener
 {
     public static Context BASE_CONTEXT;
     private static final String TAG = MainActivity.class.getSimpleName();
+    private ViewPager howItWorksPager;
+    private int currSelectedPage = 0;
+    private static final Map<Integer, HowItWorksPageFragment> pageMap = new LinkedHashMap<>(3);
+
+    static
+    {
+        initPageMap();
+    }
 
     @Override
     protected void onCreate(Bundle state)
@@ -66,10 +77,20 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_USE_LOGO | ActionBar.DISPLAY_SHOW_TITLE);
+        if (getSupportActionBar() != null)
+        {
+            getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_USE_LOGO | ActionBar.DISPLAY_SHOW_TITLE);
+        }
+        else
+        {
+            // throw new IllegalStateException("getSupportActionBar() returned null");
+        }
 
-        getSupportActionBar().setIcon(R.drawable.ic_qrcode_white_36dp);
-        if (!settings.getString("default_account", "").isEmpty() && settings.getBoolean("skip_choose", true))
+        //getSupportActionBar().setIcon(R.drawable.ic_qrcode_white_36dp);
+        getSupportFragmentManager().addOnBackStackChangedListener(this);
+        if (!settings.getString("default_account", "").isEmpty()
+                && !settings.getString("default_account", "").equalsIgnoreCase("none")
+                && settings.getBoolean("skip_choose", true))
         {
             // the user has saved a default account preference and skip choose is set to true
             String defaultAccount = settings.getString("default_account", "");
@@ -81,17 +102,17 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
             else
             {
                 // we have no data for the stored default account preference
-                AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getBaseContext());
-                alertBuilder.setMessage("We found that you set your default account to: "
-                        + defaultAccount + " but there is no stored data for that account. " +
-                        "Sorry about that - please register the account again.");
+                AlertDialog.Builder alertBuilder = new AlertDialog.Builder(MainActivity.this);
+                alertBuilder.setMessage("We found that your default account is set to: "
+                        + defaultAccount + " but we have no data for that account. " +
+                        "Sorry about that - please link the account again.");
                 alertBuilder.setCancelable(true);
-                alertBuilder.setPositiveButton("Register Account",
+                alertBuilder.setPositiveButton("Link Account",
                         new DialogInterface.OnClickListener()
                         {
                             public void onClick(DialogInterface dialog, int id)
                             {
-                                startRegisterAccountActivity();
+                                startLinkAccountActivity();
                             }
                         });
                 alertBuilder.setNegativeButton("Not Now",
@@ -103,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
                             }
                         });
                 AlertDialog alertDialog = alertBuilder.create();
+                alertDialog.setOnCancelListener(this);
                 alertDialog.show();
             }
         }
@@ -118,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
                 {
                     // we have data for multiple accounts and no default account
                     AccountChooserFragment accountChooserFragment = new AccountChooserFragment();
-                    FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                     fragmentTransaction.add(R.id.main_fragment_container,
                             accountChooserFragment, "choose-account")
                             .commit();
@@ -133,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
             {
                 // we have no stored account data
                 WelcomeFragment welcomeFragment = new WelcomeFragment();
-                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.add(R.id.main_fragment_container,
                         welcomeFragment, "welcome")
                         .addToBackStack("welcome")
@@ -145,13 +167,18 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
     @Override
     public void onBackPressed()
     {
+        // TODO maybe think about seeing if we allow our about fragment webview
+        // to open urls inside of it
+        // http://stackoverflow.com/questions/4907045/how-to-make-links-open-within-webview-or-open-by-default-browser-depending-on-do)
+        // we can see if the webview is non-null and canGoBack(), then we can call back on it
+        // the webview
         if (getFragmentManager().getBackStackEntryCount() > 0)
         {
             getFragmentManager().popBackStack();
         }
         else
         {
-            super.onBackPressed();
+            //super.onBackPressed();
         }
     }
 
@@ -160,28 +187,35 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
     {
         for (int i = 0; i < menu.size(); i++)
         {
-            MenuItem mi = menu.getItem(i);
-            String title = mi.getTitle().toString();
+            MenuItem menuItem = menu.getItem(i);
+            String title = menuItem.getTitle().toString();
             Spannable newTitle = new SpannableString(title);
             newTitle.setSpan(new ForegroundColorSpan(Color.WHITE), 0, newTitle.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            mi.setTitle(newTitle);
+            menuItem.setTitle(newTitle);
         }
         return true;
     }
 
     @Override
-    public boolean onMenuOpened(int featureId, Menu menu) {
-        if (featureId == Window.FEATURE_ACTION_BAR && menu != null) {
-            if (menu.getClass().getSimpleName().equals("MenuBuilder")) {
-                try {
-                    Method m = menu.getClass().getDeclaredMethod(
-                            "setOptionalIconsVisible", Boolean.TYPE);
-                    m.setAccessible(true);
-                    m.invoke(menu, true);
-                } catch (NoSuchMethodException e) {
-                    Log.e(TAG, "onMenuOpened", e);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+    public boolean onMenuOpened(int featureId, Menu menu)
+    {
+        if (featureId == Window.FEATURE_ACTION_BAR && menu != null)
+        {
+            if (menu.getClass().getSimpleName().equals("MenuBuilder"))
+            {
+                try
+                {
+                    Method method = menu.getClass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
+                    method.setAccessible(true);
+                    method.invoke(menu, true);
+                }
+                catch (NoSuchMethodException e)
+                {
+                    Log.e(TAG, "setOptionalIconsVisible method not found: ", e);
+                }
+                catch (Exception e)
+                {
+                    throw new IllegalStateException(e);
                 }
             }
         }
@@ -210,7 +244,8 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
                 }
                 catch (Exception e)
                 {
-                    Log.e(getClass().getSimpleName(), "onMenuOpened...unable to set icons for overflow menu", e);
+                    Log.e(TAG, "onMenuOpened...unable to set icons for overflow menu", e);
+                    throw new IllegalStateException(e);
                 }
             }
         }
@@ -233,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
         switch (item.getItemId())
         {
             case R.id.action_register_new_account:
-                startRegisterAccountActivity();
+                startLinkAccountActivity();
                 return true;
             case R.id.action_settings:
                 showSettingsFragment();
@@ -257,7 +292,7 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
         bundle.putInt("ts", ts);
         AuthenticatorFragment authenticatorFragment = new AuthenticatorFragment();
         authenticatorFragment.setArguments(bundle);
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.main_fragment_container,
                 authenticatorFragment, "authenticator")
                 .addToBackStack("authenticator")
@@ -267,7 +302,7 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
     private void showSettingsFragment()
     {
         SettingsFragment settingsFragment = new SettingsFragment();
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.main_fragment_container,
                 settingsFragment, "settings")
                 .addToBackStack("settings")
@@ -277,7 +312,7 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
     private void showAboutFragment()
     {
         AboutFragment aboutFragment = new AboutFragment();
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.main_fragment_container,
                 aboutFragment, "about")
                 .addToBackStack("about")
@@ -287,16 +322,16 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
     private void showTestDeviceFragment()
     {
         TestDeviceFragment testDeviceFragment = new TestDeviceFragment();
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.main_fragment_container,
                 testDeviceFragment, "test-device")
                 .addToBackStack("test-device")
                 .commit();
     }
 
-    private void startRegisterAccountActivity()
+    private void startLinkAccountActivity()
     {
-        Intent intent = new Intent(this, RegisterAccountActivity.class);
+        Intent intent = new Intent(this, LinkAccountActivity.class);
         startActivity(intent);
     }
 
@@ -313,11 +348,8 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
      */
     public void handleRegisterAccountClicked(View view)
     {
-        startRegisterAccountActivity();
+        startLinkAccountActivity();
     }
-
-    private ViewPager howItWorksPager;
-    private int currSelectedPage = 0;
 
     /**
      * The "How it Works" button is in WelcomeFragment
@@ -326,13 +358,14 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
      */
     public void handleHowItWorksClicked(View view)
     {
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         HowItWorksFragment howItWorksFragment = new HowItWorksFragment();
         fragmentTransaction.add(R.id.main_fragment_container,
                 howItWorksFragment, "how-it-works")
                 .addToBackStack("how-it-works")
                 .commit();
 
+        // here we force (and block) the fragment transaction, otherwise getViewPager() returns null
         getFragmentManager().executePendingTransactions();
 
         howItWorksPager = howItWorksFragment.getViewPager();
@@ -346,7 +379,6 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
             @Override
             public void onPageSelected(int position)
             {
-                Log.e(TAG, "POSITION: " + position);
                 currSelectedPage = position;
             }
 
@@ -356,60 +388,57 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
             }
         });
 
-        howItWorksFragment.getViewPager().setAdapter(new HowItWorksPagerAdapter(getSupportFragmentManager()));
         howItWorksFragment.getViewPager().setPageTransformer(false, new HowItWorksPageTransformer());
     }
 
-    private static final Map<Integer, HowItWorksPageFragment> pageMap = new LinkedHashMap<>(3);
-
-    static
+    @Override
+    public void onBackStackChanged()
     {
-        pageMap.put(0 , HowItWorksPageFragment.newInstance(0,
+        currSelectedPage = 0;
+    }
+
+    private static void initPageMap()
+    {
+        pageMap.put(0, HowItWorksPageFragment.newInstance(0,
                 "#EC407A",
                 R.drawable.ic_qrcode_white_36dp,
                 "In order to use this authenticator app, you have to link your Cryptodash account " +
-                "with this device. To do so just click the \"Register Account\" button. The " +
-                "registration process involves one step - scanning a QR code. After that, you're linked. " +
-                "Now that your account is linked, when you log in to Cryptodash or perform " +
-                "certain actions (this is configurable) you will be prompted to enter a verification code."));
+                        "with this device. To do so just click the \"Link Account\" button. The " +
+                        "linking process involves one step - scanning a QR code. After that, you're linked. " +
+                        "Now that your account is linked, when you log in to Cryptodash or perform " +
+                        "certain actions (this is configurable) you will be prompted to enter a verification code."));
 
-        pageMap.put(1 , HowItWorksPageFragment.newInstance(1,
+        pageMap.put(1, HowItWorksPageFragment.newInstance(1,
                 "#5C6BC0",
                 R.drawable.ic_keyboard_white_36dp,
                 "Every 30 seconds this app automatically generates a new, 6-digit " +
-                 "random code. Requiring this code adds an extra layer " +
-                 "of security to your account in that even if your username and password became " +
-                 "compromised, an attacker would still need your mobile phone to even attempt to " +
-                 "gain access to your account."));
+                        "random code. Requiring this code adds an extra layer " +
+                        "of security to your account in that even if your username and password became " +
+                        "compromised, an attacker would still need your mobile phone to even attempt to " +
+                        "gain access to your account."));
 
         pageMap.put(2, HowItWorksPageFragment.newInstance(2,
                 "#43A047",
                 R.drawable.ic_restore_white_48dp,
                 "Codes are generated using a secret key that is stored securely on your " +
-                "device. The generating process uses a cryptographically secure standard " +
-                "called TOTP which uses the same cryptographic hash function as Bitcoin! " +
-                "You can run this app against the set of tests listed in the TOTP "  +
-                "specification via the \"Test Device\" option in the main menu."));
+                        "device. The generating process uses a cryptographically secure standard " +
+                        "called TOTP which uses the same cryptographic hash function as Bitcoin! " +
+                        "You can run this app against the set of tests listed in the TOTP " +
+                        "specification via the \"Test Device\" option in the main menu."));
     }
 
-    private class HowItWorksPagerAdapter extends FragmentPagerAdapter
+    @Override
+    public void onCancel(DialogInterface dialogInterface)
     {
-        public HowItWorksPagerAdapter(FragmentManager fragmentManager)
-        {
-            super(fragmentManager);
-        }
-
-        @Override
-        public Fragment getItem(int position)
-        {
-            return pageMap.get(position);
-        }
-
-        @Override
-        public int getCount()
-        {
-            return 3;
-        }
+        // the alert dialog is shown when a default account setting exists
+        // but we don't have data for it
+        // TODO not sure if this is the best thing to do if the dialog is cancelled
+        WelcomeFragment welcomeFragment = new WelcomeFragment();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.add(R.id.main_fragment_container,
+                welcomeFragment, "welcome")
+                .addToBackStack("welcome")
+                .commit();
     }
 
     private class HowItWorksPageTransformer implements ViewPager.PageTransformer
@@ -447,11 +476,17 @@ public class MainActivity extends AppCompatActivity implements AccountChooserFra
             }
         }
     }
+
     /**
      * The "Next" button is in HowItWorksPageFragment
      */
     public void handleNextPageButtonClicked(View view)
     {
         howItWorksPager.setCurrentItem(++currSelectedPage, true);
+    }
+
+    static Map<Integer, HowItWorksPageFragment> getPageMap()
+    {
+        return pageMap;
     }
 }
