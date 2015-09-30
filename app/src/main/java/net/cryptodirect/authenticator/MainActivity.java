@@ -402,29 +402,29 @@ public class MainActivity
         pageMap.put(0, HowItWorksPageFragment.newInstance(0,
                 "#EC407A",
                 R.drawable.ic_qrcode_white_36dp,
-                "In order to use this authenticator app, you have to link your Cryptodash account " +
-                        "with this device. To do so just click the \"Link Account\" button. The " +
-                        "linking process involves one step - scanning a QR code. After that, you're linked. " +
+                "In order to use this authenticator app, you need to link your Cryptodash account " +
+                        "with this device. To do so, just tap the \"Link Account\" button. The " +
+                        "linking process involves one step - scanning a QR code. After that, you're successfully linked. " +
                         "Now that your account is linked, when you log in to Cryptodash or perform " +
-                        "certain actions (this is configurable) you will be prompted to enter a verification code."));
+                        "certain actions (which is configurable) you will be prompted to enter a verification code."));
 
         pageMap.put(1, HowItWorksPageFragment.newInstance(1,
                 "#5C6BC0",
                 R.drawable.ic_keyboard_white_36dp,
-                "Every 30 seconds this app automatically generates a new, 6-digit " +
+                "Every 30 seconds, this app automatically generates a new, 6-digit " +
                         "random code. Requiring this code adds an extra layer " +
-                        "of security to your account in that even if your username and password became " +
+                        "of security to your account. In other words, even if your username and password were " +
                         "compromised, an attacker would still need your mobile phone to even attempt to " +
                         "gain access to your account."));
 
         pageMap.put(2, HowItWorksPageFragment.newInstance(2,
                 "#43A047",
                 R.drawable.ic_restore_white_48dp,
-                "Codes are generated using a secret key that is stored securely on your " +
+                "Codes are generated using a 32-byte secret key that is stored securely on your " +
                         "device. The generating process uses a cryptographically secure standard " +
                         "called TOTP which uses the same cryptographic hash function as Bitcoin! " +
                         "You can run this app against the set of tests listed in the TOTP " +
-                        "specification via the \"Test Device\" option in the main menu."));
+                        "specification via the \"Test Device\" option on the main menu."));
     }
 
     @Override

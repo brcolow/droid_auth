@@ -67,9 +67,6 @@ public class LinkAccountActivity
     @Override
     public void onBackPressed()
     {
-        Log.e(TAG, "Back stack entry count: " + getFragmentManager().getBackStackEntryCount());
-        Log.e(TAG, "support Back stack entry count: " + getSupportFragmentManager().getBackStackEntryCount());
-
         super.onBackPressed();
         if (getSupportFragmentManager().getBackStackEntryCount() >= 1)
         {

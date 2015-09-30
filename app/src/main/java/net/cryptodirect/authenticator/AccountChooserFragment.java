@@ -1,6 +1,6 @@
 package net.cryptodirect.authenticator;
 
-import android.app.Activity;
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -57,16 +57,16 @@ public class AccountChooserFragment extends Fragment
     }
 
     @Override
-    public void onAttach(Activity activity)
+    public void onAttach(Context context)
     {
-        super.onAttach(activity);
+        super.onAttach(context);
         try
         {
-            listener = (OnAccountChosenListener) activity;
+            listener = (OnAccountChosenListener) context;
         }
         catch (ClassCastException e)
         {
-            throw new ClassCastException(activity.toString() + " must implement OnAccountChosenListener");
+            throw new ClassCastException(context.toString() + " must implement OnAccountChosenListener");
         }
     }
 
