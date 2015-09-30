@@ -76,3 +76,15 @@ tasks.whenTaskAdded { theTask ->
         theTask.dependsOn "askForPasswords"
     }
 }
+
+apply plugin: 'com.github.ben-manes.versions'
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.11.3'
+    }
+}
