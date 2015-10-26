@@ -9,7 +9,6 @@ the currently picked number inside settings -->
 
     <TextView
         android:id="@+id/current_number_text_view"
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:textSize="24sp"/>

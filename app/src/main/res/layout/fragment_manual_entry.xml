@@ -108,6 +108,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp"
         android:background="@android:drawable/dialog_holo_dark_frame"
+        android:drawableStart="@drawable/ic_check_white_24dp"
         android:drawableLeft="@drawable/ic_check_white_24dp"
         android:drawablePadding="5dp"
         android:padding="22dp"

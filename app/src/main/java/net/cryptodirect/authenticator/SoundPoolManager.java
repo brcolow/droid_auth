@@ -5,6 +5,7 @@ import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Build;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -39,17 +40,17 @@ public class SoundPoolManager
 
     public void playSound(String sound, boolean loop)
     {
-        if (sounds.containsKey(sound.toUpperCase()))
+        if (sounds.containsKey(sound.toUpperCase(Locale.US)))
         {
-            playingSounds.put(sound, soundPool.play(sounds.get(sound.toUpperCase()), 1.0f, 1.0f, 1, (loop ? -1 : 0), 1.0f));
+            playingSounds.put(sound, soundPool.play(sounds.get(sound.toUpperCase(Locale.US)), 1.0f, 1.0f, 1, (loop ? -1 : 0), 1.0f));
         }
     }
 
     public void stopSound(String sound)
     {
-        if (playingSounds.containsKey(sound.toUpperCase()))
+        if (playingSounds.containsKey(sound.toUpperCase(Locale.US)))
         {
-            soundPool.stop(playingSounds.get(sound.toUpperCase()));
+            soundPool.stop(playingSounds.get(sound.toUpperCase(Locale.US)));
         }
     }
 }

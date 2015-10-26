@@ -16,6 +16,7 @@
         android:layout_gravity="center"
         android:minHeight="140dp"
         android:minWidth="200dp"
+        android:contentDescription="@string/how_it_works"
         android:src="@drawable/ic_qrcode_white_36dp"/>
 
     <me.grantland.widget.AutofitTextView
@@ -52,7 +53,7 @@
         android:layout_toLeftOf="@+id/how_it_works_page_image"
         android:layout_toStartOf="@+id/how_it_works_page_image"
         android:background="#00FFFFFF"
-        android:text="Skip"
+        android:text="@string/skip"
         android:textColor="#ffffff"/>
 
     <ImageButton
@@ -67,7 +68,7 @@
         android:layout_marginRight="20dp"
         android:background="#00FFFFFF"
         android:baselineAlignBottom="false"
-        android:contentDescription="Next"
+        android:contentDescription="@string/next"
         android:src="@drawable/ic_keyboard_arrow_right_white_24dp"
         android:textColor="#ffffff"
         android:onClick="handleNextPageButtonClicked"/>
@@ -84,6 +85,7 @@
             android:id="@+id/circle_one"
             android:layout_width="10dp"
             android:layout_height="10dp"
+            android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
             android:alpha="0.2"
             android:background="@drawable/circle"
@@ -94,6 +96,7 @@
             android:id="@+id/circle_two"
             android:layout_width="10dp"
             android:layout_height="10dp"
+            android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
             android:alpha="0.2"
             android:background="@drawable/circle"
@@ -104,6 +107,7 @@
             android:id="@+id/circle_three"
             android:layout_width="10dp"
             android:layout_height="10dp"
+            android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
             android:alpha="0.2"
             android:background="@drawable/circle"
