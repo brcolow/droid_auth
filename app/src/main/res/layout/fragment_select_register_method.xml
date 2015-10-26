@@ -36,7 +36,7 @@
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="left">
+            android:layout_gravity="start">
 
             <Button
                 android:id="@+id/scan_qr_code_button"
