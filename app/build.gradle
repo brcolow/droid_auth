@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 def versionMajor = 1
 def versionMinor = 0
 def versionPatch = 1
-def versionBuild = 2 // bump for dogfood builds, public betas, etc.
+def versionBuild = 3 // bump for dogfood builds, public betas, etc.
 
 android {
     compileSdkVersion 23
@@ -14,7 +14,8 @@ android {
         minSdkVersion 15
         targetSdkVersion 23
         versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
-        versionName "${versionMajor}.${versionMinor}.${versionPatch}"
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}+" +
+                String.format("%03d", versionBuild);
     }
 
     lintOptions {
@@ -24,6 +25,7 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
     }
+
     signingConfigs {
         release {
             // We can leave these in environment variables
@@ -71,9 +73,31 @@ task askForPasswords << {
     android.signingConfigs.release.keyPassword = keyPw
 }
 
+def replacePatternInFile(file, Closure replaceText) {
+    file.write(replaceText(file.text))
+}
+
+task writeVersionToAboutFile << {
+    def file = new File('.\\app\\src\\main\\assets\\about.html')
+    def patternToFind = ~/Version \d.\d.\d+\d\d\d/
+    def replacePatternWith = 'Version ' + versionMajor + "." + versionMinor + "." + versionPatch +
+            "-" + String.format("%03d", versionBuild);
+
+//Call the method
+    replacePatternInFile(file){
+        it.replaceAll(patternToFind, replacePatternWith)
+    }
+
+}
+
+askForPasswords.mustRunAfter writeVersionToAboutFile
+
 tasks.whenTaskAdded { theTask ->
     if (theTask.name.equals("packageRelease")) {
         theTask.dependsOn "askForPasswords"
+        theTask.dependsOn "writeVersionToAboutFile"
+    } else if (theTask.name.equals("askForPasswords")) {
+        theTask.dependsOn "writeVersionToAboutFile"
     }
 }
 
