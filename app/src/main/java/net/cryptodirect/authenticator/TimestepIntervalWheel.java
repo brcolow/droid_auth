@@ -23,8 +23,9 @@ import android.view.View;
  */
 public class TimestepIntervalWheel extends View
 {
-    private final int trackWidth = 3;
-    private final int fillWidth = 12;
+    private final int trackWidth;
+    private final int fillWidth;
+    private final float numberSize;
     private final int trackColor = Color.rgb(206, 208, 208);
     private final int fillColor = Color.rgb(25, 90, 114);
     private final int numberColor = Color.rgb(206, 208, 208);
@@ -34,13 +35,18 @@ public class TimestepIntervalWheel extends View
     private final int intervalInSeconds;
     private int secondsRemainingInInterval;
     private RectF enclosingSquare;
+    private final int displayWidth;
     private static final String TAG = TimestepIntervalWheel.class.getSimpleName();
 
-    public TimestepIntervalWheel(Context context, int intervalInSeconds, int secondsRemainingInInterval)
+    public TimestepIntervalWheel(Context context, int intervalInSeconds, int secondsRemainingInInterval, int displayWidth)
     {
         super(context);
+        this.displayWidth = displayWidth;
         this.intervalInSeconds = intervalInSeconds;
         this.secondsRemainingInInterval = secondsRemainingInInterval;
+        this.trackWidth = (int) (displayWidth * 0.01f);
+        this.fillWidth = (int) (displayWidth * 0.03f);
+        numberSize = displayWidth * 0.08f;
     }
 
     @Override
@@ -62,16 +68,14 @@ public class TimestepIntervalWheel extends View
         numberPaint = new Paint();
         numberPaint.setColor(numberColor);
         numberPaint.setAntiAlias(true);
-        numberPaint.setTextSize(60f);
-        numberPaint.setTextAlign(Paint.Align.CENTER);
+        numberPaint.setTextSize(numberSize);
     }
 
     @Override
     protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight)
     {
         super.onSizeChanged(width, height, oldWidth, oldHeight);
-
-        int trackRadius = 320;
+        int trackRadius = (int) ((displayWidth * 0.64f));
         enclosingSquare = new RectF(
                 (Math.max(trackWidth, fillWidth) / 2) + (width / 2) - trackRadius / 2,
                 (Math.max(trackWidth, fillWidth) / 2) + (height / 2) - trackRadius / 2,
@@ -89,9 +93,10 @@ public class TimestepIntervalWheel extends View
         double chunkToRemovePercentage = 1d - ((double) secondsRemainingInInterval / (double) intervalInSeconds);
         int chunkToRemoveInDegrees = (int) (360d * chunkToRemovePercentage);
         canvas.drawArc(enclosingSquare, 270, -360 + chunkToRemoveInDegrees, false, fillPaint);
-        int textYPos = (int) ((canvas.getHeight() / 2) - ((numberPaint.descent() + numberPaint.ascent()) / 2)) ;
-
-        canvas.drawText(String.valueOf(secondsRemainingInInterval), canvas.getWidth() / 2, textYPos, numberPaint);
+        float textWidth = numberPaint.measureText(String.valueOf(secondsRemainingInInterval));
+        canvas.drawText(String.valueOf(secondsRemainingInInterval),
+                (canvas.getWidth() / 2) - (textWidth / 4),
+                (canvas.getHeight() / 2) + (numberSize / 2), numberPaint);
     }
 
     /**

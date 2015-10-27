@@ -1,6 +1,7 @@
 package net.cryptodirect.authenticator;
 
 import android.content.SharedPreferences;
+import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -9,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -70,15 +72,21 @@ public class AuthenticatorFragment extends Fragment
         double fractionalPart = tc - (long) tc;
         // what second of the cyclical range [0, TS] we are in, e.g. TS * 0.25
         int currentSpotInTSInterval = (int) ((double) ts * fractionalPart);
-        timestepIntervalWheel = new TimestepIntervalWheel(this.getActivity(), ts, ts - currentSpotInTSInterval);
-        RelativeLayout.LayoutParams intervalWheelLayoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-        intervalWheelLayoutParams.width = 500;
-        intervalWheelLayoutParams.addRule(RelativeLayout.BELOW, R.id.code_box);
-        intervalWheelLayoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-        ((RelativeLayout) rootView.findViewById(R.id.main_layout)).addView(timestepIntervalWheel, intervalWheelLayoutParams);
-        codeBox = ((EditText) rootView.findViewById(R.id.code_box));
+        WindowManager windowManager = getActivity().getWindowManager();
+        Rect displayRect = new Rect();
+        windowManager.getDefaultDisplay().getRectSize(displayRect);
 
-        // Set initial TOTP token value
+        RelativeLayout.LayoutParams intervalWheelLayoutParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        intervalWheelLayoutParams.addRule(RelativeLayout.BELOW, R.id.code_box);
+        intervalWheelLayoutParams.setMargins(0, 10, 0, 0); // left, top, right, bottom
+        intervalWheelLayoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+        intervalWheelLayoutParams.width = displayRect.width();
+        timestepIntervalWheel = new TimestepIntervalWheel(this.getActivity(), ts, ts - currentSpotInTSInterval, displayRect.width());
+        ((RelativeLayout) rootView.findViewById(R.id.main_layout)).addView(timestepIntervalWheel, intervalWheelLayoutParams);
+
+        // Set initial codebox to initial TOTP token
+        codeBox = ((EditText) rootView.findViewById(R.id.code_box));
         codeBox.setText(TOTP.generateTOTPSha1(key.getBytes(StandardCharsets.US_ASCII), (long) tc, NUM_DIGITS));
         Timer timer = new Timer();
         timer.schedule(new WheelTask(), 0, 1000);
