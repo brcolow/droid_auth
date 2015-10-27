@@ -42,7 +42,7 @@
         android:layout_below="@+id/email_label"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
-        android:background="#424242"
+        android:background="@drawable/code_box_gradient"
         android:ems="4"
         android:focusable="false"
         android:gravity="center_vertical|center_horizontal"
@@ -53,6 +53,10 @@
         android:textColor="#fafafa"
         android:textSize="34sp"
         android:textStyle="bold"
-        android:typeface="monospace"/>
+        android:typeface="monospace"
+        android:shadowColor="#000000"
+        android:shadowDx="3"
+        android:shadowDy="3"
+        android:shadowRadius="1.5"/>
 
 </RelativeLayout>
