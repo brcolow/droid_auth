@@ -23,7 +23,7 @@
         android:text="@string/select_method_blurb"
         android:textColor="#f2f2f2"
         android:textSize="32sp"
-        autofit:minTextSize="18sp"/>
+        autofit:minTextSize="14sp"/>
 
     <TableLayout
         android:layout_width="wrap_content"
