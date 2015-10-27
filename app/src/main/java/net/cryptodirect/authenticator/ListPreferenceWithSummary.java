@@ -3,7 +3,6 @@ package net.cryptodirect.authenticator;
 import android.content.Context;
 import android.preference.ListPreference;
 import android.util.AttributeSet;
-import android.util.Log;
 
 /**
  * Work-around for buggy %s implementation.
@@ -29,7 +28,6 @@ public class ListPreferenceWithSummary extends ListPreference
     @Override
     public void setValue(String value)
     {
-        Log.e(TAG, "SET VALUE CALLED WITH VALUE: " + value);
         super.setValue(value);
         setSummary(value);
     }
@@ -37,7 +35,6 @@ public class ListPreferenceWithSummary extends ListPreference
     @Override
     public void setSummary(CharSequence summary)
     {
-        Log.e(TAG, "SET SUMMARY CALLED WITH VALUE: " + summary);
         super.setSummary(getEntry());
     }
 }
