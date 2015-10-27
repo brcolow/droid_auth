@@ -68,9 +68,9 @@ public class LinkAccountActivity
     public void onBackPressed()
     {
         super.onBackPressed();
-        if (getSupportFragmentManager().getBackStackEntryCount() >= 1)
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0)
         {
-            getFragmentManager().popBackStack();
+            getSupportFragmentManager().popBackStack();
         }
         else
         {
@@ -156,7 +156,7 @@ public class LinkAccountActivity
     public void handleIncorrectButtonClicked(View view)
     {
         // information was incorrect, so go back to select method fragment
-        getFragmentManager().popBackStack("select-method", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        getSupportFragmentManager().popBackStack("select-method", FragmentManager.POP_BACK_STACK_INCLUSIVE);
         SelectRegisterMethodFragment selectMethodFragment = new SelectRegisterMethodFragment();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.register_account_fragment_container,

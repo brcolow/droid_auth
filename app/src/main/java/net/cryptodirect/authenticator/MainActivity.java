@@ -2,6 +2,7 @@ package net.cryptodirect.authenticator;
 
 import android.animation.ArgbEvaluator;
 import android.app.AlertDialog;
+import android.os.Build;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
@@ -38,7 +39,9 @@ import java.util.Map;
  */
 public class MainActivity
         extends AppCompatActivity
-        implements AccountChooserFragment.OnAccountChosenListener, FragmentManager.OnBackStackChangedListener, DialogInterface.OnCancelListener
+        implements AccountChooserFragment.OnAccountChosenListener,
+        FragmentManager.OnBackStackChangedListener,
+        DialogInterface.OnCancelListener
 {
     public static Context BASE_CONTEXT;
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -81,12 +84,7 @@ public class MainActivity
         {
             getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_USE_LOGO | ActionBar.DISPLAY_SHOW_TITLE);
         }
-        else
-        {
-            // throw new IllegalStateException("getSupportActionBar() returned null");
-        }
 
-        //getSupportActionBar().setIcon(R.drawable.ic_qrcode_white_36dp);
         getSupportFragmentManager().addOnBackStackChangedListener(this);
         if (!settings.getString("default_account", "").isEmpty()
                 && !settings.getString("default_account", "").equalsIgnoreCase("none")
@@ -97,7 +95,7 @@ public class MainActivity
             if (AccountManager.getInstance().accountExists(defaultAccount))
             {
                 // go to authenticator for default account preference
-                addAuthenticatorFragment(defaultAccount, 30);
+                showAuthenticatorFragment(defaultAccount, 30);
             }
             else
             {
@@ -148,7 +146,7 @@ public class MainActivity
                 else
                 {
                     // we have data for only one account
-                    addAuthenticatorFragment(AccountManager.getInstance().getOnlyAccount().getEmail(), 30);
+                    showAuthenticatorFragment(AccountManager.getInstance().getOnlyAccount().getEmail(), 30);
                 }
             }
             else
@@ -167,18 +165,45 @@ public class MainActivity
     @Override
     public void onBackPressed()
     {
-        // TODO maybe think about seeing if we allow our about fragment webview
-        // to open urls inside of it
-        // http://stackoverflow.com/questions/4907045/how-to-make-links-open-within-webview-or-open-by-default-browser-depending-on-do)
-        // we can see if the webview is non-null and canGoBack(), then we can call back on it
-        // the webview
         if (getFragmentManager().getBackStackEntryCount() > 0)
         {
-            getFragmentManager().popBackStack();
+            android.app.FragmentManager.BackStackEntry backEntry = getFragmentManager().
+                    getBackStackEntryAt(getFragmentManager().getBackStackEntryCount() - 1);
+            String fragmentName = backEntry.getName();
+            Log.e(TAG, "Fragment at top of back stack name: " + fragmentName);
+            if (fragmentName.equals("settings") || fragmentName.equals("how-it-works"))
+            {
+                // the settings and how-it-works fragments are the only fragments
+                // in the application that use the non-compat Fragment, and so are
+                // managed by getFragmentManager() rather than getSupportFragmentManager()
+                getFragmentManager().popBackStack();
+            }
+            //android.app.Fragment fragment = getFragmentManager().findFragmentByTag(fragmentName);
         }
-        else
+
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0)
         {
-            //super.onBackPressed();
+            FragmentManager.BackStackEntry backEntry = getSupportFragmentManager().
+                    getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1);
+            String fragmentName = backEntry.getName();
+            //Fragment fragment = getSupportFragmentManager().findFragmentByTag(fragmentName);
+
+            if (!fragmentName.equals("welcome") && !fragmentName.equals("authenticator")
+                    && !fragmentName.equals("choose-account"))
+            {
+                getSupportFragmentManager().popBackStack();
+            }
+            else
+            {
+                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
+                {
+                    this.finishAffinity();
+                }
+                else
+                {
+                    finish();
+                }
+            }
         }
     }
 
@@ -284,7 +309,7 @@ public class MainActivity
         }
     }
 
-    private void addAuthenticatorFragment(String email, int ts)
+    private void showAuthenticatorFragment(String email, int ts)
     {
         Bundle bundle = new Bundle();
         bundle.putString("email", email);
@@ -338,7 +363,7 @@ public class MainActivity
     @Override
     public void onAccountChosen(String chosenAccount)
     {
-        addAuthenticatorFragment(chosenAccount, 30);
+        showAuthenticatorFragment(chosenAccount, 30);
     }
 
     /**
