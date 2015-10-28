@@ -12,7 +12,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="40dp"
         android:background="@android:drawable/dialog_holo_dark_frame"
         android:padding="22dp"
         android:text="@string/begin_tests"
@@ -28,6 +28,18 @@
         android:layout_alignParentStart="true"
         android:layout_alignTop="@+id/begin_tests_button"
         android:layout_gravity="center_horizontal"
+        android:gravity="center"
         android:orientation="vertical">
+
+        <TableLayout
+            android:id="@+id/results_table"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="0"
+            android:padding="5dp"
+            android:stretchColumns="*">
+        </TableLayout>
     </LinearLayout>
 </RelativeLayout>

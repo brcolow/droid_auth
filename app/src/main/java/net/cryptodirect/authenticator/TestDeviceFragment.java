@@ -1,14 +1,19 @@
 package net.cryptodirect.authenticator;
 
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
+
+import net.cryptodirect.authenticator.crypto.TOTP;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,7 +22,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.concurrent.ExecutionException;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -29,47 +33,148 @@ import javax.net.ssl.HttpsURLConnection;
  */
 public class TestDeviceFragment extends Fragment
 {
-    private static final String TAG = TestDeviceFragment.class.getSimpleName();
+    private static final byte[] KEY_20_BYTES = "12345678901234567890"
+            .getBytes(StandardCharsets.US_ASCII);
+    private static final byte[] KEY_32_BYTES = "12345678901234567890123456789012"
+            .getBytes(StandardCharsets.US_ASCII);
+    private static final byte[] KEY_64_BYTES = ("123456789012345678901234567890123456789012345678" +
+            "9012345678901234").getBytes(StandardCharsets.US_ASCII);
+
+    private static final long[] testTimeParams = new long[]{59, 1111111109L, 1111111111L,
+            1234567890L, 2000000000L, 20000000000L};
+
+    private static final String[] testCorrectResults = new String[]{"94287082", "07081804",
+            "14050471", "89005924", "69279037", "65353130", "46119246", "68084774", "67062674",
+            "91819424", "90698825", "77737706", "90693936", "25091201", "99943326", "93441116",
+            "38618901", "47863826"};
+
+    private static final int PASSED_COLOR = Color.parseColor("#4CAF50");
+    private static final int FAILED_COLOR = Color.parseColor("#E53935");
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle state)
     {
         View view = inflater.inflate(R.layout.fragment_test_device, container, false);
         final Button button = (Button) view.findViewById(R.id.begin_tests_button);
+        final TableLayout resultsTable = (TableLayout) view.findViewById(R.id.results_table);
+
         button.setOnClickListener(new View.OnClickListener()
         {
             public void onClick(View view)
             {
+                /*
                 FetchTimeTask fetchTimeTask = new FetchTimeTask();
+                long serverTimeMillis;
                 try
                 {
-                    long serverTimeMillis = fetchTimeTask.execute().get();
-                    Log.i(TAG, "server time millis: " + serverTimeMillis);
+                    serverTimeMillis = fetchTimeTask.execute().get(5000, TimeUnit.MILLISECONDS);
                 }
-                catch (InterruptedException | ExecutionException e)
+                catch (InterruptedException | ExecutionException | TimeoutException e)
                 {
-                    e.printStackTrace();
+                    serverTimeMillis = System.currentTimeMillis();
                 }
+                */
+                boolean[] testSuccessful = new boolean[18];
+                for (int i = 0; i < testSuccessful.length; i++)
+                {
+                    if (i < 6)
+                    {
+                        testSuccessful[i] = TOTP.generateTOTPSha1(KEY_20_BYTES,
+                                TOTP.getTC(testTimeParams[i], 30), 8).equals(testCorrectResults[i]);
+                    }
+                    else if (i < 12)
+                    {
+                        testSuccessful[i] = TOTP.generateTOTPSha256(KEY_32_BYTES,
+                                TOTP.getTC(testTimeParams[i % 6], 30), 8).equals(testCorrectResults[i]);
+                    }
+                    else
+                    {
+                        testSuccessful[i] = TOTP.generateTOTPSha512(KEY_64_BYTES,
+                                TOTP.getTC(testTimeParams[i % 6], 30), 8).equals(testCorrectResults[i]);
+                    }
+                }
+                TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(
+                        TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+                layoutParams.setMargins(2, 2, 2, 0);
 
-                LinearLayout resultsContainer = (LinearLayout) view.findViewById(R.id.results_container);
-                // TODO put test results as children of resultsContainer
-                // also.. we may want to move the above code into an Async task, that is scheduled
-                // for immediate execution when the button is clicked. Before that, the button
-                // could be replaced by a progress indicator. once the async task is done, the progress
-                // container is removed and the results are drawn on the main thread
+                LinearLayout testNumberHeaderCell = new LinearLayout(getActivity());
+                testNumberHeaderCell.setBackgroundColor(Color.parseColor("#212121"));
+                testNumberHeaderCell.setLayoutParams(layoutParams);
+                TextView testNumber = new TextView(getActivity());
+                testNumber.setText("Test #");
+                testNumber.setTextColor(Color.WHITE);
+                testNumber.setPadding(0, 0, 4, 3);
+                testNumberHeaderCell.addView(testNumber);
+
+
+                LinearLayout testResultHeaderCell = new LinearLayout(getActivity());
+                testResultHeaderCell.setBackgroundColor(Color.parseColor("#212121"));
+                testResultHeaderCell.setLayoutParams(layoutParams);
+                TextView testResult = new TextView(getActivity());
+                testResult.setText("Result");
+                testResult.setTextColor(Color.WHITE);
+                testNumber.setPadding(0, 0, 4, 3);
+                testResultHeaderCell.addView(testResult);
+
+                TableRow resultsTableHeaderRow = new TableRow(getActivity());
+                resultsTableHeaderRow.addView(testNumberHeaderCell);
+                resultsTableHeaderRow.addView(testResultHeaderCell);
+                resultsTableHeaderRow.setBackgroundColor(Color.WHITE);
+                resultsTableHeaderRow.setPadding(0, 0, 0, 2); // Border between rows
+
+                resultsTable.addView(resultsTableHeaderRow);
+                layoutParams.setMargins(2, 0, 2, 0);
+
+                for (int i = 0; i < testSuccessful.length; i++)
+                {
+                    TableRow testResultRow = new TableRow(getActivity());
+
+                    testResultRow.setBackgroundColor(Color.WHITE);
+                    testResultRow.setPadding(0, 0, 0, 2); // Border between rows
+
+                    LinearLayout cell = new LinearLayout(getActivity());
+                    cell.setBackgroundColor(Color.parseColor("#212121"));
+                    cell.setLayoutParams(layoutParams);
+                    testNumber = new TextView(getActivity());
+                    testNumber.setText("Test " + (i + 1));
+                    testNumber.setTextColor(Color.WHITE);
+                    testNumber.setPadding(0, 0, 4, 3);
+                    cell.addView(testNumber);
+
+                    LinearLayout cell2 = new LinearLayout(getActivity());
+                    cell2.setBackgroundColor(Color.parseColor("#212121"));
+                    cell2.setLayoutParams(layoutParams);
+                    testResult = new TextView(getActivity());
+                    testResult.setText(testSuccessful[i] ? "Passed" : "Failed");
+                    testResult.setTextColor(testSuccessful[i] ? PASSED_COLOR : FAILED_COLOR);
+                    testNumber.setPadding(0, 0, 4, 3);
+                    cell2.addView(testResult);
+
+                    testResultRow.addView(cell);
+                    testResultRow.addView(cell2);
+                    resultsTable.addView(testResultRow);
+                }
+                button.setVisibility(View.GONE);
             }
         });
         return view;
     }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState)
+    {
+        super.onViewCreated(view, savedInstanceState);
+    }
+
 
     private class FetchTimeTask extends AsyncTask<String, Void, Long>
     {
         @Override
         protected Long doInBackground(String... args)
         {
-            String timeResponse = null;
             try
             {
+                String timeResponse = null;
                 URL url = new URL("https://cryptodash.net:4463/time");
                 HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
                 try
@@ -90,31 +195,14 @@ public class TestDeviceFragment extends Fragment
                 {
                     urlConnection.disconnect();
                 }
-            }
-            catch (IOException e)
-            {
-                Log.e(TAG, "Could not fetch current time from Centurion: ", e);
-            }
 
-            long serverTimeMillis;
-            if (timeResponse == null)
-            {
-                // couldn't get time from server - just continue with device's current time
-                serverTimeMillis = System.currentTimeMillis();
+                JSONObject timeJsonObject = new JSONObject(timeResponse);
+                return timeJsonObject.getLong("time");
             }
-            else
+            catch (IOException | JSONException e)
             {
-                try
-                {
-                    JSONObject timeJsonObject = new JSONObject(timeResponse);
-                    serverTimeMillis = timeJsonObject.getLong("time");
-                }
-                catch (JSONException e)
-                {
-                    throw new IllegalStateException(e);
-                }
+                return System.currentTimeMillis();
             }
-            return serverTimeMillis;
         }
     }
 }

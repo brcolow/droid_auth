@@ -13,9 +13,9 @@ import org.junit.Test;
  */
 public class TOTPTest
 {
-    byte[] KEY_20_BYTES = "12345678901234567890".getBytes(StandardCharsets.US_ASCII);
-    byte[] KEY_32_BYTES = "12345678901234567890123456789012".getBytes(StandardCharsets.US_ASCII);
-    byte[] KEY_64_BYTES = "1234567890123456789012345678901234567890123456789012345678901234".getBytes(StandardCharsets.US_ASCII);
+    private static final byte[] KEY_20_BYTES = "12345678901234567890".getBytes(StandardCharsets.US_ASCII);
+    private static final byte[] KEY_32_BYTES = "12345678901234567890123456789012".getBytes(StandardCharsets.US_ASCII);
+    private static final byte[] KEY_64_BYTES = "1234567890123456789012345678901234567890123456789012345678901234".getBytes(StandardCharsets.US_ASCII);
 
     @Test
     public void testTOTPSha1()

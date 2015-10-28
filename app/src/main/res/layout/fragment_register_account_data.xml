@@ -103,6 +103,9 @@
         android:id="@+id/correct_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/key_text_field"
+        android:layout_alignRight="@+id/key_text_field"
+        android:layout_alignTop="@+id/incorrect_button"
         android:background="@android:drawable/dialog_holo_dark_frame"
         android:drawableLeft="@drawable/ic_check_white_24dp"
         android:drawablePadding="5dp"
@@ -114,15 +117,16 @@
         android:singleLine="true"
         android:text="@string/information_correct"
         android:textColor="#f3f3f3"
-        android:textSize="12sp"
-        android:layout_alignTop="@+id/incorrect_button"
-        android:layout_alignRight="@+id/key_text_field"
-        android:layout_alignEnd="@+id/key_text_field"/>
+        android:textSize="12sp"/>
 
     <Button
         android:id="@+id/incorrect_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/key_text_field"
+        android:layout_alignStart="@+id/key_text_field"
+        android:layout_below="@+id/key_text_field"
+        android:layout_marginTop="52dp"
         android:background="@android:drawable/dialog_holo_dark_frame"
         android:drawableLeft="@drawable/ic_close_white_24dp"
         android:drawablePadding="5dp"
@@ -135,10 +139,6 @@
         android:singleLine="true"
         android:text="@string/information_incorrect"
         android:textColor="#f3f3f3"
-        android:textSize="12sp"
-        android:layout_below="@+id/key_text_field"
-        android:layout_alignLeft="@+id/key_text_field"
-        android:layout_alignStart="@+id/key_text_field"
-        android:layout_marginTop="52dp"/>
+        android:textSize="12sp"/>
 
 </RelativeLayout>
