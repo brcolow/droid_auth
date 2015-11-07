@@ -72,6 +72,7 @@
         android:layout_below="@+id/key_label"
         android:layout_marginTop="33dp"
         android:background="#f4f4f4"
+        android:maxLength="44"
         android:elegantTextHeight="true"
         android:enabled="true"
         android:gravity="top|start"
