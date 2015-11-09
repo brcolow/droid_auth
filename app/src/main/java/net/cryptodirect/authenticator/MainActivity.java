@@ -429,26 +429,33 @@ public class MainActivity
                 R.drawable.ic_qrcode_white_36dp,
                 "In order to use this authenticator app, you need to link your Cryptodash account " +
                         "with this device. To do so, just tap the \"Link Account\" button. The " +
-                        "linking process involves one step - scanning a QR code. After that, you're successfully linked. " +
-                        "Now that your account is linked, when you log in to Cryptodash or perform " +
+                        "linking process involves one step - scanning a QR code. You can get the required " +
+                        "QR code from either www.cryptodash.net or the Cryptodash application. When logging " +
+                        "in without two-factor authentication enabled, a warning will appear suggesting you " +
+                        "enable it. Follow the warning's instructions to retrieve your QR code and use this " +
+                        "app to scan it. After that, you're successfully linked. " +
+                        "Once your account is linked, when you log in to Cryptodash or perform " +
                         "certain actions (which is configurable) you will be prompted to enter a verification code."));
 
         pageMap.put(1, HowItWorksPageFragment.newInstance(1,
                 "#5C6BC0",
                 R.drawable.ic_keyboard_white_36dp,
-                "Every 30 seconds, this app automatically generates a new, 6-digit " +
-                        "random code. Requiring this code adds an extra layer " +
-                        "of security to your account. In other words, even if your username and password were " +
+                "Every 30 seconds, this app automatically generates a random 6-digit " +
+                        "code. When two-factor authentication is enabled, this code is required when logging in to your account or performing " +
+                        "sensitive actions (such as withdrawing funds or posting an order). Exactly which " +
+                        "actions require entering a code is completely configurable and uses sensible defaults. Requiring a code adds an extra layer " +
+                        "of security on to your account. In other words, even if your username and password were " +
                         "compromised, an attacker would still need your mobile phone to even attempt to " +
                         "gain access to your account."));
 
         pageMap.put(2, HowItWorksPageFragment.newInstance(2,
                 "#43A047",
                 R.drawable.ic_restore_white_48dp,
-                "Codes are generated using a 32-byte secret key that is stored securely on your " +
-                        "device. The generating process uses a cryptographically secure standard " +
-                        "called TOTP which uses the same cryptographic hash function as Bitcoin! " +
-                        "You can run this app against the set of tests listed in the TOTP " +
+                "Codes are generated using a 32-byte shared secret key that is stored securely on your " +
+                        "device. The process of generating a code uses a cryptographically secure standard " +
+                        "called TOTP (Time-based One-time Password Algorithm) which internally uses the same " +
+                        "cryptographic hash function as Bitcoin (SHA-256). " +
+                        "In accordance with our transparent security practices, you can run this app against the set of tests listed in the TOTP " +
                         "specification via the \"Test Device\" option on the main menu."));
     }
 

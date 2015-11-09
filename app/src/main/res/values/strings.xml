@@ -30,6 +30,8 @@
     <string name="button.method.manual">Manual Entry</string>
     <string name="skip">Skip</string>
     <string name="next">Next</string>
+    <string name="invalid_email">Invalid Email</string>
+    <string name="invalid_key">Invalid Key</string>
 
     <!-- Settings related strings -->
     <string name="general_cat">General</string>
