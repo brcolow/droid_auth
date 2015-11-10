@@ -32,6 +32,9 @@
     <string name="next">Next</string>
     <string name="invalid_email">Invalid Email</string>
     <string name="invalid_key">Invalid Key</string>
+    <string name="not_now">Not Now</string>
+    <string name="rescan">Rescan</string>
+    <string name="enter_manually">Enter Manually</string>
 
     <!-- Settings related strings -->
     <string name="general_cat">General</string>

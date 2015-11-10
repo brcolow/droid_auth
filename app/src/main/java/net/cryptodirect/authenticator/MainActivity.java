@@ -105,7 +105,7 @@ public class MainActivity
                         + defaultAccount + " but we have no data for that account. " +
                         "Sorry about that - please link the account again.");
                 alertBuilder.setCancelable(true);
-                alertBuilder.setPositiveButton("Link Account",
+                alertBuilder.setPositiveButton(getString(R.string.register_new_account),
                         new DialogInterface.OnClickListener()
                         {
                             public void onClick(DialogInterface dialog, int id)
@@ -113,7 +113,7 @@ public class MainActivity
                                 startLinkAccountActivity();
                             }
                         });
-                alertBuilder.setNegativeButton("Not Now",
+                alertBuilder.setNegativeButton(getString(R.string.not_now),
                         new DialogInterface.OnClickListener()
                         {
                             public void onClick(DialogInterface dialog, int id)

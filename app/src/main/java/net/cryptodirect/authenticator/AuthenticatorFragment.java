@@ -38,6 +38,8 @@ public class AuthenticatorFragment extends Fragment
     private static SharedPreferences sharedPreferences;
     private static TimestepIntervalWheel timestepIntervalWheel;
     private volatile boolean tickingSoundPlaying = false;
+    private static Timer timer = new Timer();
+    private static WheelTask currentTask;
     private static EditText codeBox;
     private static final String TAG = AuthenticatorFragment.class.getSimpleName();
 
@@ -88,9 +90,62 @@ public class AuthenticatorFragment extends Fragment
         // Set initial codebox to initial TOTP token
         codeBox = ((EditText) rootView.findViewById(R.id.code_box));
         codeBox.setText(TOTP.generateTOTPSha1(key.getBytes(StandardCharsets.US_ASCII), (long) tc, NUM_DIGITS));
-        Timer timer = new Timer();
-        timer.schedule(new WheelTask(), 0, 1000);
+        try
+        {
+            if (timer == null)
+            {
+                if (currentTask != null)
+                {
+                    timer = new Timer();
+                    timer.schedule(currentTask, 0, 1000);
+                }
+                else
+                {
+                    timer = new Timer();
+                    currentTask = new WheelTask();
+                    timer.schedule(new WheelTask(), 0, 1000);
+                }
+            }
+            else
+            {
+                if (currentTask != null)
+                {
+                    timer.schedule(currentTask, 0, 1000);
+                }
+                else
+                {
+                    currentTask = new WheelTask();
+                    timer.schedule(new WheelTask(), 0, 1000);
+                }
+            }
+        }
+        catch (IllegalStateException e)
+        {
+            // timer was cancelled
+            timer = new Timer();
+            if (currentTask != null)
+            {
+                timer.schedule(currentTask, 0, 1000);
+            }
+            else
+            {
+                currentTask = new WheelTask();
+                timer.schedule(new WheelTask(), 0, 1000);
+            }
+        }
+
         return rootView;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (timer != null)
+        {
+            timer.cancel();
+            timer.purge();
+            timer = null;
+        }
     }
 
     private class WheelTask extends TimerTask

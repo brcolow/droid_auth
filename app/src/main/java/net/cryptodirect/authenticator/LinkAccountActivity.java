@@ -1,12 +1,14 @@
 package net.cryptodirect.authenticator;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
@@ -19,6 +21,7 @@ public class LinkAccountActivity
         FragmentManager.OnBackStackChangedListener
 {
     private volatile boolean currentFragmentIsScanQRCode = false;
+    private final String TAG = LinkAccountActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle state)
@@ -108,25 +111,72 @@ public class LinkAccountActivity
     @Override
     public void onQRCodeScanned(BarcodeFormat barcodeFormat, String scannedCode)
     {
+        String reasonInvalid = null;
+
         if (!barcodeFormat.equals(BarcodeFormat.QR_CODE))
         {
-            throw new IllegalArgumentException("decoded barcode was not in QR code format");
-        }
-        if (!scannedCode.contains("|"))
-        {
-            throw new IllegalArgumentException("decoded QR code was not formatted correctly");
+            reasonInvalid = "The scanned barcode must be a QR code. Instead, it was in format: " +
+                    barcodeFormat.name();
         }
 
-        Bundle bundle = new Bundle();
-        bundle.putString("decoded_email", scannedCode.split("\\|")[0]);
-        bundle.putString("decoded_key", scannedCode.split("\\|")[1]);
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        LinkAccountDataFragment linkAccountDataFragment = new LinkAccountDataFragment();
-        linkAccountDataFragment.setArguments(bundle);
-        fragmentTransaction.add(R.id.register_account_fragment_container,
-                linkAccountDataFragment, "register-account-data")
-                .addToBackStack("register-account-data")
-                .commit();
+        String[] scannedCodeSplit = scannedCode.split("\\|");
+        if (!scannedCode.contains("|") || scannedCodeSplit.length != 2)
+        {
+            reasonInvalid = "The scanned QR code was not formatted correctly - make sure you are " +
+                    "scanning a Cryptodash provided QR code.";
+        }
+
+        Log.i(TAG, "Reason invalid: " + reasonInvalid);
+
+        if (reasonInvalid != null)
+        {
+            AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+            alertBuilder.setMessage(reasonInvalid);
+            alertBuilder.setCancelable(false);
+            alertBuilder.setPositiveButton(getString(R.string.rescan),
+                    new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int id)
+                        {
+                            getSupportFragmentManager().popBackStack();
+                            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                            ScanQRCodeFragment scanQRCodeFragment = new ScanQRCodeFragment();
+                            fragmentTransaction.add(R.id.register_account_fragment_container,
+                                    scanQRCodeFragment, "qr-code")
+                                    .addToBackStack("qr-code")
+                                    .commit();
+                        }
+                    });
+            alertBuilder.setNegativeButton(getString(R.string.enter_manually),
+                    new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int id)
+                        {
+                            getSupportFragmentManager().popBackStack();
+                            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                            ManualEntryFragment manualEntryFragment = new ManualEntryFragment();
+                            fragmentTransaction.add(R.id.register_account_fragment_container,
+                                    manualEntryFragment, "manual-entry")
+                                    .addToBackStack("manual-entry")
+                                    .commit();
+                        }
+                    });
+            AlertDialog alertDialog = alertBuilder.create();
+            alertDialog.show();
+        }
+        else
+        {
+            Bundle bundle = new Bundle();
+            bundle.putString("decoded_email", scannedCode.split("\\|")[0]);
+            bundle.putString("decoded_key", scannedCode.split("\\|")[1]);
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            LinkAccountDataFragment linkAccountDataFragment = new LinkAccountDataFragment();
+            linkAccountDataFragment.setArguments(bundle);
+            fragmentTransaction.add(R.id.register_account_fragment_container,
+                    linkAccountDataFragment, "register-account-data")
+                    .addToBackStack("register-account-data")
+                    .commit();
+        }
     }
 
     /**

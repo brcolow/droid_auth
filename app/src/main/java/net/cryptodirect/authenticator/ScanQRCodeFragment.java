@@ -2,11 +2,13 @@ package net.cryptodirect.authenticator;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -138,7 +140,7 @@ public class ScanQRCodeFragment extends Fragment implements ZXingScannerView.Res
     }
 
     @Override
-    public void onAttach(Activity activity)
+    public void onAttach(Context activity)
     {
         super.onAttach(activity);
         try
@@ -177,7 +179,7 @@ public class ScanQRCodeFragment extends Fragment implements ZXingScannerView.Res
         {
             SoundPoolManager.getInstance().playSound("SCAN", false);
         }
-        Toast.makeText(getActivity(), "Got QR code for email: " + rawResult.getText().split("\\|")[0], Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getActivity(), "Got QR code for email: " + rawResult.getText().split("\\|")[0], Toast.LENGTH_SHORT).show();
         listener.onQRCodeScanned(rawResult.getBarcodeFormat(), rawResult.getText());
     }
 
