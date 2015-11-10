@@ -130,7 +130,7 @@ public class LinkAccountActivity
 
         if (reasonInvalid != null)
         {
-            AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+            AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this, R.style.Theme_Dialog);
             alertBuilder.setMessage(reasonInvalid);
             alertBuilder.setCancelable(false);
             alertBuilder.setPositiveButton(getString(R.string.rescan),

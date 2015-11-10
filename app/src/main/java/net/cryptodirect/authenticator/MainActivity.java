@@ -100,7 +100,7 @@ public class MainActivity
             else
             {
                 // we have no data for the stored default account preference
-                AlertDialog.Builder alertBuilder = new AlertDialog.Builder(MainActivity.this);
+                AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this, R.style.Theme_Dialog);
                 alertBuilder.setMessage("We found that your default account is set to: "
                         + defaultAccount + " but we have no data for that account. " +
                         "Sorry about that - please link the account again.");
