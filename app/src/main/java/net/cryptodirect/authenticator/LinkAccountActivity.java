@@ -8,7 +8,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
@@ -21,7 +20,6 @@ public class LinkAccountActivity
         FragmentManager.OnBackStackChangedListener
 {
     private volatile boolean currentFragmentIsScanQRCode = false;
-    private final String TAG = LinkAccountActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle state)
@@ -126,8 +124,6 @@ public class LinkAccountActivity
                     "scanning a Cryptodash provided QR code.";
         }
 
-        Log.i(TAG, "Reason invalid: " + reasonInvalid);
-
         if (reasonInvalid != null)
         {
             AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this, R.style.Theme_Dialog);
@@ -167,8 +163,8 @@ public class LinkAccountActivity
         else
         {
             Bundle bundle = new Bundle();
-            bundle.putString("decoded_email", scannedCode.split("\\|")[0]);
-            bundle.putString("decoded_key", scannedCode.split("\\|")[1]);
+            bundle.putString("new_email", scannedCode.split("\\|")[0]);
+            bundle.putString("new_key", scannedCode.split("\\|")[1]);
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             LinkAccountDataFragment linkAccountDataFragment = new LinkAccountDataFragment();
             linkAccountDataFragment.setArguments(bundle);
@@ -185,14 +181,15 @@ public class LinkAccountActivity
      */
     public void handleCorrectButtonClicked(View view)
     {
-        EditText emailField = (EditText) findViewById(R.id.email_field);
+        EditText emailTextField = (EditText) findViewById(R.id.email_field);
         EditText keyTextField = (EditText) findViewById(R.id.key_text_field);
-        if (emailField == null || keyTextField == null)
+        if (emailTextField == null || keyTextField == null)
         {
             throw new IllegalStateException("email EditText or key EditText controls were null: ["
-                    + emailField + ", " + keyTextField + "]");
+                    + emailTextField + ", " + keyTextField + "]");
         }
-        AccountManager.getInstance().registerAccount(new Account(emailField.getText().toString(), keyTextField.getText().toString()), true);
+        AccountManager.getInstance().registerAccount(new Account(emailTextField.getText().toString(),
+                keyTextField.getText().toString()), true);
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
@@ -204,6 +201,8 @@ public class LinkAccountActivity
     public void handleIncorrectButtonClicked(View view)
     {
         // information was incorrect, so go back to select method fragment
+        getSupportFragmentManager().popBackStackImmediate();
+        /*
         getSupportFragmentManager().popBackStack("select-method", FragmentManager.POP_BACK_STACK_INCLUSIVE);
         SelectRegisterMethodFragment selectMethodFragment = new SelectRegisterMethodFragment();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -211,5 +210,33 @@ public class LinkAccountActivity
                 selectMethodFragment, "select-method")
                 .addToBackStack("select-method")
                 .commit();
+                */
     }
+
+    /**
+     * The "Okay" button is in ManualEntryFragment
+     * @param view
+     */
+    public void handleOkayButtonClicked(View view)
+    {
+        EditText emailTextField = (EditText) findViewById(R.id.email_field);
+        EditText keyTextField = (EditText) findViewById(R.id.key_text_field);
+        if (emailTextField == null || keyTextField == null)
+        {
+            throw new IllegalStateException("email EditText or key EditText controls were null: ["
+                    + emailTextField + ", " + keyTextField + "]");
+        }
+
+        Bundle bundle = new Bundle();
+        bundle.putString("new_email", emailTextField.getText().toString());
+        bundle.putString("new_key", keyTextField.getText().toString());
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        LinkAccountDataFragment linkAccountDataFragment = new LinkAccountDataFragment();
+        linkAccountDataFragment.setArguments(bundle);
+        fragmentTransaction.add(R.id.register_account_fragment_container,
+                linkAccountDataFragment, "register-account-data")
+                .addToBackStack("register-account-data")
+                .commit();
+    }
+
 }

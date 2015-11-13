@@ -16,7 +16,8 @@
     <string name="flash_off">Flash [OFF]</string>
     <string name="auto_focus_on">Auto Focus [ON]</string>
     <string name="auto_focus_off">Auto Focus [OFF]</string>
-    <string name="select_method_blurb">The easiest way to link your Cryptodash account is by scanning the provided QR code. If you don\'t have a working camera, you can still enter the code manually.</string>
+    <string name="select_method_blurb">The easiest way to link your Cryptodash account is by scanning the provided QR code.
+        If you don\'t have a working camera, you can still enter the code manually.</string>
     <string name="register_account_data_blurb">Verify that the following information is correct to continue:</string>
     <string name="email">Email:</string>
     <string name="key">Key:</string>

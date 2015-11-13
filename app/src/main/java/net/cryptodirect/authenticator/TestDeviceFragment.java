@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,6 +57,7 @@ public class TestDeviceFragment extends Fragment
     {
         View view = inflater.inflate(R.layout.fragment_test_device, container, false);
         final Button button = (Button) view.findViewById(R.id.begin_tests_button);
+        final LinearLayout resultsContainer = (LinearLayout) view.findViewById(R.id.results_container);
         final TableLayout resultsTable = (TableLayout) view.findViewById(R.id.results_table);
 
         button.setOnClickListener(new View.OnClickListener()
@@ -95,32 +97,29 @@ public class TestDeviceFragment extends Fragment
                 }
                 TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(
                         TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
-                layoutParams.setMargins(2, 2, 2, 0);
+                layoutParams.setMargins(0, 0, 0, 0);
 
                 LinearLayout testNumberHeaderCell = new LinearLayout(getActivity());
-                testNumberHeaderCell.setBackgroundColor(Color.parseColor("#212121"));
                 testNumberHeaderCell.setLayoutParams(layoutParams);
                 TextView testNumber = new TextView(getActivity());
                 testNumber.setText("Test #");
-                testNumber.setTextColor(Color.WHITE);
-                testNumber.setPadding(0, 0, 4, 3);
+                testNumber.setTextColor(Color.parseColor("#212121"));
+                testNumber.setPadding(0, 0, 0, 0);
                 testNumberHeaderCell.addView(testNumber);
 
-
                 LinearLayout testResultHeaderCell = new LinearLayout(getActivity());
-                testResultHeaderCell.setBackgroundColor(Color.parseColor("#212121"));
                 testResultHeaderCell.setLayoutParams(layoutParams);
                 TextView testResult = new TextView(getActivity());
                 testResult.setText("Result");
-                testResult.setTextColor(Color.WHITE);
-                testNumber.setPadding(0, 0, 4, 3);
+                testResult.setTextColor(Color.parseColor("#212121"));
+                testNumber.setPadding(0, 0, 0, 0);
                 testResultHeaderCell.addView(testResult);
 
                 TableRow resultsTableHeaderRow = new TableRow(getActivity());
                 resultsTableHeaderRow.addView(testNumberHeaderCell);
                 resultsTableHeaderRow.addView(testResultHeaderCell);
                 resultsTableHeaderRow.setBackgroundColor(Color.WHITE);
-                resultsTableHeaderRow.setPadding(0, 0, 0, 2); // Border between rows
+                resultsTableHeaderRow.setPadding(0, 0, 0, 1); // Border between rows
 
                 resultsTable.addView(resultsTableHeaderRow);
                 layoutParams.setMargins(2, 0, 2, 0);
@@ -155,6 +154,8 @@ public class TestDeviceFragment extends Fragment
                     resultsTable.addView(testResultRow);
                 }
                 button.setVisibility(View.GONE);
+                // TODO find the best way to arrive at this value (for all screens)
+                resultsContainer.setTranslationY(-200f);
             }
         });
         return view;

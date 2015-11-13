@@ -93,7 +93,7 @@ task writeVersionToAboutFile << {
 askForPasswords.mustRunAfter writeVersionToAboutFile
 
 tasks.whenTaskAdded { theTask ->
-    if (theTask.name.equals("packageRelease")) {
+    if (theTask.name.equals("packageRelease") || theTask.name.equals("assembleRelease")) {
         theTask.dependsOn "askForPasswords"
         theTask.dependsOn "writeVersionToAboutFile"
     } else if (theTask.name.equals("askForPasswords")) {

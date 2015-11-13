@@ -23,7 +23,7 @@
         android:maxLines="3"
         android:text="@string/manual_entry_blurb"
         android:textColor="#f2f2f2"
-        android:textSize="20sp"
+        android:textSize="22sp"
         autofit:minTextSize="16sp"/>
 
     <EditText
@@ -72,12 +72,12 @@
         android:layout_below="@+id/key_label"
         android:layout_marginTop="33dp"
         android:background="#f4f4f4"
-        android:maxLength="44"
         android:elegantTextHeight="true"
         android:enabled="true"
         android:gravity="top|start"
         android:hint="@string/sample_key"
         android:inputType="textUri|textMultiLine"
+        android:maxLength="44"
         android:maxWidth="320dp"
         android:minWidth="120dp"
         android:paddingBottom="3dp"
@@ -108,13 +108,16 @@
         android:layout_below="@+id/key_text_field"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp"
+        android:drawableTint="@color/md_green_800"
         android:background="@android:drawable/dialog_holo_dark_frame"
-        android:drawableStart="@drawable/ic_check_white_24dp"
         android:drawableLeft="@drawable/ic_check_white_24dp"
         android:drawablePadding="5dp"
+        android:drawableStart="@drawable/ic_check_white_24dp"
+        android:onClick="handleOkayButtonClicked"
         android:padding="22dp"
         android:text="@string/okay"
         android:textColor="#f3f3f3"
-        android:textSize="16sp"/>
+        android:textSize="16sp"
+        />
 
 </RelativeLayout>

@@ -14,48 +14,79 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:layout_marginEnd="15dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
         android:layout_marginStart="15dp"
         android:layout_marginTop="18dp"
         android:gravity="start"
         android:maxLines="5"
         android:text="@string/welcome_blurb"
         android:textColor="#f2f2f2"
-        android:textSize="20sp"
-        autofit:minTextSize="14sp"/>
+        android:textSize="22sp"
+        autofit:minTextSize="16sp"/>
 
-    <Button
-        android:id="@+id/register_account_button"
-        android:layout_width="fill_parent"
+    <TableLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:background="@android:drawable/dialog_holo_dark_frame"
-        android:drawableStart="@drawable/ic_person_add_white_24dp"
-        android:drawableLeft="@drawable/ic_person_add_white_24dp"
-        android:drawablePadding="5dp"
-        android:gravity="start|center_vertical"
-        android:padding="22dp"
-        android:text="@string/title_activity_register_account"
-        android:textColor="#f3f3f3"
-        android:textSize="16sp"
-        android:onClick="handleRegisterAccountClicked"/>
-
-    <Button
-        android:id="@+id/how_it_works_button"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:layout_marginTop="20dp"
-        android:background="@android:drawable/dialog_holo_dark_frame"
-        android:drawableStart="@drawable/ic_help_outline_white_24dp"
-        android:drawableLeft="@drawable/ic_help_outline_white_24dp"
-        android:drawablePadding="5dp"
-        android:gravity="start|center_vertical"
-        android:padding="22dp"
-        android:text="@string/how_it_works"
-        android:textColor="#f3f3f3"
-        android:textSize="16sp"
-        android:onClick="handleHowItWorksClicked"/>
+        android:measureWithLargestChild="false"
+        android:orientation="vertical"
+        android:stretchColumns="*">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start">
+
+            <Button
+                android:id="@+id/register_account_button"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:background="@android:drawable/dialog_holo_dark_frame"
+                android:clickable="true"
+                android:drawableLeft="@drawable/ic_person_add_white_36dp"
+                android:drawablePadding="10dp"
+                android:drawableStart="@drawable/ic_person_add_white_36dp"
+                android:elevation="10dp"
+                android:enabled="true"
+                android:gravity="center_vertical|center_horizontal"
+                android:onClick="handleRegisterAccountClicked"
+                android:padding="20dp"
+                android:singleLine="true"
+                android:text="@string/title_activity_register_account"
+                android:textColor="#f3f3f3"
+                android:textSize="20sp"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:baselineAligned="false">
+
+            <Button
+                android:id="@+id/how_it_works_button"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="20dp"
+                android:background="@android:drawable/dialog_holo_dark_frame"
+                android:clickable="true"
+                android:drawableLeft="@drawable/ic_help_outline_white_36dp"
+                android:drawablePadding="10dp"
+                android:drawableStart="@drawable/ic_help_outline_white_36dp"
+                android:elevation="10dp"
+                android:gravity="center_vertical|center_horizontal"
+                android:onClick="handleHowItWorksClicked"
+                android:paddingBottom="20dp"
+                android:paddingLeft="18dp"
+                android:paddingRight="18dp"
+                android:paddingTop="20dp"
+                android:singleLine="true"
+                android:text="@string/how_it_works"
+                android:textColor="#f3f3f3"
+                android:textSize="20sp"/>
+        </TableRow>
+    </TableLayout>
+
 </LinearLayout>

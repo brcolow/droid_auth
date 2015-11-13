@@ -10,19 +10,15 @@
         android:id="@+id/verify_information_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="false"
-        android:layout_alignParentStart="false"
         android:layout_alignParentTop="true"
-        android:layout_marginEnd="10dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="10dp"
+        android:layout_marginLeft="15dp"
         android:layout_marginStart="15dp"
         android:layout_marginTop="30dp"
         android:maxLines="2"
         android:text="@string/register_account_data_blurb"
         android:textColor="#f2f2f2"
-        android:textSize="32sp"
-        autofit:minTextSize="14sp"/>
+        android:textSize="22sp"
+        autofit:minTextSize="16sp"/>
 
     <TextView
         android:id="@+id/account_email_textview"
@@ -110,6 +106,7 @@
         android:drawableLeft="@drawable/ic_check_white_24dp"
         android:drawablePadding="5dp"
         android:drawableStart="@drawable/ic_check_white_24dp"
+        android:drawableTint="@color/md_green_800"
         android:lines="1"
         android:maxLines="1"
         android:onClick="handleCorrectButtonClicked"
@@ -131,6 +128,7 @@
         android:drawableLeft="@drawable/ic_close_white_24dp"
         android:drawablePadding="5dp"
         android:drawableStart="@drawable/ic_close_white_24dp"
+        android:drawableTint="@color/md_red_600"
         android:gravity="center"
         android:lines="1"
         android:maxLines="1"

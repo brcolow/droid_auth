@@ -54,23 +54,23 @@ public class LinkAccountDataFragment extends Fragment
         setHasOptionsMenu(false);
         View view = inflater.inflate(R.layout.fragment_register_account_data, container, false);
 
-        if (!getArguments().containsKey("decoded_key"))
-        {
-            throw new IllegalArgumentException("LinkAccountDataFragment was not given decoded key");
-        }
-        if (!getArguments().containsKey("decoded_email"))
+        if (!getArguments().containsKey("new_email"))
         {
             throw new IllegalArgumentException("LinkAccountDataFragment was not given decoded email");
         }
 
-        TextView emailField = (TextView) view.findViewById(R.id.email_field);
+        if (!getArguments().containsKey("new_key"))
+        {
+            throw new IllegalArgumentException("LinkAccountDataFragment was not given decoded key");
+        }
+        TextView emailTextField = (TextView) view.findViewById(R.id.email_field);
         // we set the email field to anonymous pro for consistency with key text field
-        emailField.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
-        emailField.setText(getArguments().getString("decoded_email"));
+        emailTextField.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
+        emailTextField.setText(getArguments().getString("new_email"));
 
         TextView keyTextField = (TextView) view.findViewById(R.id.key_text_field);
         keyTextField.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
-        keyTextField.setText(getArguments().getString("decoded_key"));
+        keyTextField.setText(getArguments().getString("new_key"));
 
         return view;
     }
@@ -83,7 +83,7 @@ public class LinkAccountDataFragment extends Fragment
         Button correctButton = (Button) view.findViewById(R.id.correct_button);
         Button incorrectButton = (Button) view.findViewById(R.id.incorrect_button);
 
-        correctButton.getCompoundDrawables()[0].setColorFilter(Utils.getIntFromRGB(46, 125, 50), PorterDuff.Mode.SRC_IN);
-        incorrectButton.getCompoundDrawables()[0].setColorFilter(Utils.getIntFromRGB(198, 40, 40), PorterDuff.Mode.SRC_IN);
+        correctButton.getCompoundDrawables()[0].setColorFilter(Utils.MaterialDesignColors.MD_GREEN_800.getColor(), PorterDuff.Mode.SRC_IN);
+        incorrectButton.getCompoundDrawables()[0].setColorFilter(Utils.MaterialDesignColors.MD_RED_600.getColor(), PorterDuff.Mode.SRC_IN);
     }
 }

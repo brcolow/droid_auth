@@ -1,28 +1,31 @@
 package net.cryptodirect.authenticator;
 
-import android.content.Context;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
-import android.support.annotation.DrawableRes;
-import android.support.v4.content.ContextCompat;
+import android.graphics.Color;
 
 public class Utils
 {
-    public static Drawable getTintedDrawable(Context context,
-                                             @DrawableRes int drawableResId,
-                                             int red, int green, int blue)
+    public enum MaterialDesignColors
     {
-        Drawable drawable = ContextCompat.getDrawable(context, drawableResId);
-        drawable.setColorFilter(getIntFromRGB(red, green, blue), PorterDuff.Mode.SRC_IN);
-        return drawable;
-    }
+        // reds
+        MD_RED_50(Color.parseColor("#FFEBEE")),
+        MD_RED_100(Color.parseColor("#FFCDD2")),
+        MD_RED_600(Color.parseColor("#E53935")),
 
-    public static int getIntFromRGB(int red, int green, int blue)
-    {
-        red = (red << 16) & 0x00FF0000;
-        green = (green << 8) & 0x0000FF00;
-        blue = blue & 0x000000FF;
+        //greens
+        MD_GREEN_500(Color.parseColor("#4CAF50")),
+        MD_GREEN_800(Color.parseColor("#2E7D32"));
 
-        return 0xFF000000 | red | green | blue;
+
+        private final int color;
+
+        MaterialDesignColors(int color)
+        {
+            this.color = color;
+        }
+
+        public int getColor()
+        {
+            return color;
+        }
     }
 }
