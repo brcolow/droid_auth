@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.os.Build;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -43,11 +42,11 @@ public class MainActivity
         FragmentManager.OnBackStackChangedListener,
         DialogInterface.OnCancelListener
 {
-    public static Context BASE_CONTEXT;
     private static final String TAG = MainActivity.class.getSimpleName();
     private ViewPager howItWorksPager;
     private int currSelectedPage = 0;
     private static final Map<Integer, HowItWorksPageFragment> pageMap = new LinkedHashMap<>(3);
+    private static EntryPage entryPage;
 
     static
     {
@@ -58,7 +57,6 @@ public class MainActivity
     protected void onCreate(Bundle state)
     {
         super.onCreate(state);
-        BASE_CONTEXT = getBaseContext();
         setContentView(R.layout.activity_main);
         if (findViewById(R.id.main_fragment_container) != null && state != null)
         {
@@ -67,6 +65,7 @@ public class MainActivity
 
         try
         {
+            AccountManager.getInstance().setBaseContext(getBaseContext());
             AccountManager.getInstance().init();
         }
         catch (IOException | JSONException e)
@@ -95,6 +94,7 @@ public class MainActivity
             if (AccountManager.getInstance().accountExists(defaultAccount))
             {
                 // go to authenticator for default account preference
+                entryPage = EntryPage.DEFAULT_ACCOUNT_AUTHENTICATOR;
                 showAuthenticatorFragment(defaultAccount, 30);
             }
             else
@@ -136,22 +136,20 @@ public class MainActivity
                 // we have data for at least one account
                 if (AccountManager.getInstance().getNumAccounts() > 1)
                 {
-                    // we have data for multiple accounts and no default account
-                    AccountChooserFragment accountChooserFragment = new AccountChooserFragment();
-                    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                    fragmentTransaction.add(R.id.main_fragment_container,
-                            accountChooserFragment, "choose-account")
-                            .commit();
+                    entryPage = EntryPage.ACCOUNT_CHOOSER;
+                    showAccountChooserFragment();
                 }
                 else
                 {
                     // we have data for only one account
+                    entryPage = EntryPage.ONE_ACCOUNT_AUTHENTICATOR;
                     showAuthenticatorFragment(AccountManager.getInstance().getOnlyAccount().getEmail(), 30);
                 }
             }
             else
             {
                 // we have no stored account data
+                entryPage = EntryPage.WELCOME;
                 WelcomeFragment welcomeFragment = new WelcomeFragment();
                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.add(R.id.main_fragment_container,
@@ -170,7 +168,6 @@ public class MainActivity
             android.app.FragmentManager.BackStackEntry backEntry = getFragmentManager().
                     getBackStackEntryAt(getFragmentManager().getBackStackEntryCount() - 1);
             String fragmentName = backEntry.getName();
-            Log.e(TAG, "Fragment at top of back stack name: " + fragmentName);
             if (fragmentName.equals("settings") || fragmentName.equals("how-it-works"))
             {
                 // the settings and how-it-works fragments are the only fragments
@@ -178,18 +175,29 @@ public class MainActivity
                 // managed by getFragmentManager() rather than getSupportFragmentManager()
                 getFragmentManager().popBackStack();
             }
-            //android.app.Fragment fragment = getFragmentManager().findFragmentByTag(fragmentName);
         }
 
-        if (getSupportFragmentManager().getBackStackEntryCount() > 0)
+        if (getSupportFragmentManager().getBackStackEntryCount() > 1)
         {
+            getSupportFragmentManager().popBackStack();
+        }
+        if (getSupportFragmentManager().getBackStackEntryCount() == 1)
+        {
+            Log.e(TAG, "Entry count: " + getSupportFragmentManager().getBackStackEntryCount());
             FragmentManager.BackStackEntry backEntry = getSupportFragmentManager().
                     getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1);
             String fragmentName = backEntry.getName();
-            //Fragment fragment = getSupportFragmentManager().findFragmentByTag(fragmentName);
 
             if (!fragmentName.equals("welcome") && !fragmentName.equals("authenticator")
                     && !fragmentName.equals("choose-account"))
+            {
+                getSupportFragmentManager().popBackStack();
+            }
+            else if (fragmentName.equals("choose-account") && entryPage != EntryPage.ACCOUNT_CHOOSER)
+            {
+                getSupportFragmentManager().popBackStack();
+            }
+            else if (fragmentName.equals("authenticator") && (entryPage == EntryPage.WELCOME || entryPage == EntryPage.ACCOUNT_CHOOSER))
             {
                 getSupportFragmentManager().popBackStack();
             }
@@ -292,6 +300,9 @@ public class MainActivity
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId())
         {
+            case R.id.action_select_account:
+                showAccountChooserFragment();
+                return true;
             case R.id.action_register_new_account:
                 startLinkAccountActivity();
                 return true;
@@ -307,6 +318,16 @@ public class MainActivity
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void showAccountChooserFragment()
+    {
+        AccountChooserFragment accountChooserFragment = new AccountChooserFragment();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.add(R.id.main_fragment_container,
+                accountChooserFragment, "choose-account")
+                .addToBackStack("choose-account")
+                .commit();
     }
 
     private void showAuthenticatorFragment(String email, int ts)
@@ -477,11 +498,8 @@ public class MainActivity
     {
         public void transformPage(View view, float position)
         {
-            // Log.e(TAG, String.valueOf("View: " + view.getId() + ": " + position));
-            //ImageView imageView = (ImageView) view.findViewById(R.id.how_it_works_page_image);
             if (position >= -1 || position <= 1) // [-1,1]
             {
-                //view.setRotationY(position * -10);
                 if (position != 0f)
                 {
                     if (position < 0)

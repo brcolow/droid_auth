@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Cryptodash Authenticator</string>
     <!-- Action Bar Menu -->
+    <string name="select_account">Accounts</string>
     <string name="register_new_account">Link Account</string>
     <string name="test_device">Test Device</string>
     <string name="action_settings">Settings</string>

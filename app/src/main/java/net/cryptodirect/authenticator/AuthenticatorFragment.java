@@ -94,29 +94,14 @@ public class AuthenticatorFragment extends Fragment
         {
             if (timer == null)
             {
-                if (currentTask != null)
-                {
-                    timer = new Timer();
-                    timer.schedule(currentTask, 0, 1000);
-                }
-                else
-                {
-                    timer = new Timer();
-                    currentTask = new WheelTask();
-                    timer.schedule(new WheelTask(), 0, 1000);
-                }
+                timer = new Timer();
+                currentTask = new WheelTask();
+                timer.schedule(currentTask, 0, 1000);
             }
             else
             {
-                if (currentTask != null)
-                {
-                    timer.schedule(currentTask, 0, 1000);
-                }
-                else
-                {
-                    currentTask = new WheelTask();
-                    timer.schedule(new WheelTask(), 0, 1000);
-                }
+                currentTask = new WheelTask();
+                timer.schedule(currentTask, 0, 1000);
             }
         }
         catch (IllegalStateException e)
@@ -130,7 +115,7 @@ public class AuthenticatorFragment extends Fragment
             else
             {
                 currentTask = new WheelTask();
-                timer.schedule(new WheelTask(), 0, 1000);
+                timer.schedule(currentTask, 0, 1000);
             }
         }
 
@@ -140,6 +125,10 @@ public class AuthenticatorFragment extends Fragment
     @Override
     public void onPause() {
         super.onPause();
+        if (currentTask != null)
+        {
+            currentTask = null;
+        }
         if (timer != null)
         {
             timer.cancel();

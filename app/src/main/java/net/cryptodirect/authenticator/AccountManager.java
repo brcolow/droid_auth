@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class AccountManager
 {
+    private Context baseContext;
     private static final AccountManager INSTANCE = new AccountManager();
     private static final String ACCOUNTS_FILE = "accounts.json";
     private final Map<String, Account> accounts = new ConcurrentHashMap<>();
@@ -32,6 +33,11 @@ public class AccountManager
 
     }
 
+    public void setBaseContext(Context baseContext)
+    {
+        this.baseContext = baseContext;
+    }
+
     public static AccountManager getInstance()
     {
         return INSTANCE;
@@ -39,19 +45,19 @@ public class AccountManager
 
     public synchronized void init() throws IOException, JSONException
     {
-        File file = MainActivity.BASE_CONTEXT.getFileStreamPath(ACCOUNTS_FILE);
+        File file = baseContext.getFileStreamPath(ACCOUNTS_FILE);
 
         if (file.length() == 0)
         {
             // create accounts.json skeleton
-            accountsFileOutputStream = MainActivity.BASE_CONTEXT.openFileOutput(ACCOUNTS_FILE, Context.MODE_PRIVATE);
+            accountsFileOutputStream = baseContext.openFileOutput(ACCOUNTS_FILE, Context.MODE_PRIVATE);
             OutputStreamWriter osw = new OutputStreamWriter(accountsFileOutputStream);
             String jsonSkeleton = "{ \"accounts\" : [] }";
             osw.write(jsonSkeleton);
             osw.flush();
         }
 
-        accountsFileInputStream = MainActivity.BASE_CONTEXT.openFileInput(ACCOUNTS_FILE);
+        accountsFileInputStream = baseContext.openFileInput(ACCOUNTS_FILE);
         InputStreamReader isr = new InputStreamReader(accountsFileInputStream);
         BufferedReader bufferedReader = new BufferedReader(isr);
         StringBuilder sb = new StringBuilder();
@@ -105,7 +111,7 @@ public class AccountManager
             accounts.put(account.getEmail(), account);
             if (accountsFileOutputStream == null)
             {
-                accountsFileOutputStream = MainActivity.BASE_CONTEXT.openFileOutput(ACCOUNTS_FILE, Context.MODE_PRIVATE);
+                accountsFileOutputStream = baseContext.openFileOutput(ACCOUNTS_FILE, Context.MODE_PRIVATE);
             }
             OutputStreamWriter osw = new OutputStreamWriter(accountsFileOutputStream, StandardCharsets.UTF_8);
             JsonWriter jsonWriter = new JsonWriter(osw);

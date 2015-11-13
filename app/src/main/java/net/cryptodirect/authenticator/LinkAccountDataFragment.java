@@ -3,13 +3,18 @@ package net.cryptodirect.authenticator;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+
+import java.util.regex.Pattern;
 
 /**
  * Takes the account key data that was obtained from either
@@ -20,8 +25,7 @@ import android.widget.TextView;
  */
 public class LinkAccountDataFragment extends Fragment
 {
-    // we display the key in Base64 - so we need a good font for this purpose
-    // i.e. O and 0 are distinguished from each other
+    private static final Pattern keyPattern = Pattern.compile("^[a-zA-Z0-9+\\/]+=$");
 
     public LinkAccountDataFragment()
     {
@@ -54,24 +58,64 @@ public class LinkAccountDataFragment extends Fragment
         setHasOptionsMenu(false);
         View view = inflater.inflate(R.layout.fragment_register_account_data, container, false);
 
-        if (!getArguments().containsKey("new_email"))
+        final String email = getArguments().getString("new_email");
+        final String key = getArguments().getString("new_key");
+
+        if (email == null)
         {
             throw new IllegalArgumentException("LinkAccountDataFragment was not given decoded email");
         }
-
-        if (!getArguments().containsKey("new_key"))
+        if (key == null)
         {
             throw new IllegalArgumentException("LinkAccountDataFragment was not given decoded key");
         }
+
         TextView emailTextField = (TextView) view.findViewById(R.id.email_field);
         // we set the email field to anonymous pro for consistency with key text field
         emailTextField.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
-        emailTextField.setText(getArguments().getString("new_email"));
+        emailTextField.setText(email);
 
         TextView keyTextField = (TextView) view.findViewById(R.id.key_text_field);
         keyTextField.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
-        keyTextField.setText(getArguments().getString("new_key"));
+        keyTextField.setText(key);
 
+        if (TextUtils.isEmpty(email)
+                || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches())
+        {
+            // email is invalid
+            Drawable errorDrawable = ContextCompat.getDrawable(getActivity().getBaseContext(), R.drawable.ic_close_white_24dp);
+            errorDrawable.setBounds(0, 0, errorDrawable.getIntrinsicWidth(), errorDrawable.getIntrinsicHeight());
+            errorDrawable.setColorFilter(Utils.MaterialDesignColors.MD_RED_600.getColor(), PorterDuff.Mode.SRC_IN);
+            emailTextField.setError(getResources().getString(R.string.invalid_email), errorDrawable);
+            //emailTextField.forceLayout();
+        }
+        else
+        {
+            // email is valid
+            Drawable validDrawable = ContextCompat.getDrawable(getActivity().getBaseContext(), R.drawable.ic_check_white_24dp);
+            validDrawable.setBounds(0, 0, validDrawable.getIntrinsicWidth(), validDrawable.getIntrinsicHeight());
+            validDrawable.setColorFilter(Utils.MaterialDesignColors.MD_GREEN_500.getColor(), PorterDuff.Mode.SRC_IN);
+            emailTextField.setCompoundDrawablesWithIntrinsicBounds(null, null, validDrawable, null);
+            //emailTextField.forceLayout();
+        }
+
+        if (TextUtils.isEmpty(key) || !keyPattern.matcher(key).matches() || key.length() != 44)
+        {
+            // key is invalid
+            Drawable errorDrawable = ContextCompat.getDrawable(getActivity().getBaseContext(), R.drawable.ic_close_white_24dp);
+            errorDrawable.setBounds(0, 0, errorDrawable.getIntrinsicWidth(), errorDrawable.getIntrinsicHeight());
+            errorDrawable.setColorFilter(Utils.MaterialDesignColors.MD_RED_600.getColor(), PorterDuff.Mode.SRC_IN);
+            keyTextField.setError(getResources().getString(R.string.invalid_key), errorDrawable);
+            //keyTextField.forceLayout();
+        }
+        else
+        {
+            Drawable validDrawable = ContextCompat.getDrawable(getActivity().getBaseContext(), R.drawable.ic_check_white_24dp);
+            validDrawable.setBounds(0, 0, validDrawable.getIntrinsicWidth(), validDrawable.getIntrinsicHeight());
+            validDrawable.setColorFilter(Utils.MaterialDesignColors.MD_GREEN_500.getColor(), PorterDuff.Mode.SRC_IN);
+            keyTextField.setCompoundDrawablesWithIntrinsicBounds(null, null, validDrawable, null);
+            //keyTextField.forceLayout();
+        }
         return view;
     }
 
