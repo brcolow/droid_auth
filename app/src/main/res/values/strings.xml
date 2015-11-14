@@ -59,4 +59,5 @@
     <string name="crash_dialog_text">Sorry, an unexpected error has occurred that we can\'t recover from. We would greatly
     appreciate you reporting this error to us so that we can fix it.</string>
     <string name="crash_dialog_ok_toast">Thank you for reporting the error!</string>
+    <string name="no_accounts">You have no linked accounts!</string>
 </resources>
