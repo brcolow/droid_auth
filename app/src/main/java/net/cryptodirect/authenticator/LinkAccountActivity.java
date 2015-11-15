@@ -1,6 +1,8 @@
 package net.cryptodirect.authenticator;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
@@ -208,7 +210,7 @@ public class LinkAccountActivity
             return;
         }
 
-        NotifyAccountLinkedTask fetchTimeTask = new NotifyAccountLinkedTask(emailTextField.getText(), keyTextField.getText());
+        NotifyAccountLinkedTask fetchTimeTask = new NotifyAccountLinkedTask(this, emailTextField.getText(), keyTextField.getText());
         JSONObject response = null;
         try
         {
@@ -216,8 +218,7 @@ public class LinkAccountActivity
         }
         catch (InterruptedException | ExecutionException | TimeoutException e)
         {
-            // could not contact Centurion in time
-            // inform the users that our server's may be down
+            ACRA.getErrorReporter().handleException(e);
         }
 
         if (response != null)
@@ -227,11 +228,29 @@ public class LinkAccountActivity
                 int responseCode = response.getInt("httpResponseCode");
                 if (responseCode != 200)
                 {
-                    // invalid credentials
+                    AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this, R.style.Theme_Dialog);
+                    alertBuilder.setMessage(R.string.centurion_invalid_args);
+                    alertBuilder.setCancelable(false);
+                    alertBuilder.setPositiveButton(getString(R.string.okay),
+                            new DialogInterface.OnClickListener()
+                            {
+                                public void onClick(DialogInterface dialog, int id)
+                                {
+                                    // TODO maybe we should allow the user to go to
+                                    // manual entry with the current text already entered
+                                    dialog.dismiss();
+                                }
+                            });
+                    AlertDialog alertDialog = alertBuilder.create();
+                    alertDialog.show();
                 }
                 else
                 {
                     // valid credentials
+                    AccountManager.getInstance().registerAccount(new Account(emailTextField.getText().toString(),
+                            keyTextField.getText().toString()), true, setAsDefaultAccountCheckBox.isChecked());
+                    Intent intent = new Intent(this, MainActivity.class);
+                    startActivity(intent);
                 }
             }
             catch (JSONException e)
@@ -240,10 +259,6 @@ public class LinkAccountActivity
             }
         }
 
-        AccountManager.getInstance().registerAccount(new Account(emailTextField.getText().toString(),
-                keyTextField.getText().toString()), true, setAsDefaultAccountCheckBox.isChecked());
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
     }
 
     /**
@@ -293,11 +308,25 @@ public class LinkAccountActivity
     {
         private final CharSequence email;
         private final CharSequence key;
+        private ProgressDialog progressDialog;
 
-        public NotifyAccountLinkedTask(CharSequence email, CharSequence key)
+        public NotifyAccountLinkedTask(Activity activity, CharSequence email, CharSequence key)
         {
+            progressDialog = new ProgressDialog(activity);
             this.email = email;
             this.key = key;
+        }
+        @Override
+        protected void onPreExecute() {
+            progressDialog.setMessage("Verifying credentials...");
+            progressDialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject result) {
+            if (progressDialog.isShowing()) {
+                progressDialog.dismiss();
+            }
         }
 
         @Override

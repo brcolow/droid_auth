@@ -43,6 +43,8 @@
     <string name="rescan">Rescan</string>
     <string name="enter_manually">Enter Manually</string>
     <string name="set_as_default">Set as default account</string>
+    <string name="centurion_invalid_args">The email address and/or key you entered is invalid. Verify
+    that they are correct, and re-submit.</string>
 
     <!-- Settings related strings -->
     <string name="general_cat">General</string>
