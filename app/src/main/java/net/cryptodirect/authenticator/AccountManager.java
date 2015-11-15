@@ -51,23 +51,23 @@ public class AccountManager
         {
             // create accounts.json skeleton
             accountsFileOutputStream = baseContext.openFileOutput(ACCOUNTS_FILE, Context.MODE_PRIVATE);
-            OutputStreamWriter osw = new OutputStreamWriter(accountsFileOutputStream);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(accountsFileOutputStream);
             String jsonSkeleton = "{ \"accounts\" : [] }";
-            osw.write(jsonSkeleton);
-            osw.flush();
+            outputStreamWriter.write(jsonSkeleton);
+            outputStreamWriter.flush();
         }
 
         accountsFileInputStream = baseContext.openFileInput(ACCOUNTS_FILE);
-        InputStreamReader isr = new InputStreamReader(accountsFileInputStream);
-        BufferedReader bufferedReader = new BufferedReader(isr);
-        StringBuilder sb = new StringBuilder();
+        InputStreamReader inputStreamReader = new InputStreamReader(accountsFileInputStream);
+        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+        StringBuilder stringBuilder = new StringBuilder();
         String line;
         while ((line = bufferedReader.readLine()) != null)
         {
-            sb.append(line);
+            stringBuilder.append(line);
         }
 
-        JSONObject accountsJsonObject = new JSONObject(sb.toString());
+        JSONObject accountsJsonObject = new JSONObject(stringBuilder.toString());
         JSONArray accountsJsonArray = accountsJsonObject.getJSONArray("accounts");
         for (int i = 0; i < accountsJsonArray.length(); i++)
         {
@@ -100,7 +100,7 @@ public class AccountManager
         return accounts.size();
     }
 
-    public boolean registerAccount(Account account, boolean overwriteExisting)
+    public boolean registerAccount(Account account, boolean overwriteExisting, boolean setAsDefault)
     {
         if (accounts.containsKey(account.getEmail()) && !overwriteExisting)
         {
@@ -113,18 +113,17 @@ public class AccountManager
             {
                 accountsFileOutputStream = baseContext.openFileOutput(ACCOUNTS_FILE, Context.MODE_PRIVATE);
             }
-            OutputStreamWriter osw = new OutputStreamWriter(accountsFileOutputStream, StandardCharsets.UTF_8);
-            JsonWriter jsonWriter = new JsonWriter(osw);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(accountsFileOutputStream, StandardCharsets.UTF_8);
+            JsonWriter jsonWriter = new JsonWriter(outputStreamWriter);
             jsonWriter.beginObject();
             jsonWriter.name("accounts");
             writeAccountsArray(jsonWriter);
             jsonWriter.endObject();
-            osw.flush();
+            outputStreamWriter.flush();
             jsonWriter.close();
         }
         catch (IOException e)
         {
-            e.printStackTrace();
             ACRA.getErrorReporter().handleException(e);
         }
 

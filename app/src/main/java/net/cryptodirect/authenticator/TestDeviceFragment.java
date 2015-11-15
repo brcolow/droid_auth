@@ -167,7 +167,6 @@ public class TestDeviceFragment extends Fragment
         super.onViewCreated(view, savedInstanceState);
     }
 
-
     private class FetchTimeTask extends AsyncTask<String, Void, Long>
     {
         @Override
@@ -175,29 +174,7 @@ public class TestDeviceFragment extends Fragment
         {
             try
             {
-                String timeResponse = null;
-                URL url = new URL("https://cryptodash.net:4463/time");
-                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
-                try
-                {
-                    BufferedReader in = new BufferedReader(new InputStreamReader(
-                            urlConnection.getInputStream()));
-
-                    String inputLine;
-                    StringBuilder timeResponseBuilder = new StringBuilder();
-                    while ((inputLine = in.readLine()) != null)
-                    {
-                        timeResponseBuilder.append(inputLine);
-                    }
-
-                    timeResponse = timeResponseBuilder.toString();
-                }
-                finally
-                {
-                    urlConnection.disconnect();
-                }
-
-                JSONObject timeJsonObject = new JSONObject(timeResponse);
+                JSONObject timeJsonObject = Centurion.getInstance().get("time");
                 return timeJsonObject.getLong("time");
             }
             catch (IOException | JSONException e)

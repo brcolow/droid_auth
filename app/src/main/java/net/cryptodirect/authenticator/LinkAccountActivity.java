@@ -3,16 +3,32 @@ package net.cryptodirect.authenticator;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.zxing.BarcodeFormat;
+
+import org.acra.ACRA;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class LinkAccountActivity
         extends AppCompatActivity
@@ -181,15 +197,51 @@ public class LinkAccountActivity
      */
     public void handleCorrectButtonClicked(View view)
     {
-        EditText emailTextField = (EditText) findViewById(R.id.email_field);
-        EditText keyTextField = (EditText) findViewById(R.id.key_text_field);
-        if (emailTextField == null || keyTextField == null)
+        TextView emailTextField = (TextView) findViewById(R.id.email_field);
+        TextView keyTextField = (TextView) findViewById(R.id.key_text_field);
+        CheckBox setAsDefaultAccountCheckBox = (CheckBox) findViewById(R.id.set_as_default_account_box);
+
+        if (keyTextField.getError() != null)
         {
-            throw new IllegalStateException("email EditText or key EditText controls were null: ["
-                    + emailTextField + ", " + keyTextField + "]");
+            Toast toast = Toast.makeText(getApplicationContext(), keyTextField.getError(), Toast.LENGTH_SHORT);
+            toast.show();
+            return;
         }
+
+        NotifyAccountLinkedTask fetchTimeTask = new NotifyAccountLinkedTask(emailTextField.getText(), keyTextField.getText());
+        JSONObject response = null;
+        try
+        {
+            response = fetchTimeTask.execute().get(5000, TimeUnit.MILLISECONDS);
+        }
+        catch (InterruptedException | ExecutionException | TimeoutException e)
+        {
+            // could not contact Centurion in time
+            // inform the users that our server's may be down
+        }
+
+        if (response != null)
+        {
+            try
+            {
+                int responseCode = response.getInt("httpResponseCode");
+                if (responseCode != 200)
+                {
+                    // invalid credentials
+                }
+                else
+                {
+                    // valid credentials
+                }
+            }
+            catch (JSONException e)
+            {
+                ACRA.getErrorReporter().handleException(e);
+            }
+        }
+
         AccountManager.getInstance().registerAccount(new Account(emailTextField.getText().toString(),
-                keyTextField.getText().toString()), true);
+                keyTextField.getText().toString()), true, setAsDefaultAccountCheckBox.isChecked());
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
@@ -200,17 +252,7 @@ public class LinkAccountActivity
      */
     public void handleIncorrectButtonClicked(View view)
     {
-        // information was incorrect, so go back to select method fragment
         getSupportFragmentManager().popBackStackImmediate();
-        /*
-        getSupportFragmentManager().popBackStack("select-method", FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        SelectRegisterMethodFragment selectMethodFragment = new SelectRegisterMethodFragment();
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.register_account_fragment_container,
-                selectMethodFragment, "select-method")
-                .addToBackStack("select-method")
-                .commit();
-                */
     }
 
     /**
@@ -221,10 +263,18 @@ public class LinkAccountActivity
     {
         EditText emailTextField = (EditText) findViewById(R.id.email_field);
         EditText keyTextField = (EditText) findViewById(R.id.key_text_field);
-        if (emailTextField == null || keyTextField == null)
+
+        String errorMessage = isEnteredKeyValid(keyTextField);
+
+        if (errorMessage != null)
         {
-            throw new IllegalStateException("email EditText or key EditText controls were null: ["
-                    + emailTextField + ", " + keyTextField + "]");
+            // key is invalid
+            Drawable errorDrawable = ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_close_white_24dp);
+            errorDrawable.setBounds(0, 0, errorDrawable.getIntrinsicWidth(), errorDrawable.getIntrinsicHeight());
+            errorDrawable.setColorFilter(Utils.MaterialDesignColors.MD_RED_600.getColor(), PorterDuff.Mode.SRC_IN);
+            keyTextField.setError(getResources().getString(R.string.invalid_key), errorDrawable);
+            keyTextField.forceLayout();
+            return;
         }
 
         Bundle bundle = new Bundle();
@@ -237,6 +287,60 @@ public class LinkAccountActivity
                 linkAccountDataFragment, "register-account-data")
                 .addToBackStack("register-account-data")
                 .commit();
+    }
+
+    private class NotifyAccountLinkedTask extends AsyncTask<String, Void, JSONObject>
+    {
+        private final CharSequence email;
+        private final CharSequence key;
+
+        public NotifyAccountLinkedTask(CharSequence email, CharSequence key)
+        {
+            this.email = email;
+            this.key = key;
+        }
+
+        @Override
+        protected JSONObject doInBackground(String... args)
+        {
+            try
+            {
+                String payload = "{\"email\": " + email + ", \"totpKeyBase64\": " + key + "}";
+                return Centurion.getInstance().post("twofactor/notify-linked", payload);
+            }
+            catch (IOException | JSONException e)
+            {
+                return null;
+            }
+        }
+    }
+
+    private String isEnteredKeyValid(EditText keyTextField)
+    {
+        // do full validation of key
+        String errorMessage = null;
+        if (keyTextField.getError() != null)
+        {
+            return keyTextField.getError().toString();
+        }
+
+        if (keyTextField.getText().length() != 44)
+        {
+            if (keyTextField.getText().length() == 0)
+            {
+                errorMessage = getResources().getString(R.string.empty_key);
+            }
+            else
+            {
+                errorMessage = getResources().getString(R.string.key_too_short);
+            }
+        }
+        else if (keyTextField.getText().toString().charAt(keyTextField.getText().length() - 1) != '=')
+        {
+            errorMessage = getResources().getString(R.string.key_equals_missing);
+        }
+
+        return errorMessage;
     }
 
 }

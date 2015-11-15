@@ -24,18 +24,13 @@
         android:id="@+id/account_email_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/verify_information_textview"
-        android:layout_alignParentEnd="false"
-        android:layout_alignParentLeft="false"
-        android:layout_alignParentRight="false"
-        android:layout_alignParentStart="false"
-        android:layout_alignParentTop="false"
-        android:layout_alignStart="@+id/verify_information_textview"
-        android:layout_below="@+id/verify_information_textview"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="24dp"
         android:text="@string/email"
         android:textColor="#f2f2f2"
-        android:textSize="20sp"/>
+        android:textSize="20sp"
+        android:layout_below="@+id/verify_information_textview"
+        android:layout_alignLeft="@+id/verify_information_textview"
+        android:layout_alignStart="@+id/verify_information_textview"/>
 
     <EditText
         android:id="@+id/email_field"
@@ -63,13 +58,13 @@
         android:id="@+id/key_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/verify_information_textview"
-        android:layout_alignStart="@+id/verify_information_textview"
-        android:layout_below="@+id/email_field"
-        android:layout_marginTop="45dp"
+        android:layout_marginTop="31dp"
         android:text="@string/key"
         android:textColor="#f2f2f2"
-        android:textSize="20sp"/>
+        android:textSize="20sp"
+        android:layout_below="@+id/email_field"
+        android:layout_alignLeft="@+id/email_field"
+        android:layout_alignStart="@+id/email_field"/>
 
     <EditText
         android:id="@+id/key_text_field"
@@ -120,10 +115,6 @@
         android:id="@+id/incorrect_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/key_text_field"
-        android:layout_alignStart="@+id/key_text_field"
-        android:layout_below="@+id/key_text_field"
-        android:layout_marginTop="52dp"
         android:background="@android:drawable/dialog_holo_dark_frame"
         android:drawableLeft="@drawable/ic_close_white_24dp"
         android:drawablePadding="5dp"
@@ -137,6 +128,24 @@
         android:singleLine="true"
         android:text="@string/information_incorrect"
         android:textColor="#f3f3f3"
-        android:textSize="12sp"/>
+        android:textSize="12sp"
+        android:layout_marginBottom="43dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignLeft="@+id/key_text_field"
+        android:layout_alignStart="@+id/key_text_field"/>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/set_as_default"
+        android:id="@+id/set_as_default_account_box"
+        android:checked="true"
+        android:textColor="#ffffff"
+        android:textSize="18sp"
+        android:paddingLeft="7dp"
+        android:layout_above="@+id/correct_button"
+        android:layout_alignLeft="@+id/incorrect_button"
+        android:layout_alignStart="@+id/incorrect_button"
+        android:layout_marginBottom="30dp"/>
 
 </RelativeLayout>

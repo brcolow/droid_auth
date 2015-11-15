@@ -14,8 +14,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.util.regex.Pattern;
-
 /**
  * Takes the account key data that was obtained from either
  * scanning a QR code (in ScanQRCodeFragment) or manually
@@ -25,7 +23,6 @@ import java.util.regex.Pattern;
  */
 public class LinkAccountDataFragment extends Fragment
 {
-    private static final Pattern keyPattern = Pattern.compile("^[a-zA-Z0-9+\\/]+=$");
 
     public LinkAccountDataFragment()
     {
@@ -56,7 +53,7 @@ public class LinkAccountDataFragment extends Fragment
     {
         getActivity().invalidateOptionsMenu();
         setHasOptionsMenu(false);
-        View view = inflater.inflate(R.layout.fragment_register_account_data, container, false);
+        View view = inflater.inflate(R.layout.fragment_link_account_data, container, false);
 
         final String email = getArguments().getString("new_email");
         final String key = getArguments().getString("new_key");
@@ -79,27 +76,7 @@ public class LinkAccountDataFragment extends Fragment
         keyTextField.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
         keyTextField.setText(key);
 
-        if (TextUtils.isEmpty(email)
-                || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches())
-        {
-            // email is invalid
-            Drawable errorDrawable = ContextCompat.getDrawable(getActivity().getBaseContext(), R.drawable.ic_close_white_24dp);
-            errorDrawable.setBounds(0, 0, errorDrawable.getIntrinsicWidth(), errorDrawable.getIntrinsicHeight());
-            errorDrawable.setColorFilter(Utils.MaterialDesignColors.MD_RED_600.getColor(), PorterDuff.Mode.SRC_IN);
-            emailTextField.setError(getResources().getString(R.string.invalid_email), errorDrawable);
-            //emailTextField.forceLayout();
-        }
-        else
-        {
-            // email is valid
-            Drawable validDrawable = ContextCompat.getDrawable(getActivity().getBaseContext(), R.drawable.ic_check_white_24dp);
-            validDrawable.setBounds(0, 0, validDrawable.getIntrinsicWidth(), validDrawable.getIntrinsicHeight());
-            validDrawable.setColorFilter(Utils.MaterialDesignColors.MD_GREEN_500.getColor(), PorterDuff.Mode.SRC_IN);
-            emailTextField.setCompoundDrawablesWithIntrinsicBounds(null, null, validDrawable, null);
-            //emailTextField.forceLayout();
-        }
-
-        if (TextUtils.isEmpty(key) || !keyPattern.matcher(key).matches() || key.length() != 44)
+        if (TextUtils.isEmpty(key) || !Utils.KEY_REGEX.matcher(key).matches() || key.length() != 44)
         {
             // key is invalid
             Drawable errorDrawable = ContextCompat.getDrawable(getActivity().getBaseContext(), R.drawable.ic_close_white_24dp);

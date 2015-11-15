@@ -1,0 +1,122 @@
+package net.cryptodirect.authenticator;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import javax.net.ssl.HttpsURLConnection;
+
+public class Centurion
+{
+    private static final String BASE_URL = "https://cryptodash.net:4463/";
+    private static final String USER_AGENT = "[Android]: Cryptodash Authenticator" +
+            BuildConfig.BUILD_TIME + "-" + BuildConfig.GIT_SHA;
+
+    private Centurion()
+    {
+    }
+
+    private static class SingletonHolder
+    {
+        private static final Centurion INSTANCE = new Centurion();
+    }
+
+    public static Centurion getInstance()
+    {
+        return SingletonHolder.INSTANCE;
+    }
+
+    public JSONObject get(String path) throws IOException
+    {
+        URL url = new URL(BASE_URL + path);
+        HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
+        urlConnection.setRequestProperty("User-Agent", USER_AGENT);
+        String response;
+        try
+        {
+            BufferedReader in = new BufferedReader(new InputStreamReader(
+                    urlConnection.getInputStream()));
+
+            String inputLine;
+            StringBuilder stringBuilder = new StringBuilder();
+            while ((inputLine = in.readLine()) != null)
+            {
+                stringBuilder.append(inputLine);
+            }
+
+            response = stringBuilder.toString();
+        }
+        finally
+        {
+            urlConnection.disconnect();
+        }
+
+        JSONObject responseJsonObject;
+        try
+        {
+            responseJsonObject = new JSONObject(response);
+        }
+        catch (JSONException e)
+        {
+            // server returned bad Json
+            throw new IllegalStateException(e);
+        }
+
+        return responseJsonObject;
+    }
+
+    public JSONObject post(String path, String payload) throws IOException, JSONException
+    {
+        URL url = new URL(BASE_URL + path);
+        HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
+        urlConnection.setRequestMethod("POST");
+        urlConnection.setRequestProperty("User-Agent", USER_AGENT);
+        urlConnection.setRequestProperty("Accept", "text/plain");
+        urlConnection.setRequestProperty("Content-Type", "application/json");
+        urlConnection.setUseCaches(false);
+        urlConnection.setDoOutput(true);
+        urlConnection.setDoOutput(true);
+
+        urlConnection.connect();
+
+        DataOutputStream dataOutputStream = new DataOutputStream(urlConnection.getOutputStream());
+        dataOutputStream.writeBytes(payload);
+        dataOutputStream.flush();
+        dataOutputStream.close();
+
+        int responseCode = urlConnection.getResponseCode();
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(
+                urlConnection.getInputStream()));
+
+        String inputLine;
+        StringBuilder stringBuilder = new StringBuilder();
+        while ((inputLine = in.readLine()) != null)
+        {
+            stringBuilder.append(inputLine);
+        }
+
+        String response = stringBuilder.toString();
+        JSONObject responseJsonObject;
+        try
+        {
+            responseJsonObject = new JSONObject(response);
+        }
+        catch (JSONException e)
+        {
+            // server returned bad Json
+            throw new IllegalStateException(e);
+        }
+
+        responseJsonObject.put("httpResponseCode", responseCode);
+
+        return responseJsonObject;
+    }
+
+}

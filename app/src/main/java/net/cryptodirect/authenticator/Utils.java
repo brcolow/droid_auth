@@ -2,8 +2,12 @@ package net.cryptodirect.authenticator;
 
 import android.graphics.Color;
 
+import java.util.regex.Pattern;
+
 public class Utils
 {
+    public static final Pattern KEY_REGEX = Pattern.compile("^[a-zA-Z0-9+/]+=$");
+    public static final Pattern BASE64_VALID_REGEX = Pattern.compile("[a-zA-Z0-9+/=]+");
     public enum MaterialDesignColors
     {
         // reds

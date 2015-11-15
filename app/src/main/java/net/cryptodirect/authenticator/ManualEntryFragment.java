@@ -1,6 +1,5 @@
 package net.cryptodirect.authenticator;
 
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -26,7 +25,6 @@ import java.util.regex.Pattern;
  */
 public class ManualEntryFragment extends Fragment
 {
-    private static final Pattern keyPattern = Pattern.compile("^[a-zA-Z0-9+\\/]+=$");
 
     public ManualEntryFragment()
     {
@@ -44,57 +42,7 @@ public class ManualEntryFragment extends Fragment
         final EditText keyTextField = (EditText) view.findViewById(R.id.key_text_field);
         keyTextField.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
 
-        // input validation
-        emailTextField.addTextChangedListener(new TextWatcher()
-        {
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count)
-            {
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after)
-            {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s)
-            {
-                if (TextUtils.isEmpty(emailTextField.getText()))
-                {
-                    emailTextField.setTextColor(Color.BLACK);
-                    emailTextField.setError(null);
-                    emailTextField.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
-                    emailTextField.forceLayout();
-                }
-                else
-                {
-                    if (!android.util.Patterns.EMAIL_ADDRESS.matcher(emailTextField.getText()).matches())
-                    {
-                        // email is invalid
-                        emailTextField.setTextColor(Color.BLACK);
-                        Drawable errorDrawable = ContextCompat.getDrawable(getActivity().getBaseContext(), R.drawable.ic_close_white_24dp);
-                        errorDrawable.setBounds(0, 0, errorDrawable.getIntrinsicWidth(), errorDrawable.getIntrinsicHeight());
-                        errorDrawable.setColorFilter(Utils.MaterialDesignColors.MD_RED_600.getColor(), PorterDuff.Mode.SRC_IN);
-                        emailTextField.setError(getResources().getString(R.string.invalid_email), errorDrawable);
-                        emailTextField.forceLayout();
-                    }
-                    else
-                    {
-                        // email is valid
-                        emailTextField.setError(null);
-                        Drawable validDrawable = ContextCompat.getDrawable(getActivity().getBaseContext(), R.drawable.ic_check_white_24dp);
-                        validDrawable.setBounds(0, 0, validDrawable.getIntrinsicWidth(), validDrawable.getIntrinsicHeight());
-                        validDrawable.setColorFilter(Utils.MaterialDesignColors.MD_GREEN_500.getColor(), PorterDuff.Mode.SRC_IN);
-                        emailTextField.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
-                        emailTextField.setCompoundDrawablesWithIntrinsicBounds(null, null, validDrawable, null);
-                        emailTextField.setTextColor(Utils.MaterialDesignColors.MD_GREEN_500.getColor());
-                        emailTextField.forceLayout();
-                    }
-                }
-            }
-        });
-
+        // on-the -fly key input validation
         keyTextField.addTextChangedListener(new TextWatcher()
         {
             @Override
@@ -112,33 +60,39 @@ public class ManualEntryFragment extends Fragment
             {
                 if (TextUtils.isEmpty(keyTextField.getText()))
                 {
-                    keyTextField.setTextColor(Color.BLACK);
                     keyTextField.setError(null);
                     keyTextField.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
                     keyTextField.forceLayout();
                 }
                 else
                 {
-                    if (!keyPattern.matcher(keyTextField.getText()).matches() || keyTextField.getText().length() != 44)
+                    String errorMessage = null;
+                    if (!Pattern.compile("[a-zA-Z0-9+/=]+").matcher(keyTextField.getText()).matches())
                     {
-                        // key is invalid
-                        keyTextField.setTextColor(Color.BLACK);
+                        errorMessage = getResources().getString(R.string.invalid_char_key);
+                    }
+                    else
+                    {
+                        if (keyTextField.length() >= 2 && keyTextField.getText().toString().substring(0, keyTextField.length() - 1).contains("="))
+                            {
+                            errorMessage = getResources().getString(R.string.key_equals_misplaced);
+                        }
+                    }
+
+                    if (errorMessage != null)
+                    {
+                        // whats been entered for the key so far is invalid
                         Drawable errorDrawable = ContextCompat.getDrawable(getActivity().getBaseContext(), R.drawable.ic_close_white_24dp);
                         errorDrawable.setBounds(0, 0, errorDrawable.getIntrinsicWidth(), errorDrawable.getIntrinsicHeight());
                         errorDrawable.setColorFilter(Utils.MaterialDesignColors.MD_RED_600.getColor(), PorterDuff.Mode.SRC_IN);
-                        keyTextField.setError(getResources().getString(R.string.invalid_key), errorDrawable);
+                        keyTextField.setError(errorMessage, errorDrawable);
                         keyTextField.forceLayout();
                     }
                     else
                     {
-                        // key is valid
+                        // key is so-far valid
                         keyTextField.setError(null);
-                        Drawable validDrawable = ContextCompat.getDrawable(getActivity().getBaseContext(), R.drawable.ic_check_white_24dp);
-                        validDrawable.setBounds(0, 0, validDrawable.getIntrinsicWidth(), validDrawable.getIntrinsicHeight());
-                        validDrawable.setColorFilter(Utils.MaterialDesignColors.MD_GREEN_500.getColor(), PorterDuff.Mode.SRC_IN);
                         keyTextField.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
-                        keyTextField.setCompoundDrawablesWithIntrinsicBounds(null, null, validDrawable, null);
-                        keyTextField.setTextColor(Utils.MaterialDesignColors.MD_GREEN_500.getColor());
                         keyTextField.forceLayout();
                     }
                 }

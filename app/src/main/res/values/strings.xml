@@ -34,9 +34,15 @@
     <string name="next">Next</string>
     <string name="invalid_email">Invalid Email</string>
     <string name="invalid_key">Invalid Key</string>
+    <string name="empty_key">Key is empty</string>
+    <string name="invalid_char_key">Key contains illegal characters</string>
+    <string name="key_too_short">Key is too short</string>
+    <string name="key_equals_missing">Key is missing \'=\'</string>
+    <string name="key_equals_misplaced">Key contains misplaced \'=\'</string>
     <string name="not_now">Not Now</string>
     <string name="rescan">Rescan</string>
     <string name="enter_manually">Enter Manually</string>
+    <string name="set_as_default">Set as default account</string>
 
     <!-- Settings related strings -->
     <string name="general_cat">General</string>
