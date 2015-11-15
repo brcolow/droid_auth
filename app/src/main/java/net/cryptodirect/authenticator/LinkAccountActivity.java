@@ -218,7 +218,10 @@ public class LinkAccountActivity
         }
         catch (InterruptedException | ExecutionException | TimeoutException e)
         {
-            ACRA.getErrorReporter().handleException(e);
+            Toast toast = Toast.makeText(getApplicationContext(), "Could not talk to Cryptodash " +
+                    "servers! Check that you have an internet connection. If you do, it may be a " +
+                    "problem on our end. Sorry about that.", Toast.LENGTH_LONG);
+            toast.show();
         }
 
         if (response != null)
@@ -316,14 +319,17 @@ public class LinkAccountActivity
             this.email = email;
             this.key = key;
         }
+
         @Override
-        protected void onPreExecute() {
+        protected void onPreExecute()
+        {
             progressDialog.setMessage("Verifying credentials...");
             progressDialog.show();
         }
 
         @Override
-        protected void onPostExecute(JSONObject result) {
+        protected void onPostExecute(JSONObject result)
+        {
             if (progressDialog.isShowing()) {
                 progressDialog.dismiss();
             }
