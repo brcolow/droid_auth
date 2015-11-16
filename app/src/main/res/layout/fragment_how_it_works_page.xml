@@ -17,7 +17,8 @@
         android:minHeight="140dp"
         android:minWidth="200dp"
         android:contentDescription="@string/how_it_works"
-        android:src="@drawable/ic_qrcode_white_36dp"/>
+        android:src="@drawable/ic_qrcode_white_36dp"
+        android:scaleType="fitCenter"/>
 
     <me.grantland.widget.AutofitTextView
         android:id="@+id/how_it_works_page_text"

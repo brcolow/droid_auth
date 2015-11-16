@@ -1,6 +1,5 @@
 package net.cryptodirect.authenticator;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -66,8 +65,8 @@ public class LinkAccountActivity
     public void onBackStackChanged()
     {
         // this is probably wrong but it works - most likely for the wrong reasons
-        Fragment f = getSupportFragmentManager().findFragmentById(R.id.register_account_fragment_container);
-        currentFragmentIsScanQRCode = f instanceof ScanQRCodeFragment;
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.register_account_fragment_container);
+        currentFragmentIsScanQRCode = fragment instanceof ScanQRCodeFragment;
     }
 
     @Override
@@ -102,6 +101,11 @@ public class LinkAccountActivity
      */
     public void handleScanQRCodeClicked(View view)
     {
+        // FIXME this handles invisible buttons from the previous fragment
+        if (getSupportFragmentManager().getBackStackEntryCount() > 1)
+        {
+            return;
+        }
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         ScanQRCodeFragment scanQRCodeFragment = new ScanQRCodeFragment();
         fragmentTransaction.add(R.id.register_account_fragment_container,
@@ -116,6 +120,10 @@ public class LinkAccountActivity
      */
     public void handleManualEntryClicked(View view)
     {
+        if (getSupportFragmentManager().getBackStackEntryCount() > 1)
+        {
+            return;
+        }
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         ManualEntryFragment manualEntryFragment = new ManualEntryFragment();
         fragmentTransaction.add(R.id.register_account_fragment_container,
@@ -199,8 +207,8 @@ public class LinkAccountActivity
      */
     public void handleCorrectButtonClicked(View view)
     {
-        TextView emailTextField = (TextView) findViewById(R.id.email_field);
-        TextView keyTextField = (TextView) findViewById(R.id.key_text_field);
+        TextView emailTextField = (TextView) findViewById(R.id.email_edit_text);
+        TextView keyTextField = (TextView) findViewById(R.id.key_edit_text);
         CheckBox setAsDefaultAccountCheckBox = (CheckBox) findViewById(R.id.set_as_default_account_box);
 
         if (keyTextField.getError() != null)
@@ -210,24 +218,35 @@ public class LinkAccountActivity
             return;
         }
 
-        NotifyAccountLinkedTask fetchTimeTask = new NotifyAccountLinkedTask(this, emailTextField.getText(), keyTextField.getText());
+        ProgressDialog progressDialog = new ProgressDialog(LinkAccountActivity.this);
+        progressDialog.setMessage("Verifying credentials...");
+        progressDialog.show();
+
+        NotifyAccountLinkedTask notifyAccountLinkedTask = new NotifyAccountLinkedTask(progressDialog, emailTextField.getText(), keyTextField.getText());
         JSONObject response = null;
         try
         {
-            response = fetchTimeTask.execute().get(5000, TimeUnit.MILLISECONDS);
+            response = notifyAccountLinkedTask.execute().get(5000, TimeUnit.MILLISECONDS);
         }
         catch (InterruptedException | ExecutionException | TimeoutException e)
         {
-            Toast toast = Toast.makeText(getApplicationContext(), "Could not talk to Cryptodash " +
-                    "servers! Check that you have an internet connection. If you do, it may be a " +
-                    "problem on our end. Sorry about that.", Toast.LENGTH_LONG);
-            toast.show();
+            // shouldn't happen
+            ACRA.getErrorReporter().handleException(e);
         }
 
         if (response != null)
         {
             try
             {
+                if (response.has("error"))
+                {
+                    final String error = response.getString("error");
+                    Toast toast = Toast.makeText(getApplicationContext(), "Looks like we are having some server trouble. This incident has been reported. Sorry about that!", Toast.LENGTH_LONG);
+                    toast.show();
+                    ACRA.getErrorReporter().handleSilentException(new IOException(error));
+                    return;
+                }
+
                 int responseCode = response.getInt("httpResponseCode");
                 if (responseCode != 200)
                 {
@@ -279,8 +298,8 @@ public class LinkAccountActivity
      */
     public void handleOkayButtonClicked(View view)
     {
-        EditText emailTextField = (EditText) findViewById(R.id.email_field);
-        EditText keyTextField = (EditText) findViewById(R.id.key_text_field);
+        EditText emailTextField = (EditText) findViewById(R.id.email_edit_text);
+        EditText keyTextField = (EditText) findViewById(R.id.key_edit_text);
 
         String errorMessage = isEnteredKeyValid(keyTextField);
 
@@ -290,7 +309,7 @@ public class LinkAccountActivity
             Drawable errorDrawable = ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_close_white_24dp);
             errorDrawable.setBounds(0, 0, errorDrawable.getIntrinsicWidth(), errorDrawable.getIntrinsicHeight());
             errorDrawable.setColorFilter(Utils.MaterialDesignColors.MD_RED_600.getColor(), PorterDuff.Mode.SRC_IN);
-            keyTextField.setError(getResources().getString(R.string.invalid_key), errorDrawable);
+            keyTextField.setError(errorMessage, errorDrawable);
             keyTextField.forceLayout();
             return;
         }
@@ -311,11 +330,11 @@ public class LinkAccountActivity
     {
         private final CharSequence email;
         private final CharSequence key;
-        private ProgressDialog progressDialog;
+        private final ProgressDialog progressDialog;
 
-        public NotifyAccountLinkedTask(Activity activity, CharSequence email, CharSequence key)
+        public NotifyAccountLinkedTask(ProgressDialog progressDialog, CharSequence email, CharSequence key)
         {
-            progressDialog = new ProgressDialog(activity);
+            this.progressDialog = progressDialog;
             this.email = email;
             this.key = key;
         }
@@ -323,14 +342,14 @@ public class LinkAccountActivity
         @Override
         protected void onPreExecute()
         {
-            progressDialog.setMessage("Verifying credentials...");
             progressDialog.show();
         }
 
         @Override
         protected void onPostExecute(JSONObject result)
         {
-            if (progressDialog.isShowing()) {
+            if (progressDialog.isShowing())
+            {
                 progressDialog.dismiss();
             }
         }
@@ -338,15 +357,18 @@ public class LinkAccountActivity
         @Override
         protected JSONObject doInBackground(String... args)
         {
+            JSONObject result;
             try
             {
-                String payload = "{\"email\": " + email + ", \"totpKeyBase64\": " + key + "}";
-                return Centurion.getInstance().post("twofactor/notify-linked", payload);
+                String payload = "{\"email\": \"" + email + "\", \"totpKeyBase64\": \"" + key + "\"}";
+                result = Centurion.getInstance().post("twofactor/notify-linked", payload);
             }
             catch (IOException | JSONException e)
             {
-                return null;
+                result = new JSONObject();
             }
+
+            return result;
         }
     }
 
@@ -374,8 +396,6 @@ public class LinkAccountActivity
         {
             errorMessage = getResources().getString(R.string.key_equals_missing);
         }
-
         return errorMessage;
     }
-
 }

@@ -7,6 +7,8 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -81,8 +83,16 @@ public class Centurion
         urlConnection.setUseCaches(false);
         urlConnection.setDoOutput(true);
         urlConnection.setDoOutput(true);
+        urlConnection.setConnectTimeout(3000);
 
-        urlConnection.connect();
+        try
+        {
+            urlConnection.connect();
+        }
+        catch (SocketTimeoutException | SocketException e)
+        {
+            return new JSONObject("{\"error\": \""+ e.getMessage() +"\"}");
+        }
 
         DataOutputStream dataOutputStream = new DataOutputStream(urlConnection.getOutputStream());
         dataOutputStream.writeBytes(payload);
@@ -103,19 +113,10 @@ public class Centurion
 
         String response = stringBuilder.toString();
         JSONObject responseJsonObject;
-        try
-        {
-            responseJsonObject = new JSONObject(response);
-        }
-        catch (JSONException e)
-        {
-            // server returned bad Json
-            throw new IllegalStateException(e);
-        }
+        responseJsonObject = new JSONObject(response);
 
         responseJsonObject.put("httpResponseCode", responseCode);
 
         return responseJsonObject;
     }
-
 }

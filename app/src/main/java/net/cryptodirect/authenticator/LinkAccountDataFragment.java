@@ -65,12 +65,12 @@ public class LinkAccountDataFragment extends Fragment
             throw new IllegalArgumentException("LinkAccountDataFragment was not given decoded key");
         }
 
-        TextView emailTextField = (TextView) view.findViewById(R.id.email_field);
+        TextView emailTextField = (TextView) view.findViewById(R.id.email_edit_text);
         // we set the email field to anonymous pro for consistency with key text field
         emailTextField.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
         emailTextField.setText(email);
 
-        TextView keyTextField = (TextView) view.findViewById(R.id.key_text_field);
+        TextView keyTextField = (TextView) view.findViewById(R.id.key_edit_text);
         keyTextField.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
         keyTextField.setText(key);
 

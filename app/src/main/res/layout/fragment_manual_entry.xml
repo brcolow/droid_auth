@@ -27,7 +27,7 @@
         autofit:minTextSize="16sp"/>
 
     <EditText
-        android:id="@+id/email_field"
+        android:id="@+id/email_edit_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignEnd="@+id/textView2"
@@ -62,7 +62,7 @@
         android:textSize="20sp"/>
 
     <EditText
-        android:id="@+id/key_text_field"
+        android:id="@+id/key_edit_text"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignEnd="@+id/textView2"
@@ -93,9 +93,9 @@
         android:id="@+id/key_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/email_field"
-        android:layout_alignStart="@+id/email_field"
-        android:layout_below="@+id/email_field"
+        android:layout_alignLeft="@+id/email_edit_text"
+        android:layout_alignStart="@+id/email_edit_text"
+        android:layout_below="@+id/email_edit_text"
         android:layout_marginTop="30dp"
         android:text="@string/key"
         android:textColor="#f2f2f2"
@@ -105,7 +105,7 @@
         android:id="@+id/okay_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/key_text_field"
+        android:layout_below="@+id/key_edit_text"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp"
         android:drawableTint="@color/md_green_800"

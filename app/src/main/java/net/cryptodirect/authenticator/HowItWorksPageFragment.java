@@ -26,7 +26,7 @@ public class HowItWorksPageFragment extends Fragment
         backgroundColor = Color.parseColor(getArguments().getString("backgroundColor"));
         view.setBackgroundColor(backgroundColor);
 
-        // TODO if this is page 3 (id 2) remove skip and ">" button and replace with [Done} button
+        // TODO if this is page 3 (id 2) remove skip and ">" button and replace with [Done] button
         View circle;
         switch (id)
         {
