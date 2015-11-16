@@ -27,6 +27,7 @@
     <string name="information_incorrect">Incorrect</string>
     <string name="manual_entry_blurb">Enter the email address associated with your Cryptodash account and the two-factor key provided to you.</string>
     <string name="okay">Okay</string>
+    <string name="no">No</string>
     <string name="email_hint">you@email.com</string>
     <string name="button.method.qrcode">Scan QR Code</string>
     <string name="button.method.manual">Manual Entry</string>

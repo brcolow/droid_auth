@@ -51,6 +51,7 @@ android {
         release {
             signingConfig signingConfigs.release
             minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -97,7 +98,6 @@ task writeVersionToAboutFile << {
     def replacePatternWith = 'Version ' + versionMajor + "." + versionMinor + "." + versionPatch +
             "+" + String.format("%03d", versionBuild);
 
-    //Call the method
     replacePatternInFile(file){
         it.replaceAll(patternToFind, replacePatternWith)
     }

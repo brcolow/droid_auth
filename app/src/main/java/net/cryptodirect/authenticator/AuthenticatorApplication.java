@@ -3,9 +3,20 @@ package net.cryptodirect.authenticator;
 import android.app.Application;
 
 import org.acra.ACRA;
+import org.acra.ACRAConfiguration;
+import org.acra.ACRAConfigurationException;
 import org.acra.ReportingInteractionMode;
-import org.acra.annotation.ReportsCrashes;
 import org.acra.sender.HttpSender;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
 
 /**
  * Two-factor authentication application for Cryptodash users, based
@@ -30,25 +41,57 @@ import org.acra.sender.HttpSender;
  * @see <a href="https://tools.ietf.org/html/rfc6238">RFC 6238</a>
  * @see <a href="http://developer.android.com/guide/topics/data/data-storage.html#filesInternal">Android: Internal Storage</a>
  */
-@ReportsCrashes(
-        formUri = "https://cryptodash.net:4463/acra/report",
-        mode = ReportingInteractionMode.DIALOG,
-        resToastText = R.string.crash_toast_text,
-        resDialogText = R.string.crash_dialog_text,
-        resDialogIcon = android.R.drawable.ic_dialog_info,
-        resDialogTitle = R.string.crash_dialog_title,
-        resDialogOkToast = R.string.crash_dialog_ok_toast,
-        httpMethod = HttpSender.Method.PUT,
-        reportType = HttpSender.Type.JSON
-)
 public class AuthenticatorApplication extends Application
 {
-    private static final String TAG = AuthenticatorApplication.class.getSimpleName();
-
     @Override
     public void onCreate()
     {
         super.onCreate();
-        ACRA.init(this);
+        ACRAConfiguration acraConfiguration = new ACRAConfiguration();
+        acraConfiguration.setFormUri(BuildConfig.DEBUG ? "https://10.0.2.2:4463/acra/report"
+                : "https://cryptodash.net:4463/acra/report");
+        if (BuildConfig.DEBUG)
+        {
+            javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier()
+            {
+                @Override
+                public boolean verify(String hostname, SSLSession session)
+                {
+                    return hostname.equals("10.0.2.2");
+                }
+            });
+
+            try
+            {
+                KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+                InputStream keyStream = getResources().openRawResource(R.raw.keystore);
+                keyStore.load(keyStream, "123456".toCharArray());
+                keyStream.close();
+                acraConfiguration.setKeyStore(keyStore);
+            }
+            catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        acraConfiguration.setResToastText(R.string.crash_toast_text);
+        acraConfiguration.setResDialogText(R.string.crash_dialog_text);
+        acraConfiguration.setResDialogIcon(android.R.drawable.ic_dialog_info);
+        acraConfiguration.setResDialogTitle(R.string.crash_dialog_title);
+        acraConfiguration.setResDialogOkToast(R.string.crash_dialog_ok_toast);
+        acraConfiguration.setResDialogPositiveButtonText(R.string.okay);
+        acraConfiguration.setResDialogNegativeButtonText(R.string.no);
+
+        acraConfiguration.setHttpMethod(HttpSender.Method.PUT);
+        acraConfiguration.setReportType(HttpSender.Type.JSON);
+        try
+        {
+            acraConfiguration.setMode(ReportingInteractionMode.DIALOG);
+        }
+        catch (ACRAConfigurationException e)
+        {
+            throw new RuntimeException(e);
+        }
+        ACRA.init(this, acraConfiguration);
     }
 }

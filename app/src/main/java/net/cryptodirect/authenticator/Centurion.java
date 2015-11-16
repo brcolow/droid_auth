@@ -15,7 +15,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class Centurion
 {
-    private static final String BASE_URL = "https://cryptodash.net:4463/";
+    private static final String BASE_URL = BuildConfig.DEBUG ? "https://10.0.2.2:4463/" : "https://cryptodash.net:4463/";
     private static final String USER_AGENT = "[Android]: Cryptodash Authenticator" +
             BuildConfig.BUILD_TIME + "-" + BuildConfig.GIT_SHA;
 
@@ -78,8 +78,8 @@ public class Centurion
         HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
         urlConnection.setRequestMethod("POST");
         urlConnection.setRequestProperty("User-Agent", USER_AGENT);
-        urlConnection.setRequestProperty("Accept", "text/plain");
-        urlConnection.setRequestProperty("Content-Type", "application/json");
+        urlConnection.setRequestProperty("Accept", "application/json");
+        urlConnection.setRequestProperty("Content-Type", "text/plain");
         urlConnection.setUseCaches(false);
         urlConnection.setDoOutput(true);
         urlConnection.setDoOutput(true);
@@ -91,7 +91,7 @@ public class Centurion
         }
         catch (SocketTimeoutException | SocketException e)
         {
-            return new JSONObject("{\"error\": \""+ e.getMessage() +"\"}");
+            return new JSONObject("{\"local_error\": \""+ e.getMessage() +"\"}");
         }
 
         DataOutputStream dataOutputStream = new DataOutputStream(urlConnection.getOutputStream());
@@ -101,8 +101,17 @@ public class Centurion
 
         int responseCode = urlConnection.getResponseCode();
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(
-                urlConnection.getInputStream()));
+        BufferedReader in;
+        if (responseCode >= 400)
+        {
+            in = new BufferedReader(new InputStreamReader(
+                    urlConnection.getErrorStream()));
+        }
+        else
+        {
+            in = new BufferedReader(new InputStreamReader(
+                    urlConnection.getInputStream()));
+        }
 
         String inputLine;
         StringBuilder stringBuilder = new StringBuilder();

@@ -238,9 +238,9 @@ public class LinkAccountActivity
         {
             try
             {
-                if (response.has("error"))
+                if (response.has("local_error"))
                 {
-                    final String error = response.getString("error");
+                    final String error = response.getString("local_error");
                     Toast toast = Toast.makeText(getApplicationContext(), "Looks like we are having some server trouble. This incident has been reported. Sorry about that!", Toast.LENGTH_LONG);
                     toast.show();
                     ACRA.getErrorReporter().handleSilentException(new IOException(error));
@@ -365,7 +365,14 @@ public class LinkAccountActivity
             }
             catch (IOException | JSONException e)
             {
-                result = new JSONObject();
+                try
+                {
+                    result = new JSONObject("{\"local_error\": \"" + e.getMessage() + "\"}");
+                }
+                catch (JSONException e2)
+                {
+                    throw new RuntimeException(e2);
+                }
             }
 
             return result;
