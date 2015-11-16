@@ -8,14 +8,15 @@ public class Utils
 {
     public static final Pattern KEY_REGEX = Pattern.compile("^[a-zA-Z0-9+/]+=$");
     public static final Pattern BASE64_VALID_REGEX = Pattern.compile("[a-zA-Z0-9+/=]+");
+
     public enum MaterialDesignColors
     {
         // reds
-        MD_RED_50(Color.parseColor("#FFEBEE")),
-        MD_RED_100(Color.parseColor("#FFCDD2")),
+        MD_RED_300(Color.parseColor("#E57373")),
         MD_RED_600(Color.parseColor("#E53935")),
 
         //greens
+        MD_GREEN_300(Color.parseColor("#81C784")),
         MD_GREEN_500(Color.parseColor("#4CAF50")),
         MD_GREEN_800(Color.parseColor("#2E7D32"));
 

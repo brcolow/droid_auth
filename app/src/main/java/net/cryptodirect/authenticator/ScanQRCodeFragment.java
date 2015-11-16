@@ -1,21 +1,17 @@
 package net.cryptodirect.authenticator;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
@@ -45,7 +41,6 @@ public class ScanQRCodeFragment extends Fragment implements ZXingScannerView.Res
 
     public ScanQRCodeFragment()
     {
-
     }
 
     @Override
@@ -55,9 +50,7 @@ public class ScanQRCodeFragment extends Fragment implements ZXingScannerView.Res
         setHasOptionsMenu(true);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
-    @SuppressLint("NewApi")
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle state)
     {
         scannerView = new ZXingScannerView(getActivity());
@@ -80,34 +73,15 @@ public class ScanQRCodeFragment extends Fragment implements ZXingScannerView.Res
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
         super.onCreateOptionsMenu(menu, inflater);
-        MenuItem menuItem;
-
-        if (flash)
-        {
-            menuItem = menu.add(Menu.NONE, R.id.menu_flash, 0, R.string.flash_on);
-        }
-        else
-        {
-            menuItem = menu.add(Menu.NONE, R.id.menu_flash, 0, R.string.flash_off);
-        }
-        MenuItemCompat.setShowAsAction(menuItem, MenuItem.SHOW_AS_ACTION_IF_ROOM);
-
-
-        if (autoFocus)
-        {
-            menuItem = menu.add(Menu.NONE, R.id.menu_auto_focus, 0, R.string.auto_focus_on);
-        }
-        else
-        {
-            menuItem = menu.add(Menu.NONE, R.id.menu_auto_focus, 0, R.string.auto_focus_off);
-        }
-        MenuItemCompat.setShowAsAction(menuItem, MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        MenuItemCompat.setShowAsAction(menu.add(Menu.NONE, R.id.menu_flash, 0,
+                flash ? R.string.flash_on : R.string.flash_off), MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        MenuItemCompat.setShowAsAction(menu.add(Menu.NONE, R.id.menu_auto_focus, 0,
+                autoFocus ? R.string.auto_focus_on : R.string.auto_focus_off), MenuItem.SHOW_AS_ACTION_IF_ROOM);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        // Handle presses on the action bar items
         switch (item.getItemId())
         {
             case R.id.menu_flash:
@@ -179,7 +153,6 @@ public class ScanQRCodeFragment extends Fragment implements ZXingScannerView.Res
         {
             SoundPoolManager.getInstance().playSound("SCAN", false);
         }
-        //Toast.makeText(getActivity(), "Got QR code for email: " + rawResult.getText().split("\\|")[0], Toast.LENGTH_SHORT).show();
         listener.onQRCodeScanned(rawResult.getBarcodeFormat(), rawResult.getText());
     }
 

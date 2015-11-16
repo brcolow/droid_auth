@@ -25,8 +25,6 @@ public class AccountManager
     private static final String ACCOUNTS_FILE = "accounts.json";
     private final Map<String, Account> accounts = new ConcurrentHashMap<>();
     private static FileOutputStream accountsFileOutputStream;
-    private static FileInputStream accountsFileInputStream;
-    private static final String TAG = AccountManager.class.getSimpleName();
 
     private AccountManager()
     {
@@ -57,7 +55,7 @@ public class AccountManager
             outputStreamWriter.flush();
         }
 
-        accountsFileInputStream = baseContext.openFileInput(ACCOUNTS_FILE);
+        FileInputStream accountsFileInputStream = baseContext.openFileInput(ACCOUNTS_FILE);
         InputStreamReader inputStreamReader = new InputStreamReader(accountsFileInputStream);
         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
         StringBuilder stringBuilder = new StringBuilder();

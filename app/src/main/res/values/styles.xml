@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- the theme applied to the application or activity -->
-    <style name="CryptodashTheme"
-           parent="@style/Theme.AppCompat.Light.DarkActionBar">
+    <style name="CryptodashTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primaryDark</item>
         <item name="android:itemBackground">@color/primary</item>
         <item name="actionMenuTextColor">@color/whiteColor</item>
+        <item name="android:colorBackground">@color/backgroundColor</item>
+        <item name="colorAccent">@color/md_green_300</item>
+        <item name="android:textColorSecondary">@color/md_red_300</item>
     </style>
     <style name="Theme.Dialog" parent="@android:style/Theme.Dialog" />
 </resources>

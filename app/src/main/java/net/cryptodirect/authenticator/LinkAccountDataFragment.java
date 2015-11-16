@@ -23,10 +23,8 @@ import android.widget.TextView;
  */
 public class LinkAccountDataFragment extends Fragment
 {
-
     public LinkAccountDataFragment()
     {
-
     }
 
     @Override
@@ -83,7 +81,6 @@ public class LinkAccountDataFragment extends Fragment
             errorDrawable.setBounds(0, 0, errorDrawable.getIntrinsicWidth(), errorDrawable.getIntrinsicHeight());
             errorDrawable.setColorFilter(Utils.MaterialDesignColors.MD_RED_600.getColor(), PorterDuff.Mode.SRC_IN);
             keyTextField.setError(getResources().getString(R.string.invalid_key), errorDrawable);
-            //keyTextField.forceLayout();
         }
         else
         {
@@ -91,7 +88,6 @@ public class LinkAccountDataFragment extends Fragment
             validDrawable.setBounds(0, 0, validDrawable.getIntrinsicWidth(), validDrawable.getIntrinsicHeight());
             validDrawable.setColorFilter(Utils.MaterialDesignColors.MD_GREEN_500.getColor(), PorterDuff.Mode.SRC_IN);
             keyTextField.setCompoundDrawablesWithIntrinsicBounds(null, null, validDrawable, null);
-            //keyTextField.forceLayout();
         }
         return view;
     }
@@ -104,7 +100,7 @@ public class LinkAccountDataFragment extends Fragment
         Button correctButton = (Button) view.findViewById(R.id.correct_button);
         Button incorrectButton = (Button) view.findViewById(R.id.incorrect_button);
 
-        correctButton.getCompoundDrawables()[0].setColorFilter(Utils.MaterialDesignColors.MD_GREEN_800.getColor(), PorterDuff.Mode.SRC_IN);
-        incorrectButton.getCompoundDrawables()[0].setColorFilter(Utils.MaterialDesignColors.MD_RED_600.getColor(), PorterDuff.Mode.SRC_IN);
+        correctButton.getCompoundDrawables()[0].setColorFilter(Utils.MaterialDesignColors.MD_GREEN_300.getColor(), PorterDuff.Mode.SRC_IN);
+        incorrectButton.getCompoundDrawables()[0].setColorFilter(Utils.MaterialDesignColors.MD_RED_300.getColor(), PorterDuff.Mode.SRC_IN);
     }
 }

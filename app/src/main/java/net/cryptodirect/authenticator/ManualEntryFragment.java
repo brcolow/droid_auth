@@ -14,8 +14,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-import java.util.regex.Pattern;
-
 /**
  * Allows to the user to register an account by manually
  * entering their email and key. Users would probably only
@@ -25,7 +23,6 @@ import java.util.regex.Pattern;
  */
 public class ManualEntryFragment extends Fragment
 {
-
     public ManualEntryFragment()
     {
     }
@@ -67,7 +64,7 @@ public class ManualEntryFragment extends Fragment
                 else
                 {
                     String errorMessage = null;
-                    if (!Pattern.compile("[a-zA-Z0-9+/=]+").matcher(keyTextField.getText()).matches())
+                    if (!Utils.BASE64_VALID_REGEX.matcher(keyTextField.getText()).matches())
                     {
                         errorMessage = getResources().getString(R.string.invalid_char_key);
                     }
@@ -106,7 +103,6 @@ public class ManualEntryFragment extends Fragment
     {
         super.onViewCreated(view, savedInstanceState);
         Button okayButton = (Button) view.findViewById(R.id.okay_button);
-        okayButton.getCompoundDrawables()[0].setColorFilter(Utils.MaterialDesignColors.MD_GREEN_800.getColor(), PorterDuff.Mode.SRC_IN);
+        okayButton.getCompoundDrawables()[0].setColorFilter(Utils.MaterialDesignColors.MD_GREEN_300.getColor(), PorterDuff.Mode.SRC_IN);
     }
-
 }

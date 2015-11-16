@@ -13,8 +13,6 @@ import android.util.AttributeSet;
  */
 public class ListPreferenceWithSummary extends ListPreference
 {
-    private static final String TAG = ListPreferenceWithSummary.class.getSimpleName();
-
     public ListPreferenceWithSummary(Context context, AttributeSet attrs)
     {
         super(context, attrs);
