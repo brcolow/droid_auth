@@ -30,10 +30,11 @@ import me.dm7.barcodescanner.zxing.ZXingScannerView;
  * <p/>
  * tom@gmail.com|OEbnsWQidFxYp3TUcAqzREIuywzD7Gz3wFZhLz8qXEI=
  */
-public class ScanQRCodeFragment extends Fragment implements ZXingScannerView.ResultHandler
+public class ScanQRCodeFragment extends Fragment implements ZXingScannerView.ResultHandler, SharedPreferences.OnSharedPreferenceChangeListener
 {
     private boolean flash;
     private boolean autoFocus;
+    private boolean playScanSound;
     private ZXingScannerView scannerView;
     private OnQRCodeScannedListener listener;
     private static final String FLASH_STATE = "FLASH_STATE";
@@ -58,14 +59,15 @@ public class ScanQRCodeFragment extends Fragment implements ZXingScannerView.Res
         {
             flash = state.getBoolean(FLASH_STATE, false);
             autoFocus = state.getBoolean(AUTO_FOCUS_STATE, true);
+            playScanSound = state.getBoolean("play_scan_sound");
         }
         else
         {
             flash = false;
             autoFocus = true;
+            playScanSound = true;
         }
         scannerView.setFormats(Collections.singletonList(BarcodeFormat.QR_CODE));
-
         return scannerView;
     }
 
@@ -143,13 +145,14 @@ public class ScanQRCodeFragment extends Fragment implements ZXingScannerView.Res
         super.onSaveInstanceState(outState);
         outState.putBoolean(FLASH_STATE, flash);
         outState.putBoolean(AUTO_FOCUS_STATE, autoFocus);
+        outState.putBoolean("play_scan_sound", playScanSound);
     }
 
     @Override
     public void handleResult(Result rawResult)
     {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        if (prefs.getBoolean("play_scan_sound", true))
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        if (sharedPreferences.getBoolean("play_scan_sound", true))
         {
             SoundPoolManager.getInstance().playSound("SCAN", false);
         }
@@ -161,6 +164,15 @@ public class ScanQRCodeFragment extends Fragment implements ZXingScannerView.Res
     {
         super.onPause();
         scannerView.stopCamera();
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
+    {
+        if (key.equals("play_scan_sound"))
+        {
+            playScanSound = sharedPreferences.getBoolean("play_scan_sound", true);
+        }
     }
 
     public interface OnQRCodeScannedListener

@@ -4,15 +4,18 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.view.Menu;
 import android.view.View;
 import android.widget.CheckBox;
@@ -22,11 +25,15 @@ import android.widget.Toast;
 
 import com.google.zxing.BarcodeFormat;
 
+import net.cryptodirect.authenticator.crypto.CodeParams;
+import net.cryptodirect.authenticator.crypto.CodeType;
+
 import org.acra.ACRA;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -36,6 +43,9 @@ public class LinkAccountActivity
         implements ScanQRCodeFragment.OnQRCodeScannedListener,
         FragmentManager.OnBackStackChangedListener
 {
+    private Account scannedAccount = null;
+    private String enteredEmail = null;
+    private String enteredKey = null;
     private volatile boolean currentFragmentIsScanQRCode = false;
 
     @Override
@@ -106,12 +116,7 @@ public class LinkAccountActivity
         {
             return;
         }
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        ScanQRCodeFragment scanQRCodeFragment = new ScanQRCodeFragment();
-        fragmentTransaction.add(R.id.register_account_fragment_container,
-                scanQRCodeFragment, "qr-code")
-                .addToBackStack("qr-code")
-                .commit();
+        showQRCodeFragment();
     }
 
     /**
@@ -143,8 +148,11 @@ public class LinkAccountActivity
                     barcodeFormat.name();
         }
 
-        String[] scannedCodeSplit = scannedCode.split("\\|");
-        if (!scannedCode.contains("|") || scannedCodeSplit.length != 2)
+        try
+        {
+            scannedAccount = Account.parse(scannedCode);
+        }
+        catch (URISyntaxException e)
         {
             reasonInvalid = "The scanned QR code was not formatted correctly - make sure you are " +
                     "scanning a Cryptodash provided QR code.";
@@ -161,12 +169,7 @@ public class LinkAccountActivity
                         public void onClick(DialogInterface dialog, int id)
                         {
                             getSupportFragmentManager().popBackStack();
-                            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                            ScanQRCodeFragment scanQRCodeFragment = new ScanQRCodeFragment();
-                            fragmentTransaction.add(R.id.register_account_fragment_container,
-                                    scanQRCodeFragment, "qr-code")
-                                    .addToBackStack("qr-code")
-                                    .commit();
+                            showQRCodeFragment();
                         }
                     });
             alertBuilder.setNegativeButton(getString(R.string.enter_manually),
@@ -189,8 +192,9 @@ public class LinkAccountActivity
         else
         {
             Bundle bundle = new Bundle();
-            bundle.putString("new_email", scannedCode.split("\\|")[0]);
-            bundle.putString("new_key", scannedCode.split("\\|")[1]);
+            bundle.putString("new_email", scannedAccount.getEmail());
+            bundle.putString("new_issuer", scannedAccount.getIssuer());
+            bundle.putString("new_key", Base64.encodeToString(scannedAccount.getSecretKey(), Base64.NO_WRAP));
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             LinkAccountDataFragment linkAccountDataFragment = new LinkAccountDataFragment();
             linkAccountDataFragment.setArguments(bundle);
@@ -199,6 +203,20 @@ public class LinkAccountActivity
                     .addToBackStack("register-account-data")
                     .commit();
         }
+    }
+
+    private void showQRCodeFragment()
+    {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("play_scan_sound", sharedPreferences.getBoolean("play_scan_sound", true));
+        ScanQRCodeFragment scanQRCodeFragment = new ScanQRCodeFragment();
+        scanQRCodeFragment.setArguments(bundle);
+        fragmentTransaction.add(R.id.register_account_fragment_container,
+                scanQRCodeFragment, "qr-code")
+                .addToBackStack("qr-code")
+                .commit();
     }
 
     /**
@@ -269,10 +287,33 @@ public class LinkAccountActivity
                 else
                 {
                     // valid credentials
-                    AccountManager.getInstance().registerAccount(new Account(emailTextField.getText().toString(),
-                            keyTextField.getText().toString()), true, setAsDefaultAccountCheckBox.isChecked());
+                    Toast toast = Toast.makeText(getApplicationContext(), "You have successfully linked your account!", Toast.LENGTH_SHORT);
+                    toast.show();
+                    // TODO instead of showing the above toast, maybe we could animate in a "Successfully linked"
+                    // text/image and then fade to time wheel widget
+                    if (scannedAccount != null)
+                    {
+                        AccountManager.getInstance().registerAccount(scannedAccount, true, setAsDefaultAccountCheckBox.isChecked());
+                    }
+                    if (enteredEmail != null && enteredKey != null)
+                    {
+                        Account newAccount = new Account(enteredEmail, "Cryptodash",
+                                Base64.decode(enteredKey, Base64.DEFAULT),
+                                new CodeParams.Builder(CodeType.TOTP).build());
+                        AccountManager.getInstance().registerAccount(newAccount, true, setAsDefaultAccountCheckBox.isChecked());
+                    }
+                    else
+                    {
+                        throw new IllegalStateException("At linked account but scannedAccount, " +
+                                "enteredEmail, and enteredKey were all null!");
+                    }
+
+                    scannedAccount = null;
+                    enteredEmail = null;
+                    enteredKey = null;
                     Intent intent = new Intent(this, MainActivity.class);
                     startActivity(intent);
+
                 }
             }
             catch (JSONException e)
@@ -317,6 +358,9 @@ public class LinkAccountActivity
         Bundle bundle = new Bundle();
         bundle.putString("new_email", emailTextField.getText().toString());
         bundle.putString("new_key", keyTextField.getText().toString());
+        enteredEmail = emailTextField.getText().toString();
+        enteredKey = keyTextField.getText().toString();
+        // TODO need to implement issuer for manual entry for non-Cryptodash accounts
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         LinkAccountDataFragment linkAccountDataFragment = new LinkAccountDataFragment();
         linkAccountDataFragment.setArguments(bundle);

@@ -1,7 +1,12 @@
 package net.cryptodirect.authenticator;
 
 import android.content.Context;
+import android.util.Base64;
 import android.util.JsonWriter;
+
+import net.cryptodirect.authenticator.crypto.Algorithm;
+import net.cryptodirect.authenticator.crypto.CodeParams;
+import net.cryptodirect.authenticator.crypto.CodeType;
 
 import org.acra.ACRA;
 import org.json.JSONArray;
@@ -70,9 +75,16 @@ public class AccountManager
         for (int i = 0; i < accountsJsonArray.length(); i++)
         {
             JSONObject accountJsonObject = accountsJsonArray.getJSONObject(i);
-            Account account = new Account(
-                    accountJsonObject.getString("email"),
-                    accountJsonObject.getString("key"));
+            JSONObject codeParamsJsonObject = accountJsonObject.getJSONObject("codeParams");
+            Account account = new Account(accountJsonObject.getString("email"),
+                    accountJsonObject.getString("issuer"),
+                    Base64.decode(accountJsonObject.getString("key"), Base64.DEFAULT),
+                    new CodeParams.Builder(CodeType.getCodeType(codeParamsJsonObject.getString("codeType")))
+                            .algorithm(Algorithm.getAlgorithm(codeParamsJsonObject.getString("algorithm")))
+                            .digits(codeParamsJsonObject.getInt("digits"))
+                            .hotpCounter(codeParamsJsonObject.getInt("hotpCounter"))
+                            .totpPeriod(codeParamsJsonObject.getInt("totpCounter"))
+                            .build());
 
             accounts.put(accountJsonObject.getString("email"), account);
         }
@@ -143,8 +155,23 @@ public class AccountManager
         writer.beginObject();
         writer.name("email");
         writer.value(account.getEmail());
+        writer.name("issuer");
+        writer.value(account.getIssuer());
         writer.name("key");
-        writer.value(account.getSecretKey());
+        writer.value(Base64.encodeToString(account.getSecretKey(), Base64.NO_WRAP));
+        writer.name("codeParams");
+        writer.beginObject();
+        writer.name("codeType");
+        writer.value(account.getCodeParams().getCodeType().name());
+        writer.name("algorithm");
+        writer.value(account.getCodeParams().getAlgorithm().name());
+        writer.name("digits");
+        writer.value(account.getCodeParams().getDigits());
+        writer.name("hotpCounter");
+        writer.value(account.getCodeParams().getHotpCounter());
+        writer.name("totpPeriod");
+        writer.value(account.getCodeParams().getTotpPeriod());
+        writer.endObject();
         writer.endObject();
     }
 

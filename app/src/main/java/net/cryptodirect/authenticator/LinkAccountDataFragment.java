@@ -8,11 +8,14 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+
+import java.util.Arrays;
 
 /**
  * Takes the account key data that was obtained from either
@@ -74,6 +77,11 @@ public class LinkAccountDataFragment extends Fragment
         keyTextField.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
         keyTextField.setText(key);
 
+        Log.e("TAG", "Key: " + key);
+        Log.e("TAG", "Is empty: " + TextUtils.isEmpty(key));
+        Log.e("TAG", "Matches key regex: " + Utils.KEY_REGEX.matcher(key).matches());
+        Log.e("TAG", "Key length:" + key.length());
+        Log.e("TAG", Arrays.toString(key.toCharArray()));
         if (TextUtils.isEmpty(key) || !Utils.KEY_REGEX.matcher(key).matches() || key.length() != 44)
         {
             // key is invalid

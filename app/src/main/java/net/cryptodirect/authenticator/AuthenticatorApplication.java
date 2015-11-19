@@ -81,12 +81,11 @@ public class AuthenticatorApplication extends Application
         acraConfiguration.setResDialogOkToast(R.string.crash_dialog_ok_toast);
         acraConfiguration.setResDialogPositiveButtonText(R.string.okay);
         acraConfiguration.setResDialogNegativeButtonText(R.string.no);
-
         acraConfiguration.setHttpMethod(HttpSender.Method.PUT);
         acraConfiguration.setReportType(HttpSender.Type.JSON);
         try
         {
-            acraConfiguration.setMode(ReportingInteractionMode.DIALOG);
+            acraConfiguration.setMode(BuildConfig.DEBUG ? ReportingInteractionMode.SILENT : ReportingInteractionMode.DIALOG);
         }
         catch (ACRAConfigurationException e)
         {

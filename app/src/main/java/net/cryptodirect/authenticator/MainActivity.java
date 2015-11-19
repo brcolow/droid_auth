@@ -334,9 +334,13 @@ public class MainActivity
     {
         Bundle bundle = new Bundle();
         bundle.putString("email", email);
-        bundle.putString("key", AccountManager.getInstance().getAccount(email).getSecretKey());
+        bundle.putByteArray("key", AccountManager.getInstance().getAccount(email).getSecretKey());
         bundle.putInt("ts", ts);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        bundle.putBoolean("play_time_running_out_sound", sharedPreferences.getBoolean("play_time_running_out_sound", true));
+        bundle.putInt("time_running_out_start", sharedPreferences.getInt("time_running_out_start", 5));
         AuthenticatorFragment authenticatorFragment = new AuthenticatorFragment();
+        sharedPreferences.registerOnSharedPreferenceChangeListener(authenticatorFragment);
         authenticatorFragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.main_fragment_container,
