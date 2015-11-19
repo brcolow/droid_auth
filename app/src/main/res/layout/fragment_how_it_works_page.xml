@@ -11,38 +11,42 @@
         android:id="@+id/how_it_works_page_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/how_it_works_page_text"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_gravity="center"
+        android:contentDescription="@string/how_it_works"
         android:minHeight="140dp"
         android:minWidth="200dp"
-        android:contentDescription="@string/how_it_works"
-        android:src="@drawable/ic_qrcode_white_36dp"
-        android:scaleType="fitCenter"/>
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_qrcode_white_36dp"/>
 
     <me.grantland.widget.AutofitTextView
         android:id="@+id/how_it_works_page_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_below="@id/how_it_works_page_image"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginBottom="26dp"
-        android:maxLines="10"
-        android:padding="25dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:maxLines="15"
+        android:padding="16dp"
         android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi id elementum justo. Suspendisse ullamcorper arcu lorem, sit amet vestibulum risus aliquet sit amet. Fusce interdun nunc a placerat posuere. Praesent vitae aliquet magna. Phasellus at mauris dolor. Aliquam erat volutpat. Nam quis malesuada lorem, luctus auctor nibh. Etiam sit amet nibh scelerisque, sodales ligula et, ultrices tellus."
         android:textColor="@color/whiteColor"
         android:textSize="22sp"
-        autofit:minTextSize="14sp"/>
+        autofit:minTextSize="12sp"
+        android:ellipsize="end"/>
 
     <View
-        android:id="@+id/view"
+        android:id="@+id/line_separator"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_alignBottom="@+id/how_it_works_page_text"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginBottom="27dp"
+        android:layout_marginBottom="36dp"
         android:background="@android:color/darker_gray"/>
 
     <Button
@@ -51,6 +55,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@+id/line_separator"
         android:layout_toLeftOf="@+id/how_it_works_page_image"
         android:layout_toStartOf="@+id/how_it_works_page_image"
         android:background="#00FFFFFF"
@@ -64,21 +71,21 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_alignTop="@+id/skip_button"
+        android:layout_alignTop="@+id/line_separator"
         android:layout_marginEnd="20dp"
         android:layout_marginRight="20dp"
         android:background="#00FFFFFF"
         android:baselineAlignBottom="false"
         android:contentDescription="@string/next"
+        android:onClick="handleNextPageButtonClicked"
         android:src="@drawable/ic_keyboard_arrow_right_white_24dp"
-        android:textColor="#ffffff"
-        android:onClick="handleNextPageButtonClicked"/>
+        android:textColor="#ffffff"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentBottom="true"
-        android:layout_alignTop="@+id/view"
+        android:layout_alignTop="@+id/line_separator"
         android:gravity="center"
         android:orientation="horizontal">
 

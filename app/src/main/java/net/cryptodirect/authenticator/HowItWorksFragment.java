@@ -22,6 +22,7 @@ public class HowItWorksFragment extends Fragment
     {
         super.onViewCreated(view, savedInstanceState);
         pager = (ViewPagerCustomDuration) view.findViewById(R.id.view_pager);
+
         if (android.os.Build.VERSION.SDK_INT >= 17)
         {
             // using child fragment manager here makes it so that when one

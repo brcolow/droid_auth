@@ -7,26 +7,38 @@ import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import me.grantland.widget.AutofitTextView;
 
-public class HowItWorksPageFragment extends Fragment
-{
+public class HowItWorksPageFragment extends Fragment implements View.OnClickListener
+{;
     private int backgroundColor;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         View view = inflater.inflate(R.layout.fragment_how_it_works_page, container, false);
-
         int id = getArguments().getInt("id");
+
+        // this must be set for things to work!
         view.setId(id);
 
+        Button skipButton = (Button) view.findViewById(R.id.skip_button);
+        skipButton.setOnClickListener(this);
         backgroundColor = Color.parseColor(getArguments().getString("backgroundColor"));
         view.setBackgroundColor(backgroundColor);
 
-        // TODO if this is page 3 (id 2) remove skip and ">" button and replace with [Done] button
+        if (id == 2)
+        {
+            ImageButton nextButton = (ImageButton) view.findViewById(R.id.next_button);
+            skipButton.setLayoutParams(nextButton.getLayoutParams());
+            skipButton.setText(R.string.done);
+            nextButton.setVisibility(View.INVISIBLE);
+        }
+
         View circle;
         switch (id)
         {
@@ -59,14 +71,14 @@ public class HowItWorksPageFragment extends Fragment
 
         AutofitTextView textView = (AutofitTextView) view.findViewById(R.id.how_it_works_page_text);
         textView.setText(getArguments().getString("blurb"));
-
+        textView.setSizeToFit(true);
+        textView.forceLayout();
         return view;
     }
 
     public static HowItWorksPageFragment newInstance(int id, String backgroundColorString,
                                                      int drawable, String text)
     {
-
         HowItWorksPageFragment howItWorksPageFragment = new HowItWorksPageFragment();
         Bundle bundle = new Bundle();
 
@@ -83,5 +95,12 @@ public class HowItWorksPageFragment extends Fragment
     public int getBackgroundColor()
     {
         return backgroundColor;
+    }
+
+    @Override
+    public void onClick(View v)
+    {
+        // handles skip/done button
+        getActivity().getFragmentManager().popBackStack();
     }
 }

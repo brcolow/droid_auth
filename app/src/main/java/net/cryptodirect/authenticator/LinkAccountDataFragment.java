@@ -77,11 +77,6 @@ public class LinkAccountDataFragment extends Fragment
         keyTextField.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
         keyTextField.setText(key);
 
-        Log.e("TAG", "Key: " + key);
-        Log.e("TAG", "Is empty: " + TextUtils.isEmpty(key));
-        Log.e("TAG", "Matches key regex: " + Utils.KEY_REGEX.matcher(key).matches());
-        Log.e("TAG", "Key length:" + key.length());
-        Log.e("TAG", Arrays.toString(key.toCharArray()));
         if (TextUtils.isEmpty(key) || !Utils.KEY_REGEX.matcher(key).matches() || key.length() != 44)
         {
             // key is invalid

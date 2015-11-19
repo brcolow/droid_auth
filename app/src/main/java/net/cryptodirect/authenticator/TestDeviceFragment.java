@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -148,8 +149,12 @@ public class TestDeviceFragment extends Fragment
                     resultsTable.addView(testResultRow);
                 }
                 button.setVisibility(View.GONE);
-                // TODO find the best way to arrive at this value (for all screens)
-                resultsContainer.setTranslationY(-200f);
+                DisplayMetrics metrics = new DisplayMetrics();
+                getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+                int height = metrics.heightPixels;
+                // 2560 is the height in pixels of Nexus 6, 493 is the dpi of Nexus 6.
+                // The -200f value centers the table on Nexus 6, so we use that as the reference
+                resultsContainer.setTranslationY((-200f) * ((height * metrics.densityDpi) / (2560f * 493f)));
             }
         });
         return view;

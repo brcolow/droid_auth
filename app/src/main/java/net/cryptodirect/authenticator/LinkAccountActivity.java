@@ -16,6 +16,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.CheckBox;
@@ -330,7 +331,18 @@ public class LinkAccountActivity
      */
     public void handleIncorrectButtonClicked(View view)
     {
-        getSupportFragmentManager().popBackStackImmediate();
+        // resume camera
+        if (getSupportFragmentManager().getBackStackEntryCount() >= 2)
+        {
+            FragmentManager.BackStackEntry backEntry = getSupportFragmentManager().
+                    getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 2);
+            if (backEntry.getName().equals("qr-code"))
+            {
+                Fragment fragment = getSupportFragmentManager().findFragmentByTag("qr-code");
+                fragment.onResume();
+            }
+        }
+        getSupportFragmentManager().popBackStack();
     }
 
     /**

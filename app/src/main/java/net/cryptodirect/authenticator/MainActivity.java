@@ -18,6 +18,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -174,16 +175,18 @@ public class MainActivity
                 // in the application that use the non-compat Fragment, and so are
                 // managed by getFragmentManager() rather than getSupportFragmentManager()
                 getFragmentManager().popBackStack();
+                return;
             }
         }
 
         if (getSupportFragmentManager().getBackStackEntryCount() > 1)
         {
             getSupportFragmentManager().popBackStack();
+            return;
         }
+
         if (getSupportFragmentManager().getBackStackEntryCount() == 1)
         {
-            Log.e(TAG, "Entry count: " + getSupportFragmentManager().getBackStackEntryCount());
             FragmentManager.BackStackEntry backEntry = getSupportFragmentManager().
                     getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1);
             String fragmentName = backEntry.getName();
