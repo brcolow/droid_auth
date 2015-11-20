@@ -8,14 +8,11 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-
-import java.util.Arrays;
 
 /**
  * Takes the account key data that was obtained from either
@@ -26,6 +23,7 @@ import java.util.Arrays;
  */
 public class LinkAccountDataFragment extends Fragment
 {
+
     public LinkAccountDataFragment()
     {
     }
@@ -58,6 +56,8 @@ public class LinkAccountDataFragment extends Fragment
 
         final String email = getArguments().getString("new_email");
         final String key = getArguments().getString("new_key");
+        final String issuer = getArguments().getString("new_issuer");
+        final int base = getArguments().getInt("new_base");
 
         if (email == null)
         {
@@ -67,6 +67,15 @@ public class LinkAccountDataFragment extends Fragment
         {
             throw new IllegalArgumentException("LinkAccountDataFragment was not given decoded key");
         }
+        if (issuer == null)
+        {
+            throw new IllegalArgumentException("LinkAccountDataFragment was not given decoded issuer");
+        }
+        if (base == 0)
+        {
+            throw new IllegalArgumentException("LinkAccountDataFragment was not given decoded base");
+        }
+
 
         TextView emailTextField = (TextView) view.findViewById(R.id.email_edit_text);
         // we set the email field to anonymous pro for consistency with key text field
@@ -77,9 +86,26 @@ public class LinkAccountDataFragment extends Fragment
         keyTextField.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
         keyTextField.setText(key);
 
-        if (TextUtils.isEmpty(key) || !Utils.KEY_REGEX.matcher(key).matches() || key.length() != 44)
+        boolean keyValid = true;
+        if (base == 64)
         {
-            // key is invalid
+            if (TextUtils.isEmpty(key) || !Utils.BASE64_KEY_REGEX.matcher(key).matches() || key.length() != 44)
+            {
+                // base64 key is invalid
+                keyValid = false;
+            }
+        }
+        else
+        {
+            if (TextUtils.isEmpty(key) || !Utils.BASE32_KEY_REGEX.matcher(key).matches() || key.length() % 8 == 0)
+            {
+                // base32 key is invalid
+                keyValid = false;
+            }
+        }
+
+        if (!keyValid)
+        {
             Drawable errorDrawable = ContextCompat.getDrawable(getActivity().getBaseContext(), R.drawable.ic_close_white_24dp);
             errorDrawable.setBounds(0, 0, errorDrawable.getIntrinsicWidth(), errorDrawable.getIntrinsicHeight());
             errorDrawable.setColorFilter(Utils.MaterialDesignColors.MD_RED_600.getColor(), PorterDuff.Mode.SRC_IN);
@@ -92,6 +118,7 @@ public class LinkAccountDataFragment extends Fragment
             validDrawable.setColorFilter(Utils.MaterialDesignColors.MD_GREEN_500.getColor(), PorterDuff.Mode.SRC_IN);
             keyTextField.setCompoundDrawablesWithIntrinsicBounds(null, null, validDrawable, null);
         }
+
         return view;
     }
 

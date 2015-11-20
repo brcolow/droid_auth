@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import com.google.zxing.BarcodeFormat;
 
+import net.cryptodirect.authenticator.crypto.Base;
 import net.cryptodirect.authenticator.crypto.CodeParams;
 import net.cryptodirect.authenticator.crypto.CodeType;
 
@@ -196,6 +197,7 @@ public class LinkAccountActivity
             bundle.putString("new_email", scannedAccount.getEmail());
             bundle.putString("new_issuer", scannedAccount.getIssuer());
             bundle.putString("new_key", Base64.encodeToString(scannedAccount.getSecretKey(), Base64.NO_WRAP));
+            bundle.putString("new_base", scannedAccount.getCodeParams().getBase() == Base.BASE32 ? "32" : "64");
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             LinkAccountDataFragment linkAccountDataFragment = new LinkAccountDataFragment();
             linkAccountDataFragment.setArguments(bundle);
@@ -237,92 +239,118 @@ public class LinkAccountActivity
             return;
         }
 
-        ProgressDialog progressDialog = new ProgressDialog(LinkAccountActivity.this);
-        progressDialog.setMessage("Verifying credentials...");
-        progressDialog.show();
-
-        NotifyAccountLinkedTask notifyAccountLinkedTask = new NotifyAccountLinkedTask(progressDialog, emailTextField.getText(), keyTextField.getText());
-        JSONObject response = null;
-        try
+        boolean wasManualEntry;
+        FragmentManager.BackStackEntry backEntry = getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 2);
+        if (backEntry.getName().equals("manual-entry"))
         {
-            response = notifyAccountLinkedTask.execute().get(5000, TimeUnit.MILLISECONDS);
+            wasManualEntry = true;
         }
-        catch (InterruptedException | ExecutionException | TimeoutException e)
+        else
         {
-            // shouldn't happen
-            ACRA.getErrorReporter().handleException(e);
+            wasManualEntry = false;
         }
 
-        if (response != null)
+        if (wasManualEntry || scannedAccount.getIssuer().toUpperCase().equals("CRYPTODASH"))
         {
+            ProgressDialog progressDialog = new ProgressDialog(LinkAccountActivity.this);
+            progressDialog.setMessage("Verifying credentials...");
+            progressDialog.show();
+            NotifyAccountLinkedTask notifyAccountLinkedTask = new NotifyAccountLinkedTask(progressDialog, emailTextField.getText(), keyTextField.getText());
+            JSONObject response;
+
+            // if this is a Cryptodash provided code, verify entered credentials via Centurion
             try
             {
-                if (response.has("local_error"))
+                response = notifyAccountLinkedTask.execute().get(5000, TimeUnit.MILLISECONDS);
+            }
+            catch (InterruptedException | ExecutionException | TimeoutException e)
+            {
+                // shouldn't happen
+                ACRA.getErrorReporter().handleException(e);
+                return;
+            }
+
+            if (response != null)
+            {
+                try
                 {
-                    final String error = response.getString("local_error");
-                    Toast toast = Toast.makeText(getApplicationContext(), "Looks like we are having some server trouble. This incident has been reported. Sorry about that!", Toast.LENGTH_LONG);
-                    toast.show();
-                    ACRA.getErrorReporter().handleSilentException(new IOException(error));
+                    if (response.has("local_error"))
+                    {
+                        final String error = response.getString("local_error");
+                        Toast toast = Toast.makeText(getApplicationContext(), "Looks like we are having some server trouble. This incident has been reported. Sorry about that!", Toast.LENGTH_LONG);
+                        toast.show();
+                        ACRA.getErrorReporter().handleSilentException(new IOException(error));
+                        return;
+                    }
+
+                    int responseCode = response.getInt("httpResponseCode");
+                    if (responseCode != 200)
+                    {
+                        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this, R.style.Theme_Dialog);
+                        alertBuilder.setMessage(R.string.centurion_invalid_args);
+                        alertBuilder.setCancelable(false);
+                        alertBuilder.setPositiveButton(getString(R.string.okay),
+                                new DialogInterface.OnClickListener()
+                                {
+                                    public void onClick(DialogInterface dialog, int id)
+                                    {
+                                        // TODO maybe we should allow the user to go to
+                                        // manual entry with the current text already entered
+                                        dialog.dismiss();
+                                    }
+                                });
+                        AlertDialog alertDialog = alertBuilder.create();
+                        alertDialog.show();
+                        return;
+                    }
+
+                }
+                catch (JSONException e)
+                {
+                    ACRA.getErrorReporter().handleException(e);
                     return;
                 }
-
-                int responseCode = response.getInt("httpResponseCode");
-                if (responseCode != 200)
-                {
-                    AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this, R.style.Theme_Dialog);
-                    alertBuilder.setMessage(R.string.centurion_invalid_args);
-                    alertBuilder.setCancelable(false);
-                    alertBuilder.setPositiveButton(getString(R.string.okay),
-                            new DialogInterface.OnClickListener()
-                            {
-                                public void onClick(DialogInterface dialog, int id)
-                                {
-                                    // TODO maybe we should allow the user to go to
-                                    // manual entry with the current text already entered
-                                    dialog.dismiss();
-                                }
-                            });
-                    AlertDialog alertDialog = alertBuilder.create();
-                    alertDialog.show();
-                }
-                else
-                {
-                    // valid credentials
-                    Toast toast = Toast.makeText(getApplicationContext(), "You have successfully linked your account!", Toast.LENGTH_SHORT);
-                    toast.show();
-                    // TODO instead of showing the above toast, maybe we could animate in a "Successfully linked"
-                    // text/image and then fade to time wheel widget
-                    if (scannedAccount != null)
-                    {
-                        AccountManager.getInstance().registerAccount(scannedAccount, true, setAsDefaultAccountCheckBox.isChecked());
-                    }
-                    if (enteredEmail != null && enteredKey != null)
-                    {
-                        Account newAccount = new Account(enteredEmail, "Cryptodash",
-                                Base64.decode(enteredKey, Base64.DEFAULT),
-                                new CodeParams.Builder(CodeType.TOTP).build());
-                        AccountManager.getInstance().registerAccount(newAccount, true, setAsDefaultAccountCheckBox.isChecked());
-                    }
-                    else
-                    {
-                        throw new IllegalStateException("At linked account but scannedAccount, " +
-                                "enteredEmail, and enteredKey were all null!");
-                    }
-
-                    scannedAccount = null;
-                    enteredEmail = null;
-                    enteredKey = null;
-                    Intent intent = new Intent(this, MainActivity.class);
-                    startActivity(intent);
-
-                }
-            }
-            catch (JSONException e)
-            {
-                ACRA.getErrorReporter().handleException(e);
             }
         }
 
+        Toast toast = Toast.makeText(getApplicationContext(), "You have successfully linked your account!", Toast.LENGTH_SHORT);
+        toast.show();
+
+        // TODO instead of showing the above toast, maybe we could animate in a "Successfully linked"
+        // text/image and then fade to time wheel widget
+
+        if (wasManualEntry)
+        {
+            if (enteredEmail != null && enteredKey != null)
+            {
+                // TODO currently we default to a Cryptodash provided code if manual entry was used
+                Account newAccount = new Account(enteredEmail, "Cryptodash",
+                        Base64.decode(enteredKey, Base64.DEFAULT),
+                        new CodeParams.Builder(CodeType.TOTP).base(64).build());
+                AccountManager.getInstance().registerAccount(newAccount, true, setAsDefaultAccountCheckBox.isChecked());
+            }
+            else
+            {
+                throw new IllegalStateException("enteredEmail or enteredKey were null!");
+            }
+        }
+        else
+        {
+            if (scannedAccount != null)
+            {
+                AccountManager.getInstance().registerAccount(scannedAccount, true, setAsDefaultAccountCheckBox.isChecked());
+            }
+            else
+            {
+                throw new IllegalStateException("scannedAccount was null!");
+            }
+        }
+
+        scannedAccount = null;
+        enteredEmail = null;
+        enteredKey = null;
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 
     /**
@@ -367,12 +395,14 @@ public class LinkAccountActivity
             return;
         }
 
+        // TODO need to implement issuer for manual entry for non-Cryptodash accounts
         Bundle bundle = new Bundle();
         bundle.putString("new_email", emailTextField.getText().toString());
         bundle.putString("new_key", keyTextField.getText().toString());
+        bundle.putString("new_issuer", "Cryptodash");
+        bundle.putInt("new_base", 64);
         enteredEmail = emailTextField.getText().toString();
         enteredKey = keyTextField.getText().toString();
-        // TODO need to implement issuer for manual entry for non-Cryptodash accounts
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         LinkAccountDataFragment linkAccountDataFragment = new LinkAccountDataFragment();
         linkAccountDataFragment.setArguments(bundle);

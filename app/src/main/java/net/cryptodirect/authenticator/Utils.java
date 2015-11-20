@@ -6,8 +6,11 @@ import java.util.regex.Pattern;
 
 public class Utils
 {
-    public static final Pattern KEY_REGEX = Pattern.compile("^[a-zA-Z0-9+/]+=$");
-    public static final Pattern BASE64_VALID_REGEX = Pattern.compile("[a-zA-Z0-9+/=]+");
+    public static final Pattern BASE64_KEY_REGEX = Pattern.compile("^[a-zA-Z0-9+/]+=$");
+    public static final Pattern VALID_BASE64_CHARS_REGEX = Pattern.compile("[a-zA-Z0-9+/=]+");
+
+    public static final Pattern BASE32_KEY_REGEX = Pattern.compile("^[A-Z2-7]+$");
+    public static final Pattern VALID_BASE32_CHARS_REGEX = Pattern.compile("[A-Z2-7]+");
 
     public enum MaterialDesignColors
     {

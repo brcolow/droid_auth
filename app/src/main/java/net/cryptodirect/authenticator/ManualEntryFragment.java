@@ -125,7 +125,7 @@ public class ManualEntryFragment extends Fragment
                 else
                 {
                     String errorMessage = null;
-                    if (!Utils.BASE64_VALID_REGEX.matcher(keyEditText.getText()).matches())
+                    if (!Utils.VALID_BASE64_CHARS_REGEX.matcher(keyEditText.getText()).matches())
                     {
                         errorMessage = getResources().getString(R.string.invalid_char_key);
                     }

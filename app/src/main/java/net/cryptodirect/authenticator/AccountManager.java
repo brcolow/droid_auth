@@ -171,6 +171,8 @@ public class AccountManager
         writer.value(account.getCodeParams().getHotpCounter());
         writer.name("totpPeriod");
         writer.value(account.getCodeParams().getTotpPeriod());
+        writer.name("base");
+        writer.value(account.getCodeParams().getBase().name());
         writer.endObject();
         writer.endObject();
     }

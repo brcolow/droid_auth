@@ -92,6 +92,15 @@ public class Account
         }
 
         String accountLabel = uri.getPath().substring(1);
+        while (accountLabel.charAt(0) == '/') {
+            accountLabel = accountLabel.substring(1);
+        }
+
+        if (accountLabel.isEmpty()) {
+            throw new IllegalArgumentException("Given uriString does not have a non-empty path " +
+                    "for uriString: " + uriString);
+        }
+
         Map<String, List<String>> queryParams = splitQuery(uri);
 
         int counter = -1;
@@ -105,6 +114,11 @@ public class Account
             else
             {
                 counter = Integer.valueOf(queryParams.get("counter").get(0));
+                if (counter < 0)
+                {
+                    throw new IllegalArgumentException("Counter query parameter must be positive " +
+                            "but was: " + counter + " for uriString: " + uriString);
+                }
             }
         }
 
@@ -142,6 +156,15 @@ public class Account
         }
         byte[] key = base == 32 ? Base32.decode(queryParams.get("secret").get(0)) :
                 Base64.decode(queryParams.get("secret").get(0), Base64.DEFAULT);
+
+        if (base == 32)
+        {
+            if (key.length % 8 != 0 || key.length == 0)
+            {
+                throw new IllegalArgumentException("Base-32 secret key must have N chars where " +
+                        "N is a multiple of 8 but length was: " + queryParams.get("secret").get(0).length());
+            }
+        }
 
         String issuer = "Unknown";
         if (queryParams.containsKey("issuer"))
@@ -193,13 +216,9 @@ public class Account
                 switch (d)
                 {
                     case 6:
-                        digits = 6;
-                        break;
                     case 7:
-                        digits = 7;
-                        break;
                     case 8:
-                        digits = 8;
+                        digits = d;
                         break;
                     default:
                         throw new IllegalArgumentException("Unsupported number of digits: " +
@@ -231,9 +250,8 @@ public class Account
             }
         }
 
-
         return new Account(accountLabel, issuer, key, new CodeParams.Builder(codeType)
-                .algorithm(algorithm).digits(digits).totpPeriod(period).hotpCounter(counter).build());
+                .algorithm(algorithm).digits(digits).totpPeriod(period).hotpCounter(counter).base(base).build());
     }
 
     public static Map<String, List<String>> splitQuery(URI uri) {

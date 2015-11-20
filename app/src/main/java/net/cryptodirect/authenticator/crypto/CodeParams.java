@@ -7,6 +7,7 @@ public class CodeParams
     private final int digits;
     private final int hotpCounter;
     private final int totpPeriod;
+    private final Base base;
 
     private CodeParams(Builder builder)
     {
@@ -15,6 +16,7 @@ public class CodeParams
         this.digits = builder.digits;
         this.hotpCounter = builder.hotpCounter;
         this.totpPeriod = builder.totpPeriod;
+        this.base = builder.base;
     }
 
     public CodeType getCodeType()
@@ -42,6 +44,11 @@ public class CodeParams
         return totpPeriod;
     }
 
+    public Base getBase()
+    {
+        return base;
+    }
+
     public static class Builder
     {
         private final CodeType codeType;
@@ -49,6 +56,7 @@ public class CodeParams
         private int digits = Defaults.DIGITS;
         private int hotpCounter = -1;
         private int totpPeriod = Defaults.TOTP_PERIOD;
+        private Base base = Base.BASE32;
 
         public Builder(CodeType codeType)
         {
@@ -85,6 +93,23 @@ public class CodeParams
             }
 
             this.totpPeriod = totpPeriod;
+            return this;
+        }
+
+        public Builder base(int base)
+        {
+            switch (base)
+            {
+                case 32:
+                    this.base = Base.BASE32;
+                    break;
+                case 64:
+                    this.base = Base.BASE64;
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unsupported base: " + base + " must be 32 or 64");
+            }
+
             return this;
         }
 
