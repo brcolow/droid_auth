@@ -354,6 +354,7 @@ public class MainActivity
 
     private void showSettingsFragment()
     {
+        setTheme(R.style.SettingsFragmentStyle);
         SettingsFragment settingsFragment = new SettingsFragment();
         android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.main_fragment_container,

@@ -15,8 +15,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.AndroidRuntimeException;
 import android.util.Base64;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.CheckBox;
@@ -261,53 +261,49 @@ public class LinkAccountActivity
             // if this is a Cryptodash provided code, verify entered credentials via Centurion
             try
             {
-                response = notifyAccountLinkedTask.execute().get(5000, TimeUnit.MILLISECONDS);
+                response = notifyAccountLinkedTask.execute().get(4000, TimeUnit.MILLISECONDS);
             }
             catch (InterruptedException | ExecutionException | TimeoutException e)
             {
-                // shouldn't happen
-                ACRA.getErrorReporter().handleException(e);
-                return;
+                try
+                {
+                    response = new JSONObject("{\"local_error\": " + JSONObject.quote(e.getMessage()) + "}");
+                }
+                catch (JSONException e1)
+                {
+                    throw new AndroidRuntimeException(e1);
+                }
             }
 
             if (response != null)
             {
-                try
+                if (response.has("local_error"))
                 {
-                    if (response.has("local_error"))
-                    {
-                        final String error = response.getString("local_error");
-                        Toast toast = Toast.makeText(getApplicationContext(), "Looks like we are having some server trouble. This incident has been reported. Sorry about that!", Toast.LENGTH_LONG);
-                        toast.show();
-                        ACRA.getErrorReporter().handleSilentException(new IOException(error));
-                        return;
-                    }
-
-                    int responseCode = response.getInt("httpResponseCode");
-                    if (responseCode != 200)
-                    {
-                        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this, R.style.Theme_Dialog);
-                        alertBuilder.setMessage(R.string.centurion_invalid_args);
-                        alertBuilder.setCancelable(false);
-                        alertBuilder.setPositiveButton(getString(R.string.okay),
-                                new DialogInterface.OnClickListener()
-                                {
-                                    public void onClick(DialogInterface dialog, int id)
-                                    {
-                                        // TODO maybe we should allow the user to go to
-                                        // manual entry with the current text already entered
-                                        dialog.dismiss();
-                                    }
-                                });
-                        AlertDialog alertDialog = alertBuilder.create();
-                        alertDialog.show();
-                        return;
-                    }
-
+                    final String error = response.optString("local_error");
+                    Toast toast = Toast.makeText(getApplicationContext(), "Looks like we are having some server trouble. This incident has been reported. Sorry about that!", Toast.LENGTH_LONG);
+                    toast.show();
+                    ACRA.getErrorReporter().handleSilentException(new IOException(error));
+                    return;
                 }
-                catch (JSONException e)
+
+                int responseCode = Integer.valueOf(response.optString("httpResponseCode", "-1"));
+                if (responseCode != 200)
                 {
-                    ACRA.getErrorReporter().handleException(e);
+                    AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this, R.style.Theme_Dialog);
+                    alertBuilder.setMessage(R.string.centurion_invalid_args);
+                    alertBuilder.setCancelable(false);
+                    alertBuilder.setPositiveButton(getString(R.string.okay),
+                            new DialogInterface.OnClickListener()
+                            {
+                                public void onClick(DialogInterface dialog, int id)
+                                {
+                                    // TODO maybe we should allow the user to go to
+                                    // manual entry with the current text already entered
+                                    dialog.dismiss();
+                                }
+                            });
+                    AlertDialog alertDialog = alertBuilder.create();
+                    alertDialog.show();
                     return;
                 }
             }
@@ -443,25 +439,8 @@ public class LinkAccountActivity
         @Override
         protected JSONObject doInBackground(String... args)
         {
-            JSONObject result;
-            try
-            {
-                String payload = "{\"email\": \"" + email + "\", \"totpKeyBase64\": \"" + key + "\"}";
-                result = Centurion.getInstance().post("twofactor/notify-linked", payload);
-            }
-            catch (IOException | JSONException e)
-            {
-                try
-                {
-                    result = new JSONObject("{\"local_error\": \"" + e.getMessage() + "\"}");
-                }
-                catch (JSONException e2)
-                {
-                    throw new RuntimeException(e2);
-                }
-            }
-
-            return result;
+            String payload = "{\"email\": \"" + email + "\", \"totpKeyBase64\": \"" + key + "\"}";
+            return Centurion.getInstance().post("twofactor/notify-linked", payload);
         }
     }
 

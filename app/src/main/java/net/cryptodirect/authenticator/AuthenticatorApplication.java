@@ -52,6 +52,7 @@ public class AuthenticatorApplication extends Application
                 : "https://cryptodash.net:4463/acra/report");
         if (BuildConfig.DEBUG)
         {
+            acraConfiguration.setDeleteOldUnsentReportsOnApplicationStart(true);
             javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier()
             {
                 @Override
@@ -74,6 +75,7 @@ public class AuthenticatorApplication extends Application
                 e.printStackTrace();
             }
         }
+
         acraConfiguration.setResToastText(R.string.crash_toast_text);
         acraConfiguration.setResDialogText(R.string.crash_dialog_text);
         acraConfiguration.setResDialogIcon(android.R.drawable.ic_dialog_info);

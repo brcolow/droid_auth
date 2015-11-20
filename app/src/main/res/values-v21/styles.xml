@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-        <style name="CryptodashTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
-                <item name="colorPrimary">@color/primary</item>
-                <item name="colorPrimaryDark">@color/primaryDark</item>
-                <item name="android:itemBackground">@color/primary</item>
-                <item name="actionMenuTextColor">@color/whiteColor</item>
-                <item name="android:colorBackground">@color/backgroundColor</item>
-                <item name="colorAccent">@color/md_green_300</item>
-                <item name="android:colorAccent">@color/md_green_300</item>
-                <item name="android:textColorSecondary">@color/md_red_300</item>
-        </style>
+    <style name="CryptodashTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primaryDark</item>
+        <item name="android:itemBackground">@color/primary</item>
+        <item name="actionMenuTextColor">@color/whiteColor</item>
+        <item name="android:colorBackground">@color/backgroundColor</item>
+        <item name="colorAccent">@color/md_green_300</item>
+        <item name="android:colorAccent">@color/md_green_300</item>
+        <item name="android:textColorSecondary">@color/md_red_300</item>
+    </style>
+    <style name="SettingsFragmentStyle">
+        <item name="android:textColorSecondary">#DDD</item>
+        <item name="android:textColor">#F8F8F8</item>
+        <item name="android:background">#313131</item>
+        <item name="colorAccent">@color/primary</item>
+        <item name="android:colorAccent">@color/primaryDark</item>
+    </style>
 </resources>

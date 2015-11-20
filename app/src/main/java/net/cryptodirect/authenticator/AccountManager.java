@@ -5,6 +5,7 @@ import android.util.Base64;
 import android.util.JsonWriter;
 
 import net.cryptodirect.authenticator.crypto.Algorithm;
+import net.cryptodirect.authenticator.crypto.Base32;
 import net.cryptodirect.authenticator.crypto.CodeParams;
 import net.cryptodirect.authenticator.crypto.CodeType;
 
@@ -76,14 +77,17 @@ public class AccountManager
         {
             JSONObject accountJsonObject = accountsJsonArray.getJSONObject(i);
             JSONObject codeParamsJsonObject = accountJsonObject.getJSONObject("codeParams");
+            int base = codeParamsJsonObject.getInt("base");
             Account account = new Account(accountJsonObject.getString("email"),
                     accountJsonObject.getString("issuer"),
-                    Base64.decode(accountJsonObject.getString("key"), Base64.DEFAULT),
+                    base == 32 ? Base32.decode(accountJsonObject.getString("key")) :
+                        Base64.decode(accountJsonObject.getString("key"), Base64.DEFAULT),
                     new CodeParams.Builder(CodeType.getCodeType(codeParamsJsonObject.getString("codeType")))
                             .algorithm(Algorithm.getAlgorithm(codeParamsJsonObject.getString("algorithm")))
                             .digits(codeParamsJsonObject.getInt("digits"))
                             .hotpCounter(codeParamsJsonObject.getInt("hotpCounter"))
                             .totpPeriod(codeParamsJsonObject.getInt("totpCounter"))
+                            .base(base)
                             .build());
 
             accounts.put(accountJsonObject.getString("email"), account);
