@@ -336,9 +336,7 @@ public class MainActivity
     private void showAuthenticatorFragment(String email, int ts)
     {
         Bundle bundle = new Bundle();
-        bundle.putString("email", email);
-        bundle.putByteArray("key", AccountManager.getInstance().getAccount(email).getSecretKey());
-        bundle.putInt("ts", ts);
+        bundle.putSerializable("account", AccountManager.getInstance().getAccount(email));
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         bundle.putBoolean("play_time_running_out_sound", sharedPreferences.getBoolean("play_time_running_out_sound", true));
         bundle.putInt("time_running_out_start", sharedPreferences.getInt("time_running_out_start", 5));

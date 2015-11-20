@@ -5,7 +5,6 @@ import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,22 +25,15 @@ import java.util.TimerTask;
  */
 public class AuthenticatorFragment extends Fragment implements SharedPreferences.OnSharedPreferenceChangeListener
 {
-    // time step (default is 30 seconds)
-    private int ts;
-    // String whose bytes (in ASCII) are used for the hmac
-    private byte[] key;
     private boolean playTimeRunningOutSound;
     private int timeRunningOutStart;
-
-    // the number of digits the final TOTP password should have
-    private static final int NUM_DIGITS = 6;
+    private Account account;
     private final Handler handler = new Handler();
     private TimestepIntervalWheel timestepIntervalWheel;
     private volatile boolean tickingSoundPlaying = false;
     private final Timer timer = new Timer("Wheel Timer", true);
     private final WheelTask currentTask = new WheelTask();
     private EditText codeBox;
-    private static final String TAG = AuthenticatorFragment.class.getSimpleName();
 
     public AuthenticatorFragment()
     {
@@ -59,21 +51,20 @@ public class AuthenticatorFragment extends Fragment implements SharedPreferences
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle state)
     {
         View rootView = inflater.inflate(R.layout.fragment_authenticator, container, false);
-        String email = getArguments().getString("email");
-        key = getArguments().getByteArray("key");
-        ts = getArguments().getInt("ts");
+        if (getArguments().getSerializable("account") == null)
+        {
+            throw new IllegalArgumentException("AuthenticatorFragment bundle did not have value " +
+                    "at key \"account\"");
+        }
+
+        account = (Account) getArguments().getSerializable("account");
         playTimeRunningOutSound = getArguments().getBoolean("play_time_running_out_sound");
         timeRunningOutStart = getArguments().getInt("time_running_out_start");
 
-        if (ts == 0)
-        {
-            Log.e(TAG, "AuthenticatorFragment was not passed ts argument, using default of 30!");
-            ts = 30;
-        }
-
-        ((TextView) rootView.findViewById(R.id.email_label)).setText(email);
+        ((TextView) rootView.findViewById(R.id.email_label)).setText(account.getEmail());
 
         // Set up TimestepIntervalWheel with current time
+        int ts = account.getCodeParams().getTotpPeriod();
         double tc = TOTP.getTC(ts);
         // how far along we are percentage-wise of the cyclical range [0, TS], e.g. 0.25
         double fractionalPart = tc - (long) tc;
@@ -94,7 +85,7 @@ public class AuthenticatorFragment extends Fragment implements SharedPreferences
 
         // Set initial codebox to initial TOTP token
         codeBox = ((EditText) rootView.findViewById(R.id.code_box));
-        codeBox.setText(TOTP.generateTOTPSha1(key, (long) tc, NUM_DIGITS));
+        codeBox.setText(TOTP.generateTOTPSha1(account.getSecretKey(), (long) tc, account.getCodeParams().getDigits()));
 
         return rootView;
     }
@@ -124,7 +115,10 @@ public class AuthenticatorFragment extends Fragment implements SharedPreferences
 
             if (timestepIntervalWheel.decrementSecondsRemaining())
             {
-                handler.post(new SetNewCodeTask(TOTP.generateTOTPSha1(key, TOTP.getTC(ts), NUM_DIGITS)));
+                handler.post(new SetNewCodeTask(TOTP.generateTOTPSha1(account.getSecretKey(),
+                        TOTP.getTC(account.getCodeParams().getTotpPeriod()),
+                        account.getCodeParams().getDigits())));
+
                 // SoundPoolManager.getInstance().stopSound("TICKTOCK");
                 tickingSoundPlaying = false;
             }

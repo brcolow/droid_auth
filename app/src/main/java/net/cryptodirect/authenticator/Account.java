@@ -7,6 +7,7 @@ import net.cryptodirect.authenticator.crypto.Base32;
 import net.cryptodirect.authenticator.crypto.CodeParams;
 import net.cryptodirect.authenticator.crypto.CodeType;
 
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -21,7 +22,7 @@ import java.util.Map;
  * Represents a registered Cryptodash account, consisting of
  * an email and secret key bytes to generate the TOTP codes.
  */
-public class Account
+public class Account implements Serializable
 {
     private final String email;
     private final String issuer;
