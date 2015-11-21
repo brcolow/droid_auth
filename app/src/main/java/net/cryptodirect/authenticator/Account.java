@@ -73,7 +73,7 @@ public class Account implements Serializable
      */
     public static Account parse(String uriString) throws URISyntaxException
     {
-        // otpauth://totp/test@gmail.com?secret=OEbnsWQidFxYp3TUcAqzREIuywzD7Gz3wFZhLz8qXEI=&issuer=Cryptodash&base=64&algorithm=SHA1&digits=6&period=30
+        // otpauth://totp/test@gmail.com?secret=OEbnsWQidFxYp3TUcAqzREIuywzD7Gz3wFZhLz8qXEI%3D&issuer=Cryptodash&base=64&algorithm=SHA1&digits=6&period=30
         URI uri = new URI(uriString);
         if (!uri.getScheme().equals("otpauth"))
         {
@@ -155,8 +155,19 @@ public class Account implements Serializable
             // use default base 32
             base = 32;
         }
-        byte[] key = base == 32 ? Base32.decode(queryParams.get("secret").get(0)) :
-                Base64.decode(queryParams.get("secret").get(0), Base64.DEFAULT);
+
+        final String urlDecodedSecret;
+        try
+        {
+            urlDecodedSecret = URLDecoder.decode(queryParams.get("secret").get(0), "UTF-8");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw new IllegalArgumentException("Could not URL decode the given secret for uriString: " + uriString);
+        }
+
+        byte[] key = base == 32 ? Base32.decode(urlDecodedSecret) :
+                Base64.decode(urlDecodedSecret, Base64.DEFAULT);
 
         if (base == 32)
         {

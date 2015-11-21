@@ -566,7 +566,6 @@ public class MainActivity
      */
     public void handleNextPageButtonClicked(View view)
     {
-        Log.e("TAG", "NEXT BUTTON CLICKED!");
         howItWorksPager.setCurrentItem(++currSelectedPage, true);
     }
 
