@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import com.google.zxing.BarcodeFormat;
 
+import net.cryptodirect.authenticator.crypto.Algorithm;
 import net.cryptodirect.authenticator.crypto.Base;
 import net.cryptodirect.authenticator.crypto.CodeParams;
 import net.cryptodirect.authenticator.crypto.CodeType;
@@ -322,7 +323,7 @@ public class LinkAccountActivity
                 // TODO currently we default to a Cryptodash provided code if manual entry was used
                 Account newAccount = new Account(enteredEmail, "Cryptodash",
                         Base64.decode(enteredKey, Base64.DEFAULT),
-                        new CodeParams.Builder(CodeType.TOTP).base(64).build());
+                        new CodeParams.Builder(CodeType.TOTP).base(64).algorithm(Algorithm.SHA256).build());
                 AccountManager.getInstance().registerAccount(newAccount, true, setAsDefaultAccountCheckBox.isChecked());
             }
             else

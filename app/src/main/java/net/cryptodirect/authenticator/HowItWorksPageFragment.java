@@ -70,6 +70,7 @@ public class HowItWorksPageFragment extends Fragment implements View.OnClickList
                 getArguments().getInt("drawable", R.drawable.ic_keyboard_white_36dp)));
 
         AutofitTextView textView = (AutofitTextView) view.findViewById(R.id.how_it_works_page_text);
+        textView.setHeightFitting(true);
         textView.setText(getArguments().getString("blurb"));
         textView.setSizeToFit(true);
         textView.forceLayout();

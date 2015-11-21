@@ -48,6 +48,7 @@
     that they are correct, and try again.</string>
     <string name="done">Done</string>
     <string name="no_accounts">You have no linked accounts!</string>
+    <string name="check_accounts">Check Accounts</string>
 
     <!-- Settings related strings -->
     <string name="general_cat">General</string>

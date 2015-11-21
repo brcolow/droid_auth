@@ -1,6 +1,8 @@
 package net.cryptodirect.authenticator;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.JsonWriter;
 
@@ -47,7 +49,7 @@ public class AccountManager
         return INSTANCE;
     }
 
-    public synchronized void init() throws IOException, JSONException
+    public synchronized void init(int numAccounts) throws IOException, JSONException
     {
         File file = baseContext.getFileStreamPath(ACCOUNTS_FILE);
 
@@ -59,6 +61,7 @@ public class AccountManager
             String jsonSkeleton = "{ \"accounts\" : [] }";
             outputStreamWriter.write(jsonSkeleton);
             outputStreamWriter.flush();
+            return; // early out optimization
         }
 
         FileInputStream accountsFileInputStream = baseContext.openFileInput(ACCOUNTS_FILE);
@@ -92,6 +95,14 @@ public class AccountManager
 
             accounts.put(accountJsonObject.getString("email"), account);
         }
+
+        if (accounts.size() != numAccounts)
+        {
+            // data corruption
+            throw new DataMismatchException("SharedPreferences said we have " + numAccounts +
+                    " accounts, but accounts.json only contained " + accounts.size() + " accounts!",
+                    Math.abs(numAccounts - accounts.size()));
+        }
     }
 
     public Account getAccount(String email)
@@ -120,6 +131,7 @@ public class AccountManager
         {
             return false;
         }
+
         try
         {
             accounts.put(account.getEmail(), account);
@@ -135,6 +147,16 @@ public class AccountManager
             jsonWriter.endObject();
             outputStreamWriter.flush();
             jsonWriter.close();
+
+            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(baseContext);
+            SharedPreferences.Editor prefsEditor = settings.edit();
+            prefsEditor.putInt("numAccounts", accounts.size());
+            if (setAsDefault)
+            {
+                prefsEditor.putString("default_account", account.getEmail());
+            }
+            prefsEditor.apply();
+
         }
         catch (IOException e)
         {
@@ -188,5 +210,21 @@ public class AccountManager
     public CharSequence[] getAccountEmails()
     {
         return accounts.keySet().toArray(new CharSequence[accounts.size()]);
+    }
+
+    public static class DataMismatchException extends JSONException
+    {
+        private final int numMissingAccounts;
+
+        public DataMismatchException(String s, int numMissingAccounts)
+        {
+            super(s);
+            this.numMissingAccounts = numMissingAccounts;
+        }
+
+        public int getNumMissingAccounts()
+        {
+            return numMissingAccounts;
+        }
     }
 }

@@ -18,7 +18,6 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -64,10 +63,41 @@ public class MainActivity
             return;
         }
 
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        final int numAccounts = settings.getInt("numAccounts", 0);
         try
         {
             AccountManager.getInstance().setBaseContext(getBaseContext());
-            AccountManager.getInstance().init();
+            AccountManager.getInstance().init(numAccounts);
+        }
+        catch (AccountManager.DataMismatchException e)
+        {
+            // report data corruption
+            ACRA.getErrorReporter().handleSilentException(e);
+            AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this, R.style.Theme_Dialog);
+            alertBuilder.setMessage("The stored account data is corrupted. There should be data " +
+                    "for " + numAccounts + " accounts but there were only " + e.getNumMissingAccounts()
+                    + ". Please check which accounts are still registered. This incident has been reported.");
+            alertBuilder.setCancelable(false);
+            alertBuilder.setPositiveButton(getString(R.string.check_accounts),
+                    new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int id)
+                        {
+                            showAccountChooserFragment();
+                        }
+                    });
+            alertBuilder.setNegativeButton(getString(R.string.not_now),
+                    new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int id)
+                        {
+                            dialog.cancel();
+                        }
+                    });
+            AlertDialog alertDialog = alertBuilder.create();
+            alertDialog.show();
         }
         catch (IOException | JSONException e)
         {
@@ -78,8 +108,6 @@ public class MainActivity
         FontManager.getInstance().init(getApplicationContext());
         SoundPoolManager.getInstance().init(getApplicationContext());
 
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         if (getSupportActionBar() != null)
         {
             getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_USE_LOGO | ActionBar.DISPLAY_SHOW_TITLE);
@@ -538,6 +566,7 @@ public class MainActivity
      */
     public void handleNextPageButtonClicked(View view)
     {
+        Log.e("TAG", "NEXT BUTTON CLICKED!");
         howItWorksPager.setCurrentItem(++currSelectedPage, true);
     }
 
