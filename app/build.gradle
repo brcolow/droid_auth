@@ -80,6 +80,7 @@ def buildTime() {
 task askForPasswords << {
     // Must create String because System.readPassword() returns char[]
     // (and assigning that below fails silently)
+    System.console().println()
     def storePw = new String(System.console().readPassword("Keystore password: "))
     def keyPw  = new String(System.console().readPassword("Key password: "))
 

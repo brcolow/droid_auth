@@ -2,4 +2,6 @@
 <resources>
     <color name="md_red_300">#E57373</color>
     <color name="md_green_300">#81C784</color>
+    <color name="md_green_800">#2E7D32</color>
+
 </resources>
