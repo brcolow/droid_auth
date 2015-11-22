@@ -5,8 +5,10 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.JsonWriter;
+import android.util.Log;
 
 import net.cryptodirect.authenticator.crypto.Algorithm;
+import net.cryptodirect.authenticator.crypto.Base;
 import net.cryptodirect.authenticator.crypto.Base32;
 import net.cryptodirect.authenticator.crypto.CodeParams;
 import net.cryptodirect.authenticator.crypto.CodeType;
@@ -32,7 +34,6 @@ public class AccountManager
     private static final AccountManager INSTANCE = new AccountManager();
     private static final String ACCOUNTS_FILE = "accounts.json";
     private final Map<String, Account> accounts = new ConcurrentHashMap<>();
-    private static FileOutputStream accountsFileOutputStream;
 
     private AccountManager()
     {
@@ -56,12 +57,12 @@ public class AccountManager
         if (file.length() == 0)
         {
             // create accounts.json skeleton
-            accountsFileOutputStream = baseContext.openFileOutput(ACCOUNTS_FILE, Context.MODE_PRIVATE);
+            FileOutputStream accountsFileOutputStream = baseContext.openFileOutput(ACCOUNTS_FILE, Context.MODE_PRIVATE);
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(accountsFileOutputStream);
             String jsonSkeleton = "{ \"accounts\" : [] }";
             outputStreamWriter.write(jsonSkeleton);
             outputStreamWriter.flush();
-            return; // early out optimization
+            outputStreamWriter.close();
         }
 
         FileInputStream accountsFileInputStream = baseContext.openFileInput(ACCOUNTS_FILE);
@@ -89,7 +90,7 @@ public class AccountManager
                             .algorithm(Algorithm.getAlgorithm(codeParamsJsonObject.getString("algorithm")))
                             .digits(codeParamsJsonObject.getInt("digits"))
                             .hotpCounter(codeParamsJsonObject.getInt("hotpCounter"))
-                            .totpPeriod(codeParamsJsonObject.getInt("totpCounter"))
+                            .totpPeriod(codeParamsJsonObject.getInt("totpPeriod"))
                             .base(base)
                             .build());
 
@@ -117,6 +118,7 @@ public class AccountManager
 
     public boolean accountExists(String email)
     {
+        Log.e("TAG", accounts.toString());
         return accounts.containsKey(email);
     }
 
@@ -135,10 +137,7 @@ public class AccountManager
         try
         {
             accounts.put(account.getEmail(), account);
-            if (accountsFileOutputStream == null)
-            {
-                accountsFileOutputStream = baseContext.openFileOutput(ACCOUNTS_FILE, Context.MODE_PRIVATE);
-            }
+            FileOutputStream accountsFileOutputStream = baseContext.openFileOutput(ACCOUNTS_FILE, Context.MODE_PRIVATE);
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(accountsFileOutputStream, StandardCharsets.UTF_8);
             JsonWriter jsonWriter = new JsonWriter(outputStreamWriter);
             jsonWriter.beginObject();
@@ -147,6 +146,7 @@ public class AccountManager
             jsonWriter.endObject();
             outputStreamWriter.flush();
             jsonWriter.close();
+            outputStreamWriter.close();
 
             SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(baseContext);
             SharedPreferences.Editor prefsEditor = settings.edit();
@@ -198,7 +198,7 @@ public class AccountManager
         writer.name("totpPeriod");
         writer.value(account.getCodeParams().getTotpPeriod());
         writer.name("base");
-        writer.value(account.getCodeParams().getBase().name());
+        writer.value(account.getCodeParams().getBase().equals(Base.BASE32) ? 32 : 64);
         writer.endObject();
         writer.endObject();
     }
