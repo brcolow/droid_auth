@@ -15,7 +15,6 @@ public class SoundPoolManager
     private static final SoundPoolManager INSTANCE = new SoundPoolManager();
     private static final Map<String, Integer> sounds = new ConcurrentHashMap<>();
     private static final Map<String, Integer> playingSounds = new ConcurrentHashMap<>();
-    private static final String TAG = SoundPoolManager.class.getSimpleName();
 
     public static SoundPoolManager getInstance()
     {

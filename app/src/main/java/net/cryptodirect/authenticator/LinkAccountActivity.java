@@ -198,7 +198,7 @@ public class LinkAccountActivity
             bundle.putString("new_email", scannedAccount.getEmail());
             bundle.putString("new_issuer", scannedAccount.getIssuer());
             bundle.putString("new_key", Base64.encodeToString(scannedAccount.getSecretKey(), Base64.NO_WRAP));
-            bundle.putString("new_base", scannedAccount.getCodeParams().getBase() == Base.BASE32 ? "32" : "64");
+            bundle.putInt("new_base", scannedAccount.getCodeParams().getBase() == Base.BASE32 ? 32 : 64);
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             LinkAccountDataFragment linkAccountDataFragment = new LinkAccountDataFragment();
             linkAccountDataFragment.setArguments(bundle);
@@ -242,14 +242,7 @@ public class LinkAccountActivity
 
         boolean wasManualEntry;
         FragmentManager.BackStackEntry backEntry = getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 2);
-        if (backEntry.getName().equals("manual-entry"))
-        {
-            wasManualEntry = true;
-        }
-        else
-        {
-            wasManualEntry = false;
-        }
+        wasManualEntry = backEntry.getName().equals("manual-entry");
 
         if (wasManualEntry || scannedAccount.getIssuer().toUpperCase().equals("CRYPTODASH"))
         {

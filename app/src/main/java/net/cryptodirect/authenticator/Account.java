@@ -266,7 +266,7 @@ public class Account implements Serializable
                 .algorithm(algorithm).digits(digits).totpPeriod(period).hotpCounter(counter).base(base).build());
     }
 
-    public static Map<String, List<String>> splitQuery(URI uri) {
+    private static Map<String, List<String>> splitQuery(URI uri) {
         final Map<String, List<String>> keyValuePairs = new LinkedHashMap<>();
         final String[] pairs = uri.getQuery().split("&");
         for (String pair : pairs) {

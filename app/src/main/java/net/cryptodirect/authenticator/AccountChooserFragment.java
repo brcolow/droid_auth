@@ -9,10 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import org.acra.ACRA;
 
 /**
  * If the user has more than one account registered, this Fragment
@@ -70,7 +70,7 @@ public class AccountChooserFragment extends Fragment
         }
         catch (ClassCastException e)
         {
-            throw new ClassCastException(context.toString() + " must implement OnAccountChosenListener");
+            ACRA.getErrorReporter().handleException(e);
         }
     }
 

@@ -1,5 +1,8 @@
 package net.cryptodirect.authenticator;
 
+import static net.cryptodirect.authenticator.Utils.NEXUS_6_HEIGHT_PIXELS;
+import static net.cryptodirect.authenticator.Utils.NEXUS_6_DPI;
+
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -97,7 +100,7 @@ public class TestDeviceFragment extends Fragment
                 LinearLayout testNumberHeaderCell = new LinearLayout(getActivity());
                 testNumberHeaderCell.setLayoutParams(layoutParams);
                 TextView testNumber = new TextView(getActivity());
-                testNumber.setText("Test #");
+                testNumber.setText(R.string.test_number_sign);
                 testNumber.setTextColor(Color.parseColor("#212121"));
                 testNumber.setPadding(0, 0, 0, 0);
                 testNumberHeaderCell.addView(testNumber);
@@ -105,7 +108,7 @@ public class TestDeviceFragment extends Fragment
                 LinearLayout testResultHeaderCell = new LinearLayout(getActivity());
                 testResultHeaderCell.setLayoutParams(layoutParams);
                 TextView testResult = new TextView(getActivity());
-                testResult.setText("Result");
+                testResult.setText(R.string.result);
                 testResult.setTextColor(Color.parseColor("#212121"));
                 testNumber.setPadding(0, 0, 0, 0);
                 testResultHeaderCell.addView(testResult);
@@ -130,7 +133,7 @@ public class TestDeviceFragment extends Fragment
                     cell.setBackgroundColor(Color.parseColor("#212121"));
                     cell.setLayoutParams(layoutParams);
                     testNumber = new TextView(getActivity());
-                    testNumber.setText("Test " + (i + 1));
+                    testNumber.setText(String.format("Test %d", i + 1));
                     testNumber.setTextColor(Color.WHITE);
                     testNumber.setPadding(0, 0, 4, 3);
                     cell.addView(testNumber);
@@ -152,18 +155,11 @@ public class TestDeviceFragment extends Fragment
                 DisplayMetrics metrics = new DisplayMetrics();
                 getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
                 int height = metrics.heightPixels;
-                // 2560 is the height in pixels of Nexus 6, 493 is the dpi of Nexus 6.
                 // The -200f value centers the table on Nexus 6, so we use that as the reference
-                resultsContainer.setTranslationY((-200f) * ((height * metrics.densityDpi) / (2560f * 493f)));
+                resultsContainer.setTranslationY((-200f) * ((height * metrics.densityDpi) / (float) (NEXUS_6_HEIGHT_PIXELS * NEXUS_6_DPI)));
             }
         });
         return view;
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState)
-    {
-        super.onViewCreated(view, savedInstanceState);
     }
 
     private class FetchTimeTask extends AsyncTask<String, Void, Long>

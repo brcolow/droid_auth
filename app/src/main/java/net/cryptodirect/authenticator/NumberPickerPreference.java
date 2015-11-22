@@ -30,8 +30,8 @@ import java.lang.reflect.Field;
 
 public class NumberPickerPreference extends DialogPreference
 {
-    private int mMin, mMax, mDefault;
-    private String mMaxExternalKey, mMinExternalKey;
+    private final int mMin, mMax, mDefault;
+    private final String mMaxExternalKey, mMinExternalKey;
     private NumberPicker mNumberPicker;
     private static final String TAG = NumberPickerPreference.class.getSimpleName();
 
@@ -48,7 +48,6 @@ public class NumberPickerPreference extends DialogPreference
         mMin = numberPickerType.getInt(R.styleable.NumberPickerPreference_min, 0);
 
         mDefault = mMin;
-        // dialogType.recycle();
         numberPickerType.recycle();
     }
 

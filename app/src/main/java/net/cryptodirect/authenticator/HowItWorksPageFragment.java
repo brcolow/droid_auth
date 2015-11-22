@@ -14,7 +14,7 @@ import android.widget.ImageView;
 import me.grantland.widget.AutofitTextView;
 
 public class HowItWorksPageFragment extends Fragment implements View.OnClickListener
-{;
+{
     private int backgroundColor;
 
     @Override
@@ -70,7 +70,19 @@ public class HowItWorksPageFragment extends Fragment implements View.OnClickList
                 getArguments().getInt("drawable", R.drawable.ic_keyboard_white_36dp)));
 
         AutofitTextView textView = (AutofitTextView) view.findViewById(R.id.how_it_works_page_text);
-        textView.setHeightFitting(true);
+        switch (id)
+        {
+            case 0:
+                textView.setMaxLines(15);
+                break;
+            case 1:
+                textView.setMaxLines(12);
+                break;
+            case 2:
+                textView.setMaxLines(12);
+                break;
+        }
+
         textView.setText(getArguments().getString("blurb"));
         textView.setSizeToFit(true);
         textView.forceLayout();

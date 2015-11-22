@@ -7,6 +7,7 @@
         <item name="android:itemBackground">@color/primary</item>
         <item name="actionMenuTextColor">@color/whiteColor</item>
         <item name="android:colorBackground">@color/backgroundColor</item>
+        <item name="android:background">@color/backgroundColor</item>
         <item name="colorAccent">@color/md_green_300</item>
         <item name="android:textColorSecondary">@color/md_red_300</item>
     </style>

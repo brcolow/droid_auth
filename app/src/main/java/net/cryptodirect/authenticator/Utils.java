@@ -12,6 +12,9 @@ public class Utils
     public static final Pattern BASE32_KEY_REGEX = Pattern.compile("^[A-Z2-7]+$");
     public static final Pattern VALID_BASE32_CHARS_REGEX = Pattern.compile("[A-Z2-7]+");
 
+    public static final int NEXUS_6_HEIGHT_PIXELS = 2368;
+    public static final int NEXUS_6_DPI = 640;
+
     public enum MaterialDesignColors
     {
         // reds
@@ -20,9 +23,7 @@ public class Utils
 
         //greens
         MD_GREEN_300(Color.parseColor("#81C784")),
-        MD_GREEN_500(Color.parseColor("#4CAF50")),
-        MD_GREEN_800(Color.parseColor("#2E7D32"));
-
+        MD_GREEN_500(Color.parseColor("#4CAF50"));
 
         private final int color;
 

@@ -2,7 +2,6 @@
 <resources>
     <color name="primary">#b8943b</color>
     <color name="primaryDark">#a98836</color>
-    <color name="primaryLight">#c4a148</color>
     <color name="whiteColor">#ffffff</color>
     <color name="backgroundColor">#212121</color>
 </resources>

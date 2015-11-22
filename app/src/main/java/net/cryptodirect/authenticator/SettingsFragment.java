@@ -23,7 +23,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     {
         super.onCreate(state);
         initialMessage = getActivity().getApplicationContext().getString(R.string.time_running_out_start_summ);
-        addPreferencesFromResource(R.xml.preferences);;
+        addPreferencesFromResource(R.xml.preferences);
         ListPreference defaultAccountPref = (ListPreference) findPreference("default_account");
         CharSequence[] accountEmailsArray = AccountManager.getInstance().getAccountEmails();
         defaultAccountPref.setEntries(accountEmailsArray);

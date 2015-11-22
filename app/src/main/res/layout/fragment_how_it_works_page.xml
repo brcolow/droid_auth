@@ -4,7 +4,6 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@android:color/holo_green_dark"
                 tools:context="net.cryptodirect.authenticator.HowItWorksPageFragment">
 
     <ImageView
@@ -32,7 +31,7 @@
         android:layout_marginTop="5dp"
         android:maxLines="15"
         android:padding="16dp"
-        android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi id elementum justo. Suspendisse ullamcorper arcu lorem, sit amet vestibulum risus aliquet sit amet. Fusce interdun nunc a placerat posuere. Praesent vitae aliquet magna. Phasellus at mauris dolor. Aliquam erat volutpat. Nam quis malesuada lorem, luctus auctor nibh. Etiam sit amet nibh scelerisque, sodales ligula et, ultrices tellus."
+        android:text=""
         android:textColor="@color/whiteColor"
         android:textSize="22sp"
         autofit:minTextSize="12sp"

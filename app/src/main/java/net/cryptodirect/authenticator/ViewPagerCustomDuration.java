@@ -7,6 +7,8 @@ import android.util.AttributeSet;
 import android.view.animation.Interpolator;
 import android.widget.Scroller;
 
+import org.acra.ACRA;
+
 import java.lang.reflect.Field;
 
 /**
@@ -53,6 +55,7 @@ public class ViewPagerCustomDuration extends ViewPager
         }
         catch (Exception e)
         {
+            ACRA.getErrorReporter().handleException(e);
         }
     }
 
@@ -68,20 +71,9 @@ public class ViewPagerCustomDuration extends ViewPager
     {
         private double scrollFactor = 1;
 
-        public ScrollerCustomDuration(Context context)
-        {
-            super(context);
-        }
-
         public ScrollerCustomDuration(Context context, Interpolator interpolator)
         {
             super(context, interpolator);
-        }
-
-        @SuppressLint("NewApi")
-        public ScrollerCustomDuration(Context context, Interpolator interpolator, boolean flywheel)
-        {
-            super(context, interpolator, flywheel);
         }
 
         /**

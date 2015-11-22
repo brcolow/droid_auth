@@ -29,11 +29,10 @@
     <string name="okay">Okay</string>
     <string name="no">No</string>
     <string name="email_hint">Your Email</string>
-    <string name="button.method.qrcode">Scan QR Code</string>
-    <string name="button.method.manual">Manual Entry</string>
+    <string name="scan_qrcode">Scan QR Code</string>
+    <string name="manual_entry">Manual Entry</string>
     <string name="skip">Skip</string>
     <string name="next">Next</string>
-    <string name="invalid_email">Invalid Email</string>
     <string name="invalid_key">Invalid Key</string>
     <string name="empty_key">Key is empty</string>
     <string name="invalid_char_key">Key contains illegal characters</string>
@@ -49,6 +48,8 @@
     <string name="done">Done</string>
     <string name="no_accounts">You have no linked accounts!</string>
     <string name="check_accounts">Check Accounts</string>
+    <string name="test_number_sign">Test #</string>
+    <string name="result">Result</string>
 
     <!-- Settings related strings -->
     <string name="general_cat">General</string>

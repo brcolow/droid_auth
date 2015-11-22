@@ -36,7 +36,6 @@ public class TimestepIntervalWheel extends View
     private int secondsRemainingInInterval;
     private RectF enclosingSquare;
     private final int displayWidth;
-    private static final String TAG = TimestepIntervalWheel.class.getSimpleName();
 
     public TimestepIntervalWheel(Context context, int intervalInSeconds, int secondsRemainingInInterval, int displayWidth)
     {
