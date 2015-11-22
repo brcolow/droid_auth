@@ -1,6 +1,8 @@
 package net.cryptodirect.authenticator.crypto;
 
-public class CodeParams
+import java.io.Serializable;
+
+public class CodeParams implements Serializable
 {
     private final CodeType codeType;
     private final Algorithm algorithm;

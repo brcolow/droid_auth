@@ -1,6 +1,8 @@
 package net.cryptodirect.authenticator.crypto;
 
-public enum Algorithm
+import java.io.Serializable;
+
+public enum Algorithm implements Serializable
 {
     SHA1,
     SHA256,

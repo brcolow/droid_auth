@@ -1,6 +1,8 @@
 package net.cryptodirect.authenticator.crypto;
 
-public enum CodeType
+import java.io.Serializable;
+
+public enum CodeType implements Serializable
 {
     HOTP,
     TOTP;

@@ -1,6 +1,8 @@
 package net.cryptodirect.authenticator.crypto;
 
-public enum Base
+import java.io.Serializable;
+
+public enum Base implements Serializable
 {
     BASE32, BASE64
 }
