@@ -75,6 +75,7 @@ public class Account implements Serializable
      *
      * @param uriString the optauth URI String
      * @return the Account instance corresponding to the given uri
+     * @throws URISyntaxException if the given uriString is invalid
      */
     public static Account parse(String uriString) throws URISyntaxException
     {
@@ -82,15 +83,15 @@ public class Account implements Serializable
         URI uri = new URI(uriString);
         if (!uri.getScheme().equals("otpauth"))
         {
-            throw new IllegalArgumentException("Given uriString does not have scheme \"otpauth\" " +
-                    "but was: " + uri.getScheme() + " for uriString: " + uriString);
+            throw new URISyntaxException(uriString, "Does not have scheme \"otpauth\" " +
+                    "but was: " + uri.getScheme());
         }
 
         CodeType codeType;
         if (!uri.getHost().equals("totp") && !uri.getHost().equals("hotp"))
         {
-            throw new IllegalArgumentException("Given uriString does not have host of either " +
-                    "\"totp\" or \"hotp\" but was: " + uri.getHost() + " for uriString: " + uriString);
+            throw new URISyntaxException(uriString, "Does not have host of either " +
+                    "\"totp\" or \"hotp\" but was: " + uri.getHost());
         }
         else
         {
@@ -103,8 +104,7 @@ public class Account implements Serializable
         }
 
         if (accountLabel.isEmpty()) {
-            throw new IllegalArgumentException("Given uriString does not have a non-empty path " +
-                    "for uriString: " + uriString);
+            throw new URISyntaxException(uriString, "Path must be non-empty");
         }
 
         Map<String, List<String>> queryParams = splitQuery(uri);
@@ -114,23 +114,23 @@ public class Account implements Serializable
         {
             if (queryParams.containsKey("counter") || queryParams.get("counter").size() != 1)
             {
-                throw new IllegalArgumentException("Counter query parameter must be specified " +
-                        "exactly once when using HOTP code type for uriString: " + uriString);
+                throw new URISyntaxException(uriString, "Counter query parameter must be specified " +
+                        "exactly once when using HOTP code type");
             }
             else
             {
                 counter = Integer.valueOf(queryParams.get("counter").get(0));
                 if (counter < 0)
                 {
-                    throw new IllegalArgumentException("Counter query parameter must be positive " +
-                            "but was: " + counter + " for uriString: " + uriString);
+                    throw new URISyntaxException(uriString, "Counter query parameter must be positive " +
+                            "but was: " + counter);
                 }
             }
         }
 
         if (!queryParams.containsKey("secret") || queryParams.get("secret").size() != 1)
         {
-            throw new IllegalArgumentException("Invalid secret query parameter for uriString: " + uriString);
+            throw new URISyntaxException(uriString, "Invalid secret query parameter");
         }
 
         int base = -1;
@@ -138,15 +138,14 @@ public class Account implements Serializable
         {
             if (queryParams.get("base").size() != 1)
             {
-                throw new IllegalArgumentException("Base query parameter specified more than " +
-                        "once for uriString: " + uriString);
+                throw new URISyntaxException(uriString, "Base query parameter specified more than once");
             }
             else
             {
                 if (!queryParams.get("base").get(0).equals("32") && !queryParams.get("base").get(0).equals("64"))
                 {
-                    throw new IllegalArgumentException("Unsupported base for key param: " +
-                            queryParams.get("base").get(0) + " for uriString: " + uriString);
+                    throw new URISyntaxException(uriString, "Unsupported base for key param: " +
+                            queryParams.get("base").get(0));
                 }
                 else
                 {
@@ -173,7 +172,7 @@ public class Account implements Serializable
         }
 
         /*
-        // TODO decide if we really want this behavior (that the secret must contain no padding)
+        // TODO decide if we really want this behavior (that the base32 secret must contain no padding)
         if (base == 32)
         {
             if (queryParams.get("secret").get(0).length() % 8 != 0)
@@ -195,8 +194,7 @@ public class Account implements Serializable
         {
             if (queryParams.get("algorithm").size() != 1)
             {
-                throw new IllegalArgumentException("Algorithm query parameter specified more " +
-                        "than once for uriString: " + uriString);
+                throw new URISyntaxException(uriString, "Algorithm query parameter specified more than once");
             }
             else
             {
@@ -213,7 +211,7 @@ public class Account implements Serializable
                         algorithm = Algorithm.SHA512;
                         break;
                     default:
-                        throw new IllegalArgumentException("Unsupported algorithm: " + algo +
+                        throw new URISyntaxException(uriString, "Unsupported algorithm: " + algo +
                                 " - must be one of [SHA1, SHA256, SHA512]");
                 }
 
@@ -225,8 +223,7 @@ public class Account implements Serializable
         {
             if (queryParams.get("digits").size() != 1)
             {
-                throw new IllegalArgumentException("Digits query parameter specified more " +
-                        "than once for uriString: " + uriString);
+                throw new URISyntaxException(uriString, "Digits query parameter specified more than once");
             }
             else
             {
@@ -239,7 +236,7 @@ public class Account implements Serializable
                         digits = d;
                         break;
                     default:
-                        throw new IllegalArgumentException("Unsupported number of digits: " +
+                        throw new URISyntaxException(uriString, "Unsupported number of digits: " +
                                 digits + " - must 6, 7, or 8");
                 }
             }
@@ -250,16 +247,14 @@ public class Account implements Serializable
         {
             if (queryParams.get("period").size() != 1)
             {
-                throw new IllegalArgumentException("Period query parameter specified more " +
-                        "than once for uriString: " + uriString);
+                throw new URISyntaxException(uriString, "Period query parameter specified more than once");
             }
             else
             {
                 int p = Integer.valueOf(queryParams.get("period").get(0));
                 if (p <= 0)
                 {
-                    throw new IllegalArgumentException("Period query parameter must be greater " +
-                            "than 0 for uriString: " + uriString);
+                    throw new URISyntaxException(uriString, "Period query parameter must be greater than 0");
                 }
                 else
                 {
