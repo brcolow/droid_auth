@@ -85,7 +85,8 @@ public class AuthenticatorFragment extends Fragment implements SharedPreferences
 
         // Set initial codebox to initial TOTP token
         codeBox = ((EditText) rootView.findViewById(R.id.code_box));
-        codeBox.setText(TOTP.generateTOTPSha1(account.getSecretKey(), (long) tc, account.getCodeParams().getDigits()));
+        codeBox.setText(TOTP.generateTOTP(account.getSecretKey(), (long) tc,
+                account.getCodeParams().getDigits(), account.getCodeParams().getAlgorithm()));
 
         return rootView;
     }
@@ -115,9 +116,10 @@ public class AuthenticatorFragment extends Fragment implements SharedPreferences
 
             if (timestepIntervalWheel.decrementSecondsRemaining())
             {
-                handler.post(new SetNewCodeTask(TOTP.generateTOTPSha1(account.getSecretKey(),
+                handler.post(new SetNewCodeTask(TOTP.generateTOTP(account.getSecretKey(),
                         TOTP.getTC(account.getCodeParams().getTotpPeriod()),
-                        account.getCodeParams().getDigits())));
+                        account.getCodeParams().getDigits(),
+                        account.getCodeParams().getAlgorithm())));
 
                 // SoundPoolManager.getInstance().stopSound("TICKTOCK");
                 tickingSoundPlaying = false;

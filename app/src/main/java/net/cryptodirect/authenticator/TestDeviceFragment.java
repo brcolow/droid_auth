@@ -17,6 +17,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import net.cryptodirect.authenticator.crypto.Algorithm;
 import net.cryptodirect.authenticator.crypto.TOTP;
 
 import org.json.JSONException;
@@ -79,18 +80,21 @@ public class TestDeviceFragment extends Fragment
                 {
                     if (i < 6)
                     {
-                        testSuccessful[i] = TOTP.generateTOTPSha1(KEY_20_BYTES,
-                                TOTP.getTC(testTimeParams[i], 30), 8).equals(testCorrectResults[i]);
+                        testSuccessful[i] = TOTP.generateTOTP(KEY_20_BYTES,
+                                TOTP.getTC(testTimeParams[i], 30), 8, Algorithm.SHA1)
+                                .equals(testCorrectResults[i]);
                     }
                     else if (i < 12)
                     {
-                        testSuccessful[i] = TOTP.generateTOTPSha256(KEY_32_BYTES,
-                                TOTP.getTC(testTimeParams[i % 6], 30), 8).equals(testCorrectResults[i]);
+                        testSuccessful[i] = TOTP.generateTOTP(KEY_32_BYTES,
+                                TOTP.getTC(testTimeParams[i % 6], 30), 8, Algorithm.SHA256)
+                                .equals(testCorrectResults[i]);
                     }
                     else
                     {
-                        testSuccessful[i] = TOTP.generateTOTPSha512(KEY_64_BYTES,
-                                TOTP.getTC(testTimeParams[i % 6], 30), 8).equals(testCorrectResults[i]);
+                        testSuccessful[i] = TOTP.generateTOTP(KEY_64_BYTES,
+                                TOTP.getTC(testTimeParams[i % 6], 30), 8, Algorithm.SHA512)
+                                .equals(testCorrectResults[i]);
                     }
                 }
                 TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(

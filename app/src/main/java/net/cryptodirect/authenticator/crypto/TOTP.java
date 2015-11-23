@@ -61,55 +61,22 @@ public class TOTP
     {
         return (time - T0) / TS;
     }
+
     /**
-     * <p>Generates an RFC 6238 compliant TOTP value using SHA1. Argument names
-     * are taken directly from RFC 6238.</p>
+     * <p>Generates an RFC 6238 compliant TOTP value using the specified algorithm.
+     * Argument names are taken directly from RFC 6238.</p>
      *
      * @see <a href="https://tools.ietf.org/html/rfc6238">RFC 6238</a>
      * @param K the agreed upon key
      * @param TC the current time counter
      * @param N the number of digits the returned token should have
+     * @param algorithm which SHA to use
      * @return the TOTP token in base 10 that includes {@code N} digits
      */
-    public static String generateTOTPSha1(byte[] K, long TC, int N)
-    {
-        return generateTOTP(K, TC, N, "HmacSHA1");
-    }
-
-    /**
-     * <p>Generates an RFC 6238 compliant TOTP value using SHA-256. Argument names
-     * are taken directly from RFC 6238.</p>
-     *
-     * @see <a href="https://tools.ietf.org/html/rfc6238">RFC 6238</a>
-     * @param K the agreed upon key
-     * @param TC the current time counter
-     * @param N the number of digits the returned token should have
-     * @return the TOTP token in base 10 that includes {@code N} digits
-     */
-    public static String generateTOTPSha256(byte[] K, long TC, int N)
-    {
-        return generateTOTP(K, TC, N, "HmacSHA256");
-    }
-
-    /**
-     * <p>Generates an RFC 6238 compliant TOTP value using SHA-512. Argument names
-     * are taken directly from RFC 6238.</p>
-     *
-     * @see <a href="https://tools.ietf.org/html/rfc6238">RFC 6238</a>
-     * @param K the agreed upon key
-     * @param TC the current time counter
-     * @param N the number of digits the returned token should have
-     * @return the TOTP token in base 10 that includes {@code N} digits
-     */
-    public static String generateTOTPSha512(byte[] K, long TC, int N)
-    {
-        return generateTOTP(K, TC, N, "HmacSHA512");
-    }
-
-    private static String generateTOTP(byte[] K, long TC, int N, String sha)
+    public static String generateTOTP(byte[] K, long TC, int N, Algorithm algorithm)
     {
         byte[] rawTC = ByteBuffer.allocate(8).putLong(TC).array();
-        byte[] hash = hmacSha(K, rawTC, sha);
+        byte[] hash = hmacSha(K, rawTC, algorithm);
 
         // put selected bytes into result int
         int offset = hash[hash.length - 1] & 0xf;
@@ -128,18 +95,18 @@ public class TOTP
         return result;
     }
 
-    private static byte[] hmacSha(byte[] key, byte[] value, String sha)
+    private static byte[] hmacSha(byte[] key, byte[] value, Algorithm algorithm)
     {
         try
         {
             SecretKeySpec secret = new SecretKeySpec(key, "RAW");
-            Mac mac = Mac.getInstance(sha);
+            Mac mac = Mac.getInstance(algorithm.getArgumentName());
             mac.init(secret);
             return mac.doFinal(value);
         }
         catch (GeneralSecurityException e)
         {
-            Log.e(TAG, "Could not execute HMAC-" + sha, e);
+            Log.e(TAG, "Could not execute " + algorithm.getArgumentName(), e);
             throw new AndroidRuntimeException(e);
         }
     }

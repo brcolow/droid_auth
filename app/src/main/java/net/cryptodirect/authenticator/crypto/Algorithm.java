@@ -22,4 +22,19 @@ public enum Algorithm implements Serializable
                 throw new IllegalArgumentException("Unknown algorithm: " + algorithm);
         }
     }
+
+    public String getArgumentName()
+    {
+        switch (this)
+        {
+            case SHA1:
+                return "HmacSHA1";
+            case SHA256:
+                return "HmacSHA256";
+            case SHA512:
+                return "HmacSHA512";
+            default:
+                return "";
+        }
+    }
 }
