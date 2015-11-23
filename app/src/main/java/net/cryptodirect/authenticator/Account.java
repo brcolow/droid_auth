@@ -173,7 +173,7 @@ public class Account implements Serializable
         }
 
         /*
-        // TODO decide if we really want this behavior
+        // TODO decide if we really want this behavior (that the secret must contain no padding)
         if (base == 32)
         {
             if (queryParams.get("secret").get(0).length() % 8 != 0)

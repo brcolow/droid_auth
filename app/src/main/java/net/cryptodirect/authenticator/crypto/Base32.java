@@ -3,6 +3,8 @@
 package net.cryptodirect.authenticator.crypto;
 
 
+import net.cryptodirect.authenticator.StandardCharsets;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -111,7 +113,7 @@ public class Base32 {
                 }
             }
 
-            return new String(os.toByteArray());
+            return new String(os.toByteArray(), StandardCharsets.ISO_8859_1);
         }
 
         private static int blockLenToPadding(int blocklen)
@@ -151,11 +153,11 @@ public class Base32 {
          * Convert a base32-encoded String to binary data
          *
          * @param src A String containing the encoded data
-         * @return An array containing the binary data, or null if the string is invalid
+         * @throws IllegalArgumentException if given string cannot be decoded
          */
         public byte[] decode(String src) {
             ByteArrayOutputStream bs = new ByteArrayOutputStream();
-            byte [] raw = src.getBytes();
+            byte [] raw = src.getBytes(StandardCharsets.ISO_8859_1);
             for (byte aRaw : raw)
             {
                 char c = (char) aRaw;
@@ -166,9 +168,12 @@ public class Base32 {
                 }
             }
 
+
+
             if (padding) {
-                if (bs.size() % 8 != 0)
-                    return null;
+                if (bs.size() % 8 != 0) {
+                    throw new IllegalArgumentException("Invalid number of bytes for encoded string: " + new String(bs.toByteArray()));
+                }
             } else {
                 while (bs.size() % 8 != 0)
                     bs.write('=');
@@ -190,12 +195,13 @@ public class Base32 {
                         break;
                     s[j] = (short) alphabet.indexOf(in[i * 8 + j]);
                     if (s[j] < 0)
-                        return null;
+                        throw new IllegalArgumentException("Invalid Base32 character: " + s[j]);
                     padlen--;
                 }
                 int blocklen = paddingToBlockLen(padlen);
-                if (blocklen < 0)
-                    return null;
+                if (blocklen < 0) {
+                    throw new IllegalArgumentException("blocklen must be non-negative");
+                }
 
                 // all 5 bits of 1st, high 3 (of 5) of 2nd
                 t[0] = (s[0] << 3) | s[1] >> 2;
@@ -231,7 +237,7 @@ public class Base32 {
                     return 4;
                 case 0:
                     return 5;
-                default :
+                default:
                     return -1;
             }
         }
