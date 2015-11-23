@@ -1,6 +1,7 @@
 package net.cryptodirect.authenticator;
 
 import android.util.Base64;
+import android.util.Log;
 
 import net.cryptodirect.authenticator.crypto.Algorithm;
 import net.cryptodirect.authenticator.crypto.Base32;
@@ -156,18 +157,9 @@ public class Account implements Serializable
             base = 32;
         }
 
-        final String urlDecodedSecret;
-        try
-        {
-            urlDecodedSecret = URLDecoder.decode(queryParams.get("secret").get(0), "UTF-8");
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            throw new IllegalArgumentException("Could not URL decode the given secret for uriString: " + uriString);
-        }
-
-        byte[] key = base == 32 ? Base32.decode(urlDecodedSecret) :
-                Base64.decode(urlDecodedSecret, Base64.DEFAULT);
+        Log.e("TAG", queryParams.get("secret").get(0));
+        byte[] key = base == 32 ? Base32.decode(queryParams.get("secret").get(0)) :
+                Base64.decode(queryParams.get("secret").get(0), Base64.DEFAULT);
 
         if (base == 32)
         {
@@ -274,11 +266,12 @@ public class Account implements Serializable
             final String key;
             try
             {
-                key = index > 0 ? URLDecoder.decode(pair.substring(0, index), StandardCharsets.UTF_8.name()) : pair;
+                key = index > 0 ? URLDecoder.decode(pair.substring(0, index), StandardCharsets.UTF_8.name()).replace(' ', '+') : pair;
                 if (!keyValuePairs.containsKey(key)) {
                     keyValuePairs.put(key, new LinkedList<String>());
                 }
-                final String value = index > 0 && pair.length() > index + 1 ? URLDecoder.decode(pair.substring(index + 1), StandardCharsets.UTF_8.name()) : null;
+                final String value = index > 0 && pair.length() > index + 1 ?
+                        URLDecoder.decode(pair.substring(index + 1), StandardCharsets.UTF_8.name()).replace(' ', '+') : null;
                 keyValuePairs.get(key).add(value);
             }
             catch (UnsupportedEncodingException e)
