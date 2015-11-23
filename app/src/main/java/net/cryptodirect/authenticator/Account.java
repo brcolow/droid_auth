@@ -1,10 +1,8 @@
-package net.cryptodirect.authenticator;
-
-import android.util.Base64;
-import android.util.Log;
+package net.cryptodirect.authenticator;;
 
 import net.cryptodirect.authenticator.crypto.Algorithm;
 import net.cryptodirect.authenticator.crypto.Base32;
+import net.cryptodirect.authenticator.crypto.Base64;
 import net.cryptodirect.authenticator.crypto.CodeParams;
 import net.cryptodirect.authenticator.crypto.CodeType;
 
@@ -13,6 +11,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -51,6 +50,11 @@ public class Account implements Serializable
     public byte[] getSecretKey()
     {
         return secretKey;
+    }
+
+    public String getBase64EncodedSecretKey()
+    {
+        return Base64.getEncoder().encodeToString(secretKey);
     }
 
     public CodeParams getCodeParams()
@@ -157,9 +161,16 @@ public class Account implements Serializable
             base = 32;
         }
 
-        Log.e("TAG", queryParams.get("secret").get(0));
-        byte[] key = base == 32 ? Base32.decode(queryParams.get("secret").get(0)) :
-                Base64.decode(queryParams.get("secret").get(0), Base64.DEFAULT);
+        byte[] key;
+
+        if (base == 32)
+        {
+            key = new Base32().decodeToBytes(queryParams.get("secret").get(0));
+        }
+        else
+        {
+            key = Base64.getDecoder().decode(queryParams.get("secret").get(0));
+        }
 
         if (base == 32)
         {

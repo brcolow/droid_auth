@@ -5,7 +5,7 @@ apply plugin: 'com.android.application'
 def versionMajor = 1
 def versionMinor = 0
 def versionPatch = 4
-def versionBuild = 8 // bump for dogfood builds, public betas, etc.
+def versionBuild = 9 // bump for dogfood builds, public betas, etc.
 
 android {
     compileSdkVersion 23
@@ -63,7 +63,7 @@ dependencies {
     compile 'com.android.support:support-v13:23.1.1'
     compile 'me.dm7.barcodescanner:zxing:1.8.3'
     compile 'ch.acra:acra:4.7.0-RC.2'
-    compile project(':autofittextview')
+    compile 'me.grantland:autofittextview:0.2.1'
     testCompile 'junit:junit:4.12'
 }
 

@@ -3,13 +3,13 @@ package net.cryptodirect.authenticator;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Base64;
 import android.util.JsonWriter;
 import android.util.Log;
 
 import net.cryptodirect.authenticator.crypto.Algorithm;
 import net.cryptodirect.authenticator.crypto.Base;
 import net.cryptodirect.authenticator.crypto.Base32;
+import net.cryptodirect.authenticator.crypto.Base64;
 import net.cryptodirect.authenticator.crypto.CodeParams;
 import net.cryptodirect.authenticator.crypto.CodeType;
 
@@ -84,8 +84,8 @@ public class AccountManager
             int base = codeParamsJsonObject.getInt("base");
             Account account = new Account(accountJsonObject.getString("email"),
                     accountJsonObject.getString("issuer"),
-                    base == 32 ? Base32.decode(accountJsonObject.getString("key")) :
-                        Base64.decode(accountJsonObject.getString("key"), Base64.DEFAULT),
+                    base == 32 ? new Base32().decodeToBytes(accountJsonObject.getString("key")) :
+                            Base64.getDecoder().decode(accountJsonObject.getString("key")),
                     new CodeParams.Builder(CodeType.getCodeType(codeParamsJsonObject.getString("codeType")))
                             .algorithm(Algorithm.getAlgorithm(codeParamsJsonObject.getString("algorithm")))
                             .digits(codeParamsJsonObject.getInt("digits"))
@@ -184,7 +184,7 @@ public class AccountManager
         writer.name("issuer");
         writer.value(account.getIssuer());
         writer.name("key");
-        writer.value(Base64.encodeToString(account.getSecretKey(), Base64.NO_WRAP));
+        writer.value(account.getBase64EncodedSecretKey());
         writer.name("codeParams");
         writer.beginObject();
         writer.name("codeType");

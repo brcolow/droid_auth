@@ -52,6 +52,7 @@
         android:ems="16"
         android:enabled="false"
         android:inputType="none"
+        android:maxLines="2"
         android:maxWidth="320dp"
         android:minWidth="120dp"
         android:paddingBottom="2dp"

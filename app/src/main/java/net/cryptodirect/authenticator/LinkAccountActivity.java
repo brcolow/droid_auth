@@ -16,7 +16,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AndroidRuntimeException;
-import android.util.Base64;
 import android.view.Menu;
 import android.view.View;
 import android.widget.CheckBox;
@@ -28,6 +27,7 @@ import com.google.zxing.BarcodeFormat;
 
 import net.cryptodirect.authenticator.crypto.Algorithm;
 import net.cryptodirect.authenticator.crypto.Base;
+import net.cryptodirect.authenticator.crypto.Base64;
 import net.cryptodirect.authenticator.crypto.CodeParams;
 import net.cryptodirect.authenticator.crypto.CodeType;
 
@@ -197,7 +197,7 @@ public class LinkAccountActivity
             Bundle bundle = new Bundle();
             bundle.putString("new_email", scannedAccount.getEmail());
             bundle.putString("new_issuer", scannedAccount.getIssuer());
-            bundle.putString("new_key", Base64.encodeToString(scannedAccount.getSecretKey(), Base64.NO_WRAP));
+            bundle.putString("new_key", scannedAccount.getBase64EncodedSecretKey());
             bundle.putInt("new_base", scannedAccount.getCodeParams().getBase() == Base.BASE32 ? 32 : 64);
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             LinkAccountDataFragment linkAccountDataFragment = new LinkAccountDataFragment();
@@ -315,7 +315,7 @@ public class LinkAccountActivity
             {
                 // TODO currently we default to a Cryptodash provided code if manual entry was used
                 Account newAccount = new Account(enteredEmail, "Cryptodash",
-                        Base64.decode(enteredKey, Base64.DEFAULT),
+                        Base64.getDecoder().decode(enteredKey),
                         new CodeParams.Builder(CodeType.TOTP).base(64).algorithm(Algorithm.SHA256).build());
                 AccountManager.getInstance().registerAccount(newAccount, true, setAsDefaultAccountCheckBox.isChecked());
             }
