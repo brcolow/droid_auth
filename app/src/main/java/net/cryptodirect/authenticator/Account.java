@@ -165,21 +165,24 @@ public class Account implements Serializable
 
         if (base == 32)
         {
-            key = new Base32().decodeToBytes(queryParams.get("secret").get(0));
+            key = Base32.getDecoder().decode(queryParams.get("secret").get(0));
         }
         else
         {
             key = Base64.getDecoder().decode(queryParams.get("secret").get(0));
         }
 
+        /*
+        // TODO decide if we really want this behavior
         if (base == 32)
         {
-            if (key.length % 8 != 0 || key.length == 0)
+            if (queryParams.get("secret").get(0).length() % 8 != 0)
             {
                 throw new IllegalArgumentException("Base-32 secret key must have N chars where " +
                         "N is a multiple of 8 but length was: " + queryParams.get("secret").get(0).length());
             }
         }
+        */
 
         String issuer = "Unknown";
         if (queryParams.containsKey("issuer"))

@@ -16,13 +16,12 @@ public class Base32Test
     @Test
     public void testBase32DecodingRFC4648Vectors()
     {
-        Base32 base32 = new Base32();
-        assertArrayEquals(base32.decodeToBytes(""), "".getBytes(StandardCharsets.UTF_8));
-        assertArrayEquals(base32.decodeToBytes("MY======"), "f".getBytes(StandardCharsets.UTF_8));
-        assertArrayEquals(base32.decodeToBytes("MZXQ===="), "fo".getBytes(StandardCharsets.UTF_8));
-        assertArrayEquals(base32.decodeToBytes("MZXW6==="), "foo".getBytes(StandardCharsets.UTF_8));
-        assertArrayEquals(base32.decodeToBytes("MZXW6YQ="), "foob".getBytes(StandardCharsets.UTF_8));
-        assertArrayEquals(base32.decodeToBytes("MZXW6YTB"), "fooba".getBytes(StandardCharsets.UTF_8));
-        assertArrayEquals(base32.decodeToBytes("MZXW6YTBOI======"), "foobar".getBytes(StandardCharsets.UTF_8));
+        assertArrayEquals(Base32.getDecoder().decode(""), "".getBytes(StandardCharsets.UTF_8));
+        assertArrayEquals(Base32.getDecoder().decode("MY======"), "f".getBytes(StandardCharsets.UTF_8));
+        assertArrayEquals(Base32.getDecoder().decode("MZXQ===="), "fo".getBytes(StandardCharsets.UTF_8));
+        assertArrayEquals(Base32.getDecoder().decode("MZXW6==="), "foo".getBytes(StandardCharsets.UTF_8));
+        assertArrayEquals(Base32.getDecoder().decode("MZXW6YQ="), "foob".getBytes(StandardCharsets.UTF_8));
+        assertArrayEquals(Base32.getDecoder().decode("MZXW6YTB"), "fooba".getBytes(StandardCharsets.UTF_8));
+        assertArrayEquals(Base32.getDecoder().decode("MZXW6YTBOI======"), "foobar".getBytes(StandardCharsets.UTF_8));
     }
 }

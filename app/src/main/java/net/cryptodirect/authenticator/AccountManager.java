@@ -84,7 +84,7 @@ public class AccountManager
             int base = codeParamsJsonObject.getInt("base");
             Account account = new Account(accountJsonObject.getString("email"),
                     accountJsonObject.getString("issuer"),
-                    base == 32 ? new Base32().decodeToBytes(accountJsonObject.getString("key")) :
+                    base == 32 ? Base32.getDecoder().decode(accountJsonObject.getString("key")) :
                             Base64.getDecoder().decode(accountJsonObject.getString("key")),
                     new CodeParams.Builder(CodeType.getCodeType(codeParamsJsonObject.getString("codeType")))
                             .algorithm(Algorithm.getAlgorithm(codeParamsJsonObject.getString("algorithm")))
