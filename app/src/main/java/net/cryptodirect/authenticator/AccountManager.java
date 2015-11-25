@@ -8,7 +8,6 @@ import android.util.Log;
 
 import net.cryptodirect.authenticator.crypto.Algorithm;
 import net.cryptodirect.authenticator.crypto.Base;
-import net.cryptodirect.authenticator.crypto.Base32;
 import net.cryptodirect.authenticator.crypto.Base64;
 import net.cryptodirect.authenticator.crypto.CodeParams;
 import net.cryptodirect.authenticator.crypto.CodeType;
@@ -37,7 +36,6 @@ public class AccountManager
 
     private AccountManager()
     {
-
     }
 
     public void setBaseContext(Context baseContext)
@@ -84,8 +82,7 @@ public class AccountManager
             int base = codeParamsJsonObject.getInt("base");
             Account account = new Account(accountJsonObject.getString("email"),
                     accountJsonObject.getString("issuer"),
-                    base == 32 ? Base32.getDecoder().decode(accountJsonObject.getString("key")) :
-                            Base64.getDecoder().decode(accountJsonObject.getString("key")),
+                    Base64.getDecoder().decode(accountJsonObject.getString("key")),
                     new CodeParams.Builder(CodeType.getCodeType(codeParamsJsonObject.getString("codeType")))
                             .algorithm(Algorithm.getAlgorithm(codeParamsJsonObject.getString("algorithm")))
                             .digits(codeParamsJsonObject.getInt("digits"))
@@ -118,7 +115,6 @@ public class AccountManager
 
     public boolean accountExists(String email)
     {
-        Log.e("TAG", accounts.toString());
         return accounts.containsKey(email);
     }
 

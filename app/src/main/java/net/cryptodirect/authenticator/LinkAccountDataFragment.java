@@ -14,6 +14,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import net.cryptodirect.authenticator.crypto.Base32;
+import net.cryptodirect.authenticator.crypto.Base64;
+
 /**
  * Takes the account key data that was obtained from either
  * scanning a QR code (in ScanQRCodeFragment) or manually
@@ -55,7 +58,7 @@ public class LinkAccountDataFragment extends Fragment
         View view = inflater.inflate(R.layout.fragment_link_account_data, container, false);
 
         final String email = getArguments().getString("new_email");
-        final String key = getArguments().getString("new_key");
+        final byte[] rawKey = getArguments().getByteArray("new_key");
         final String issuer = getArguments().getString("new_issuer");
         final int base = getArguments().getInt("new_base");
 
@@ -63,7 +66,7 @@ public class LinkAccountDataFragment extends Fragment
         {
             throw new IllegalArgumentException("LinkAccountDataFragment was not given decoded email");
         }
-        if (key == null)
+        if (rawKey == null)
         {
             throw new IllegalArgumentException("LinkAccountDataFragment was not given decoded key");
         }
@@ -84,6 +87,20 @@ public class LinkAccountDataFragment extends Fragment
 
         TextView keyTextField = (TextView) view.findViewById(R.id.key_edit_text);
         keyTextField.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
+        final String key;
+
+        switch (base)
+        {
+            case 32:
+                key = Base32.getEncoder().encode(rawKey);
+                break;
+            case 64:
+                key = Base64.getEncoder().encodeToString(rawKey);
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported base: " + base);
+        }
+
         keyTextField.setText(key);
 
         boolean keyValid = true;
@@ -97,7 +114,7 @@ public class LinkAccountDataFragment extends Fragment
         }
         else
         {
-            if (TextUtils.isEmpty(key) || !Utils.BASE32_KEY_REGEX.matcher(key).matches() || key.length() % 8 == 0)
+            if (TextUtils.isEmpty(key) || !Utils.BASE32_KEY_REGEX.matcher(key).matches())
             {
                 // base32 key is invalid
                 keyValid = false;

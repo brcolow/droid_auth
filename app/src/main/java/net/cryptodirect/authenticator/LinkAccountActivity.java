@@ -197,7 +197,7 @@ public class LinkAccountActivity
             Bundle bundle = new Bundle();
             bundle.putString("new_email", scannedAccount.getEmail());
             bundle.putString("new_issuer", scannedAccount.getIssuer());
-            bundle.putString("new_key", scannedAccount.getBase64EncodedSecretKey());
+            bundle.putByteArray("new_key", scannedAccount.getSecretKey());
             bundle.putInt("new_base", scannedAccount.getCodeParams().getBase() == Base.BASE32 ? 32 : 64);
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             LinkAccountDataFragment linkAccountDataFragment = new LinkAccountDataFragment();
