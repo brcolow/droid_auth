@@ -2,10 +2,6 @@ package net.cryptodirect.authenticator.crypto;
 
 import net.cryptodirect.authenticator.StandardCharsets;
 
-import java.io.FilterOutputStream;
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.JsonWriter;
-import android.util.Log;
 
 import net.cryptodirect.authenticator.crypto.Algorithm;
 import net.cryptodirect.authenticator.crypto.Base;
@@ -211,6 +210,7 @@ public class AccountManager
     public static class DataMismatchException extends JSONException
     {
         private final int numMissingAccounts;
+        static final long serialVersionUID = 1L;
 
         public DataMismatchException(String s, int numMissingAccounts)
         {

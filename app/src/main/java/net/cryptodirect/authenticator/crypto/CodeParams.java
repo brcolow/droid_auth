@@ -10,6 +10,7 @@ public class CodeParams implements Serializable
     private final int hotpCounter;
     private final int totpPeriod;
     private final Base base;
+    static final long serialVersionUID = 1L;
 
     private CodeParams(Builder builder)
     {

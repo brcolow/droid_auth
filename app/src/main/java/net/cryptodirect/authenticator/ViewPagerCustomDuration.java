@@ -1,6 +1,5 @@
 package net.cryptodirect.authenticator;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;

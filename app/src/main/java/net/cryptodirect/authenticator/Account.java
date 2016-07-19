@@ -1,4 +1,4 @@
-package net.cryptodirect.authenticator;;
+package net.cryptodirect.authenticator;
 
 import net.cryptodirect.authenticator.crypto.Algorithm;
 import net.cryptodirect.authenticator.crypto.Base32;
@@ -11,7 +11,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,6 +27,7 @@ public class Account implements Serializable
     private final String issuer;
     private final byte[] secretKey;
     private final CodeParams codeParams;
+    static final long serialVersionUID = 1L;
 
     public Account(String email, String issuer, byte[] secretKey, CodeParams codeParams)
     {
