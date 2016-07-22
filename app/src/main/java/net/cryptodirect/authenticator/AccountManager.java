@@ -23,14 +23,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static net.cryptodirect.authenticator.StandardCharsets.UTF_8;
 
 public class AccountManager
 {
     private Context baseContext;
     private static final AccountManager INSTANCE = new AccountManager();
-    private static final String ACCOUNTS_FILE = "accounts.json";
+    public static final String ACCOUNTS_FILE = "accounts.json";
     private final Map<String, Account> accounts = new ConcurrentHashMap<>();
 
     private AccountManager()
@@ -54,8 +57,10 @@ public class AccountManager
         if (file.length() == 0)
         {
             // create accounts.json skeleton
-            FileOutputStream accountsFileOutputStream = baseContext.openFileOutput(ACCOUNTS_FILE, Context.MODE_PRIVATE);
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(accountsFileOutputStream);
+            FileOutputStream accountsFileOutputStream = baseContext.openFileOutput(
+                    ACCOUNTS_FILE, Context.MODE_PRIVATE);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(
+                    accountsFileOutputStream);
             String jsonSkeleton = "{ \"accounts\" : [] }";
             outputStreamWriter.write(jsonSkeleton);
             outputStreamWriter.flush();
@@ -82,8 +87,10 @@ public class AccountManager
             Account account = new Account(accountJsonObject.getString("email"),
                     accountJsonObject.getString("issuer"),
                     Base64.getDecoder().decode(accountJsonObject.getString("key")),
-                    new CodeParams.Builder(CodeType.getCodeType(codeParamsJsonObject.getString("codeType")))
-                            .algorithm(Algorithm.getAlgorithm(codeParamsJsonObject.getString("algorithm")))
+                    new CodeParams.Builder(
+                            CodeType.getCodeType(codeParamsJsonObject.getString("codeType")))
+                            .algorithm(Algorithm.getAlgorithm(codeParamsJsonObject
+                                    .getString("algorithm")))
                             .digits(codeParamsJsonObject.getInt("digits"))
                             .hotpCounter(codeParamsJsonObject.getInt("hotpCounter"))
                             .totpPeriod(codeParamsJsonObject.getInt("totpPeriod"))
@@ -104,10 +111,20 @@ public class AccountManager
 
     public Account getAccount(String email)
     {
+        if (email == null)
+        {
+            throw new IllegalArgumentException("email must not be null");
+        }
+
         return accounts.get(email);
     }
 
-    public Account getOnlyAccount()
+    public Collection<Account> getAccounts()
+    {
+        return accounts.values();
+    }
+
+    public Account getFirstAccount()
     {
        return accounts.values().iterator().next();
     }
@@ -124,6 +141,11 @@ public class AccountManager
 
     public boolean registerAccount(Account account, boolean overwriteExisting, boolean setAsDefault)
     {
+        if (account == null)
+        {
+            throw new IllegalArgumentException("account must not be null");
+        }
+
         if (accounts.containsKey(account.getEmail()) && !overwriteExisting)
         {
             return false;
@@ -132,8 +154,10 @@ public class AccountManager
         try
         {
             accounts.put(account.getEmail(), account);
-            FileOutputStream accountsFileOutputStream = baseContext.openFileOutput(ACCOUNTS_FILE, Context.MODE_PRIVATE);
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(accountsFileOutputStream, StandardCharsets.UTF_8);
+            FileOutputStream accountsFileOutputStream = baseContext.openFileOutput(
+                    ACCOUNTS_FILE, Context.MODE_PRIVATE);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(
+                    accountsFileOutputStream, UTF_8);
             JsonWriter jsonWriter = new JsonWriter(outputStreamWriter);
             jsonWriter.beginObject();
             jsonWriter.name("accounts");

@@ -53,8 +53,8 @@ public class AuthenticatorFragment extends Fragment implements SharedPreferences
         View rootView = inflater.inflate(R.layout.fragment_authenticator, container, false);
         if (getArguments().getSerializable("account") == null)
         {
-            throw new IllegalArgumentException("AuthenticatorFragment bundle did not have value " +
-                    "at key \"account\"");
+            throw new IllegalArgumentException("bundle: " + state + " did not have serializable " +
+                    "\"account\"");
         }
 
         account = (Account) getArguments().getSerializable("account");

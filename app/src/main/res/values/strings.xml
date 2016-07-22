@@ -50,6 +50,8 @@
     <string name="check_accounts">Check Accounts</string>
     <string name="test_number_sign">Test #</string>
     <string name="result">Result</string>
+    <string name="verifying_credentials_title">Please wait…</string>
+    <string name="verifying_credentials">Verifying the credentials you entered.</string>
 
     <!-- Settings related strings -->
     <string name="general_cat">General</string>

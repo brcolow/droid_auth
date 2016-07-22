@@ -54,6 +54,12 @@ public class TestDeviceFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle state)
     {
+        Centurion centurion = state.getParcelable("centurion");
+        if (centurion == null)
+        {
+            throw new IllegalArgumentException("bundle: " + state + " did not contain parcelable " +
+                    "\"centurion\"");
+        }
         View view = inflater.inflate(R.layout.fragment_test_device, container, false);
         final Button button = (Button) view.findViewById(R.id.begin_tests_button);
         final LinearLayout resultsContainer = (LinearLayout) view.findViewById(R.id.results_container);
@@ -61,20 +67,21 @@ public class TestDeviceFragment extends Fragment
 
         button.setOnClickListener(new View.OnClickListener()
         {
+            @Override
             public void onClick(View view)
             {
-                /*
-                FetchTimeTask fetchTimeTask = new FetchTimeTask();
-                long serverTimeMillis;
-                try
-                {
-                    serverTimeMillis = fetchTimeTask.execute().get(5000, TimeUnit.MILLISECONDS);
-                }
-                catch (InterruptedException | ExecutionException | TimeoutException e)
-                {
-                    serverTimeMillis = System.currentTimeMillis();
-                }
-                */
+            /*
+            FetchTimeTask fetchTimeTask = new FetchTimeTask(centurion);
+            long serverTimeMillis;
+            try
+            {
+                serverTimeMillis = fetchTimeTask.execute().get(5000, TimeUnit.MILLISECONDS);
+            }
+            catch (InterruptedException | ExecutionException | TimeoutException e)
+            {
+                serverTimeMillis = System.currentTimeMillis();
+            }
+            */
                 boolean[] testSuccessful = new boolean[18];
                 for (int i = 0; i < testSuccessful.length; i++)
                 {
@@ -101,23 +108,23 @@ public class TestDeviceFragment extends Fragment
                         TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
                 layoutParams.setMargins(0, 0, 0, 0);
 
-                LinearLayout testNumberHeaderCell = new LinearLayout(getActivity());
+                LinearLayout testNumberHeaderCell = new LinearLayout(TestDeviceFragment.this.getActivity());
                 testNumberHeaderCell.setLayoutParams(layoutParams);
-                TextView testNumber = new TextView(getActivity());
+                TextView testNumber = new TextView(TestDeviceFragment.this.getActivity());
                 testNumber.setText(R.string.test_number_sign);
                 testNumber.setTextColor(Color.parseColor("#212121"));
                 testNumber.setPadding(0, 0, 0, 0);
                 testNumberHeaderCell.addView(testNumber);
 
-                LinearLayout testResultHeaderCell = new LinearLayout(getActivity());
+                LinearLayout testResultHeaderCell = new LinearLayout(TestDeviceFragment.this.getActivity());
                 testResultHeaderCell.setLayoutParams(layoutParams);
-                TextView testResult = new TextView(getActivity());
+                TextView testResult = new TextView(TestDeviceFragment.this.getActivity());
                 testResult.setText(R.string.result);
                 testResult.setTextColor(Color.parseColor("#212121"));
                 testNumber.setPadding(0, 0, 0, 0);
                 testResultHeaderCell.addView(testResult);
 
-                TableRow resultsTableHeaderRow = new TableRow(getActivity());
+                TableRow resultsTableHeaderRow = new TableRow(TestDeviceFragment.this.getActivity());
                 resultsTableHeaderRow.addView(testNumberHeaderCell);
                 resultsTableHeaderRow.addView(testResultHeaderCell);
                 resultsTableHeaderRow.setBackgroundColor(Color.WHITE);
@@ -128,24 +135,24 @@ public class TestDeviceFragment extends Fragment
 
                 for (int i = 0; i < testSuccessful.length; i++)
                 {
-                    TableRow testResultRow = new TableRow(getActivity());
+                    TableRow testResultRow = new TableRow(TestDeviceFragment.this.getActivity());
 
                     testResultRow.setBackgroundColor(Color.WHITE);
                     testResultRow.setPadding(0, 0, 0, 2); // Border between rows
 
-                    LinearLayout cell = new LinearLayout(getActivity());
+                    LinearLayout cell = new LinearLayout(TestDeviceFragment.this.getActivity());
                     cell.setBackgroundColor(Color.parseColor("#212121"));
                     cell.setLayoutParams(layoutParams);
-                    testNumber = new TextView(getActivity());
+                    testNumber = new TextView(TestDeviceFragment.this.getActivity());
                     testNumber.setText(String.format("Test %d", i + 1));
                     testNumber.setTextColor(Color.WHITE);
                     testNumber.setPadding(0, 0, 4, 3);
                     cell.addView(testNumber);
 
-                    LinearLayout cell2 = new LinearLayout(getActivity());
+                    LinearLayout cell2 = new LinearLayout(TestDeviceFragment.this.getActivity());
                     cell2.setBackgroundColor(Color.parseColor("#212121"));
                     cell2.setLayoutParams(layoutParams);
-                    testResult = new TextView(getActivity());
+                    testResult = new TextView(TestDeviceFragment.this.getActivity());
                     testResult.setText(testSuccessful[i] ? "Passed" : "Failed");
                     testResult.setTextColor(testSuccessful[i] ? PASSED_COLOR : FAILED_COLOR);
                     testNumber.setPadding(0, 0, 4, 3);
@@ -157,7 +164,7 @@ public class TestDeviceFragment extends Fragment
                 }
                 button.setVisibility(View.GONE);
                 DisplayMetrics metrics = new DisplayMetrics();
-                getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+                TestDeviceFragment.this.getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
                 int height = metrics.heightPixels;
                 // The -200f value centers the table on Nexus 6, so we use that as the reference
                 resultsContainer.setTranslationY((-200f) * ((height * metrics.densityDpi) / (float) (NEXUS_6_HEIGHT_PIXELS * NEXUS_6_DPI)));
@@ -168,17 +175,24 @@ public class TestDeviceFragment extends Fragment
 
     private class FetchTimeTask extends AsyncTask<String, Void, Long>
     {
+        private final Centurion centurion;
+
+        FetchTimeTask(Centurion centurion)
+        {
+            this.centurion = centurion;
+        }
+
         @Override
         protected Long doInBackground(String... args)
         {
             try
             {
-                JSONObject timeJsonObject = Centurion.getInstance().get("time");
+                JSONObject timeJsonObject = centurion.get("time");
                 return timeJsonObject.getLong("time");
             }
-            catch (IOException | JSONException e)
+            catch (JSONException e)
             {
-                return System.currentTimeMillis();
+                throw new RuntimeException(e);
             }
         }
     }

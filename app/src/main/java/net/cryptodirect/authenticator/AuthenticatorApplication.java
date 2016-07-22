@@ -19,6 +19,9 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
+
 /**
  * Two-factor authentication application for Cryptodash users, based
  * on RFC 6238 - TOTP: Time-Based One-Time Password Algorithm.
@@ -76,12 +79,18 @@ public class AuthenticatorApplication extends Application
 
         if (BuildConfig.DEBUG)
         {
-            javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) ->
-                    hostname.equals("10.0.2.2"));
+            javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier()
+            {
+                @Override
+                public boolean verify(String hostname, SSLSession session)
+                {
+                    return hostname.equals("10.0.2.2");
+                }
+            });
         }
     }
 
-    private static class MyKeyStoreFactory implements KeyStoreFactory
+    public static class MyKeyStoreFactory implements KeyStoreFactory
     {
         @Nullable
         @Override

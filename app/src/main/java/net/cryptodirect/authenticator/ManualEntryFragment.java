@@ -19,6 +19,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import static net.cryptodirect.authenticator.Utils.MaterialDesignColors.MD_GREEN_300;
+import static net.cryptodirect.authenticator.Utils.MaterialDesignColors.MD_RED_600;
+
 /**
  * Allows to the user to register an account by manually
  * entering their email and key. Users would probably only
@@ -61,7 +64,7 @@ public class ManualEntryFragment extends Fragment
         emailEditText.setOnEditorActionListener(new TextView.OnEditorActionListener()
         {
             @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event)
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent event)
             {
                 if (actionId == EditorInfo.IME_ACTION_DONE)
                 {
@@ -75,11 +78,12 @@ public class ManualEntryFragment extends Fragment
         keyEditText.setOnEditorActionListener(new TextView.OnEditorActionListener()
         {
             @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event)
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent event)
             {
                 if (actionId == EditorInfo.IME_ACTION_DONE)
                 {
-                    InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    InputMethodManager inputMethodManager = (InputMethodManager) ManualEntryFragment.this.getActivity()
+                            .getSystemService(Context.INPUT_METHOD_SERVICE);
                     inputMethodManager.hideSoftInputFromWindow(keyEditText.getWindowToken(), 0);
                 }
                 return false;
@@ -93,7 +97,9 @@ public class ManualEntryFragment extends Fragment
             {
                 if (keyCode == KeyEvent.KEYCODE_ENTER)
                 {
-                    InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    InputMethodManager inputMethodManager =
+                            (InputMethodManager) ManualEntryFragment.this.getActivity()
+                            .getSystemService(Context.INPUT_METHOD_SERVICE);
                     inputMethodManager.hideSoftInputFromWindow(keyEditText.getWindowToken(), 0);
                 }
                 return false;
@@ -131,7 +137,8 @@ public class ManualEntryFragment extends Fragment
                     }
                     else
                     {
-                        if (keyEditText.length() >= 2 && keyEditText.getText().toString().substring(0, keyEditText.length() - 1).contains("="))
+                        if (keyEditText.length() >= 2 && keyEditText.getText().toString().substring(
+                                0, keyEditText.length() - 1).contains("="))
                         {
                             errorMessage = getResources().getString(R.string.key_equals_misplaced);
                         }
@@ -140,9 +147,11 @@ public class ManualEntryFragment extends Fragment
                     if (errorMessage != null)
                     {
                         // whats been entered for the key so far is invalid
-                        Drawable errorDrawable = ContextCompat.getDrawable(getActivity().getBaseContext(), R.drawable.ic_close_white_24dp);
-                        errorDrawable.setBounds(0, 0, errorDrawable.getIntrinsicWidth(), errorDrawable.getIntrinsicHeight());
-                        errorDrawable.setColorFilter(Utils.MaterialDesignColors.MD_RED_600.getColor(), PorterDuff.Mode.SRC_IN);
+                        Drawable errorDrawable = ContextCompat.getDrawable(
+                                getActivity().getBaseContext(), R.drawable.ic_close_white_24dp);
+                        errorDrawable.setBounds(0, 0, errorDrawable.getIntrinsicWidth(),
+                                errorDrawable.getIntrinsicHeight());
+                        errorDrawable.setColorFilter(MD_RED_600.getColor(), PorterDuff.Mode.SRC_IN);
                         keyEditText.setError(errorMessage, errorDrawable);
                         keyEditText.forceLayout();
                     }
@@ -164,6 +173,7 @@ public class ManualEntryFragment extends Fragment
     {
         super.onViewCreated(view, savedInstanceState);
         Button okayButton = (Button) view.findViewById(R.id.okay_button);
-        okayButton.getCompoundDrawables()[0].setColorFilter(Utils.MaterialDesignColors.MD_GREEN_300.getColor(), PorterDuff.Mode.SRC_IN);
+        okayButton.getCompoundDrawables()[0].setColorFilter(MD_GREEN_300.getColor(),
+                PorterDuff.Mode.SRC_IN);
     }
 }

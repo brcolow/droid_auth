@@ -122,6 +122,54 @@ public class CodeParams implements Serializable
         }
     }
 
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        CodeParams other = (CodeParams) o;
+
+        return digits == other.digits &&
+                hotpCounter == other.hotpCounter &&
+                totpPeriod == other.totpPeriod &&
+                codeType == other.codeType &&
+                algorithm == other.algorithm &&
+                base == other.base;
+
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = codeType.hashCode();
+        result = 31 * result + algorithm.hashCode();
+        result = 31 * result + digits;
+        result = 31 * result + hotpCounter;
+        result = 31 * result + totpPeriod;
+        result = 31 * result + base.hashCode();
+        return result;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "CodeParams{" +
+                "codeType=" + codeType +
+                ", algorithm=" + algorithm +
+                ", digits=" + digits +
+                ", hotpCounter=" + hotpCounter +
+                ", totpPeriod=" + totpPeriod +
+                ", base=" + base +
+                '}';
+    }
+
     /**
      * Code parameter default values when not specified explicitly in the otpauth URI
      */

@@ -11,11 +11,14 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import static net.cryptodirect.authenticator.StandardCharsets.UTF_8;
 
 /**
  * Represents a registered Cryptodash account, consisting of
@@ -60,6 +63,47 @@ public class Account implements Serializable
     public CodeParams getCodeParams()
     {
         return codeParams;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        Account account = (Account) o;
+
+        return email.equals(account.email) &&
+                issuer.equals(account.issuer) &&
+                Arrays.equals(secretKey, account.secretKey) &&
+                codeParams.equals(account.codeParams);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = email.hashCode();
+        result = 31 * result + issuer.hashCode();
+        result = 31 * result + Arrays.hashCode(secretKey);
+        result = 31 * result + codeParams.hashCode();
+        return result;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "Account{" +
+                "email='" + email + '\'' +
+                ", issuer='" + issuer + '\'' +
+                ", secretKey=" + Arrays.toString(secretKey) +
+                ", codeParams=" + codeParams +
+                '}';
     }
 
     /**
@@ -114,16 +158,16 @@ public class Account implements Serializable
         {
             if (queryParams.containsKey("counter") || queryParams.get("counter").size() != 1)
             {
-                throw new URISyntaxException(uriString, "Counter query parameter must be specified " +
-                        "exactly once when using HOTP code type");
+                throw new URISyntaxException(uriString, "Counter query parameter must be " +
+                        "specified exactly once when using HOTP code type");
             }
             else
             {
                 counter = Integer.valueOf(queryParams.get("counter").get(0));
                 if (counter < 0)
                 {
-                    throw new URISyntaxException(uriString, "Counter query parameter must be positive " +
-                            "but was: " + counter);
+                    throw new URISyntaxException(uriString, "Counter query parameter must be " +
+                            "positive but was: " + counter);
                 }
             }
         }
@@ -138,11 +182,13 @@ public class Account implements Serializable
         {
             if (queryParams.get("base").size() != 1)
             {
-                throw new URISyntaxException(uriString, "Base query parameter specified more than once");
+                throw new URISyntaxException(uriString,
+                        "Base query parameter specified more than once");
             }
             else
             {
-                if (!queryParams.get("base").get(0).equals("32") && !queryParams.get("base").get(0).equals("64"))
+                if (!queryParams.get("base").get(0).equals("32") &&
+                        !queryParams.get("base").get(0).equals("64"))
                 {
                     throw new URISyntaxException(uriString, "Unsupported base for key param: " +
                             queryParams.get("base").get(0));
@@ -264,10 +310,12 @@ public class Account implements Serializable
         }
 
         return new Account(accountLabel, issuer, key, new CodeParams.Builder(codeType)
-                .algorithm(algorithm).digits(digits).totpPeriod(period).hotpCounter(counter).base(base).build());
+                .algorithm(algorithm).digits(digits).totpPeriod(period).hotpCounter(counter)
+                .base(base).build());
     }
 
-    private static Map<String, List<String>> splitQuery(URI uri) {
+    private static Map<String, List<String>> splitQuery(URI uri)
+    {
         final Map<String, List<String>> keyValuePairs = new LinkedHashMap<>();
         final String[] pairs = uri.getQuery().split("&");
         for (String pair : pairs) {
@@ -275,12 +323,14 @@ public class Account implements Serializable
             final String key;
             try
             {
-                key = index > 0 ? URLDecoder.decode(pair.substring(0, index), StandardCharsets.UTF_8.name()).replace(' ', '+') : pair;
+                key = index > 0 ? URLDecoder.decode(pair.substring(0, index), UTF_8.name())
+                        .replace(' ', '+') : pair;
                 if (!keyValuePairs.containsKey(key)) {
                     keyValuePairs.put(key, new LinkedList<String>());
                 }
                 final String value = index > 0 && pair.length() > index + 1 ?
-                        URLDecoder.decode(pair.substring(index + 1), StandardCharsets.UTF_8.name()).replace(' ', '+') : null;
+                        URLDecoder.decode(pair.substring(index + 1), UTF_8.name())
+                                .replace(' ', '+') : null;
                 keyValuePairs.get(key).add(value);
             }
             catch (UnsupportedEncodingException e)

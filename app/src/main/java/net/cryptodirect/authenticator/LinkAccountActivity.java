@@ -16,6 +16,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AndroidRuntimeException;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.CheckBox;
@@ -37,6 +38,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -46,6 +48,7 @@ public class LinkAccountActivity
         implements ScanQRCodeFragment.OnQRCodeScannedListener,
         FragmentManager.OnBackStackChangedListener
 {
+    private Centurion centurion;
     private Account scannedAccount = null;
     private String enteredEmail = null;
     private String enteredKey = null;
@@ -55,6 +58,13 @@ public class LinkAccountActivity
     protected void onCreate(Bundle state)
     {
         super.onCreate(state);
+        Intent intent = getIntent();
+        if (!intent.hasExtra("centurion"))
+        {
+            throw new IllegalArgumentException("intent: " + intent + " did not contain extra " +
+                    "\"centurion\"");
+        }
+        centurion = (Centurion) intent.getSerializableExtra("centurion");
         setContentView(R.layout.activity_register_account);
         getSupportFragmentManager().addOnBackStackChangedListener(this);
         if (findViewById(R.id.register_account_fragment_container) != null)
@@ -166,29 +176,30 @@ public class LinkAccountActivity
             AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this, R.style.Theme_Dialog);
             alertBuilder.setMessage(reasonInvalid);
             alertBuilder.setCancelable(false);
-            alertBuilder.setPositiveButton(getString(R.string.rescan),
-                    new DialogInterface.OnClickListener()
-                    {
-                        public void onClick(DialogInterface dialog, int id)
-                        {
-                            getSupportFragmentManager().popBackStack();
-                            showQRCodeFragment();
-                        }
-                    });
-            alertBuilder.setNegativeButton(getString(R.string.enter_manually),
-                    new DialogInterface.OnClickListener()
-                    {
-                        public void onClick(DialogInterface dialog, int id)
-                        {
-                            getSupportFragmentManager().popBackStack();
-                            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                            ManualEntryFragment manualEntryFragment = new ManualEntryFragment();
-                            fragmentTransaction.add(R.id.register_account_fragment_container,
-                                    manualEntryFragment, "manual-entry")
-                                    .addToBackStack("manual-entry")
-                                    .commit();
-                        }
-                    });
+            alertBuilder.setPositiveButton(getString(R.string.rescan), new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int id)
+                {
+                    LinkAccountActivity.this.getSupportFragmentManager().popBackStack();
+                    LinkAccountActivity.this.showQRCodeFragment();
+                }
+            });
+            alertBuilder.setNegativeButton(getString(R.string.enter_manually), new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int id)
+                {
+                    LinkAccountActivity.this.getSupportFragmentManager().popBackStack();
+                    FragmentTransaction fragmentTransaction = LinkAccountActivity.this
+                            .getSupportFragmentManager().beginTransaction();
+                    ManualEntryFragment manualEntryFragment = new ManualEntryFragment();
+                    fragmentTransaction.add(R.id.register_account_fragment_container,
+                            manualEntryFragment, "manual-entry")
+                            .addToBackStack("manual-entry")
+                            .commit();
+                }
+            });
             AlertDialog alertDialog = alertBuilder.create();
             alertDialog.show();
         }
@@ -224,35 +235,41 @@ public class LinkAccountActivity
     }
 
     /**
-     * The "Correct" button is in LinkAccountDataFragment
+     * The "Correct" button is in LinkAccountDataFragment.
+     *
      * @param view
      */
     public void handleCorrectButtonClicked(View view)
     {
         TextView emailTextField = (TextView) findViewById(R.id.email_edit_text);
         TextView keyTextField = (TextView) findViewById(R.id.key_edit_text);
-        CheckBox setAsDefaultAccountCheckBox = (CheckBox) findViewById(R.id.set_as_default_account_box);
+        CheckBox setAsDefaultAccountCheckBox = (CheckBox) findViewById(
+                R.id.set_as_default_account_box);
 
         if (keyTextField.getError() != null)
         {
-            Toast toast = Toast.makeText(getApplicationContext(), keyTextField.getError(), Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(getApplicationContext(), keyTextField.getError(),
+                    Toast.LENGTH_SHORT);
             toast.show();
             return;
         }
 
         boolean wasManualEntry;
-        FragmentManager.BackStackEntry backEntry = getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 2);
+        FragmentManager.BackStackEntry backEntry = getSupportFragmentManager().getBackStackEntryAt(
+                getSupportFragmentManager().getBackStackEntryCount() - 2);
         wasManualEntry = backEntry.getName().equals("manual-entry");
 
-        if (wasManualEntry || scannedAccount.getIssuer().toUpperCase().equals("CRYPTODASH"))
+        if (wasManualEntry || scannedAccount.getIssuer().toUpperCase(Locale.US).equals("CRYPTODASH"))
         {
             ProgressDialog progressDialog = new ProgressDialog(LinkAccountActivity.this);
-            progressDialog.setMessage("Verifying credentials...");
+            progressDialog.setTitle(getResources().getString(R.string.verifying_credentials_title));
+            progressDialog.setMessage(getResources().getString(R.string.verifying_credentials));
             progressDialog.show();
-            NotifyAccountLinkedTask notifyAccountLinkedTask = new NotifyAccountLinkedTask(progressDialog, emailTextField.getText(), keyTextField.getText());
+            NotifyAccountLinkedTask notifyAccountLinkedTask = new NotifyAccountLinkedTask(
+                    progressDialog, emailTextField.getText(), keyTextField.getText());
             JSONObject response;
 
-            // if this is a Cryptodash provided code, verify entered credentials via Centurion
+            // if this is a code provided by us, verify entered credentials via Centurion
             try
             {
                 response = notifyAccountLinkedTask.execute().get(4000, TimeUnit.MILLISECONDS);
@@ -274,7 +291,9 @@ public class LinkAccountActivity
                 if (response.has("local_error"))
                 {
                     final String error = response.optString("local_error");
-                    Toast toast = Toast.makeText(getApplicationContext(), "Looks like we are having some server trouble. This incident has been reported. Sorry about that!", Toast.LENGTH_LONG);
+                    Toast toast = Toast.makeText(getApplicationContext(), "Looks like we have a " +
+                            "problem on our end. Sorry about that! We have notified our developers " +
+                            "of the problem.", Toast.LENGTH_LONG);
                     toast.show();
                     ACRA.getErrorReporter().handleSilentException(new IOException(error));
                     return;
@@ -286,16 +305,16 @@ public class LinkAccountActivity
                     AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this, R.style.Theme_Dialog);
                     alertBuilder.setMessage(R.string.centurion_invalid_args);
                     alertBuilder.setCancelable(false);
-                    alertBuilder.setPositiveButton(getString(R.string.okay),
-                            new DialogInterface.OnClickListener()
-                            {
-                                public void onClick(DialogInterface dialog, int id)
-                                {
-                                    // TODO maybe we should allow the user to go to
-                                    // manual entry with the current text already entered
-                                    dialog.dismiss();
-                                }
-                            });
+                    alertBuilder.setPositiveButton(getString(R.string.okay), new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id)
+                        {
+                            // TODO maybe we should allow the user to go to
+                            // manual entry with the current text already entered
+                            dialog.dismiss();
+                        }
+                    });
                     AlertDialog alertDialog = alertBuilder.create();
                     alertDialog.show();
                     return;
@@ -303,7 +322,8 @@ public class LinkAccountActivity
             }
         }
 
-        Toast toast = Toast.makeText(getApplicationContext(), "You have successfully linked your account!", Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(getApplicationContext(), "You have successfully linked " +
+                "your account!", Toast.LENGTH_SHORT);
         toast.show();
 
         // TODO instead of showing the above toast, maybe we could animate in a "Successfully linked"
@@ -328,7 +348,8 @@ public class LinkAccountActivity
         {
             if (scannedAccount != null)
             {
-                AccountManager.getInstance().registerAccount(scannedAccount, true, setAsDefaultAccountCheckBox.isChecked());
+                AccountManager.getInstance().registerAccount(scannedAccount, true,
+                        setAsDefaultAccountCheckBox.isChecked());
             }
             else
             {
@@ -388,7 +409,7 @@ public class LinkAccountActivity
         // TODO need to implement issuer for manual entry for non-Cryptodash accounts
         Bundle bundle = new Bundle();
         bundle.putString("new_email", emailTextField.getText().toString());
-        bundle.putString("new_key", keyTextField.getText().toString());
+        bundle.putByteArray("new_key", Base64.getDecoder().decode(keyTextField.getText().toString()));
         bundle.putString("new_issuer", "Cryptodash");
         bundle.putInt("new_base", 64);
         enteredEmail = emailTextField.getText().toString();
@@ -408,7 +429,8 @@ public class LinkAccountActivity
         private final CharSequence key;
         private final ProgressDialog progressDialog;
 
-        public NotifyAccountLinkedTask(ProgressDialog progressDialog, CharSequence email, CharSequence key)
+        public NotifyAccountLinkedTask(ProgressDialog progressDialog, CharSequence email,
+                                       CharSequence key)
         {
             this.progressDialog = progressDialog;
             this.email = email;
@@ -434,7 +456,9 @@ public class LinkAccountActivity
         protected JSONObject doInBackground(String... args)
         {
             String payload = "{\"email\": \"" + email + "\", \"totpKeyBase64\": \"" + key + "\"}";
-            return Centurion.getInstance().post("twofactor/notify-linked", payload);
+            JSONObject response = centurion.post("twofactor/notify-linked", payload);
+            Log.e("Blah", "Response: " + response.toString());
+            return response;
         }
     }
 

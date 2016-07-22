@@ -1,10 +1,11 @@
 package net.cryptodirect.authenticator.crypto;
 
-import static net.cryptodirect.authenticator.crypto.Algorithm.*;
+import static net.cryptodirect.authenticator.StandardCharsets.US_ASCII;
 
+import static net.cryptodirect.authenticator.crypto.Algorithm.SHA1;
+import static net.cryptodirect.authenticator.crypto.Algorithm.SHA256;
+import static net.cryptodirect.authenticator.crypto.Algorithm.SHA512;
 import static org.junit.Assert.assertEquals;
-
-import net.cryptodirect.authenticator.StandardCharsets;
 
 import org.junit.Test;
 
@@ -15,9 +16,9 @@ import org.junit.Test;
  */
 public class TOTPTest
 {
-    private static final byte[] KEY_20_BYTES = "12345678901234567890".getBytes(StandardCharsets.US_ASCII);
-    private static final byte[] KEY_32_BYTES = "12345678901234567890123456789012".getBytes(StandardCharsets.US_ASCII);
-    private static final byte[] KEY_64_BYTES = "1234567890123456789012345678901234567890123456789012345678901234".getBytes(StandardCharsets.US_ASCII);
+    private static final byte[] KEY_20_BYTES = "12345678901234567890".getBytes(US_ASCII);
+    private static final byte[] KEY_32_BYTES = "12345678901234567890123456789012".getBytes(US_ASCII);
+    private static final byte[] KEY_64_BYTES = "1234567890123456789012345678901234567890123456789012345678901234".getBytes(US_ASCII);
 
     @Test
     public void testTOTPSha1()

@@ -47,6 +47,7 @@ public class MainActivity
     private int currSelectedPage = 0;
     private static final Map<Integer, HowItWorksPageFragment> pageMap = new LinkedHashMap<>(3);
     private static EntryPage entryPage;
+    private Centurion centurion;
 
     static
     {
@@ -57,6 +58,9 @@ public class MainActivity
     protected void onCreate(Bundle state)
     {
         super.onCreate(state);
+        Intent intent = getIntent();
+        centurion = (Centurion) intent.getSerializableExtra("net.cryptodirect.authenticator.Centurion");
+
         setContentView(R.layout.activity_main);
         if (findViewById(R.id.main_fragment_container) != null && state != null)
         {
@@ -80,22 +84,22 @@ public class MainActivity
                     "for " + numAccounts + " accounts but there were only " + e.getNumMissingAccounts()
                     + ". Please check which accounts are still registered. This incident has been reported.");
             alertBuilder.setCancelable(false);
-            alertBuilder.setPositiveButton(getString(R.string.check_accounts),
-                    new DialogInterface.OnClickListener()
-                    {
-                        public void onClick(DialogInterface dialog, int id)
-                        {
-                            showAccountChooserFragment();
-                        }
-                    });
-            alertBuilder.setNegativeButton(getString(R.string.not_now),
-                    new DialogInterface.OnClickListener()
-                    {
-                        public void onClick(DialogInterface dialog, int id)
-                        {
-                            dialog.cancel();
-                        }
-                    });
+            alertBuilder.setPositiveButton(getString(R.string.check_accounts), new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int id)
+                {
+                    MainActivity.this.showAccountChooserFragment();
+                }
+            });
+            alertBuilder.setNegativeButton(getString(R.string.not_now), new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int id)
+                {
+                    dialog.cancel();
+                }
+            });
             AlertDialog alertDialog = alertBuilder.create();
             alertDialog.show();
         }
@@ -137,14 +141,16 @@ public class MainActivity
                 alertBuilder.setPositiveButton(getString(R.string.register_new_account),
                         new DialogInterface.OnClickListener()
                         {
+                            @Override
                             public void onClick(DialogInterface dialog, int id)
                             {
-                                startLinkAccountActivity();
+                                MainActivity.this.startLinkAccountActivity();
                             }
                         });
                 alertBuilder.setNegativeButton(getString(R.string.not_now),
                         new DialogInterface.OnClickListener()
                         {
+                            @Override
                             public void onClick(DialogInterface dialog, int id)
                             {
                                 dialog.cancel();
@@ -172,7 +178,7 @@ public class MainActivity
                 {
                     // we have data for only one account
                     entryPage = EntryPage.ONE_ACCOUNT_AUTHENTICATOR;
-                    showAuthenticatorFragment(AccountManager.getInstance().getOnlyAccount().getEmail(), 30);
+                    showAuthenticatorFragment(AccountManager.getInstance().getFirstAccount().getEmail(), 30);
                 }
             }
             else
@@ -228,7 +234,8 @@ public class MainActivity
             {
                 getSupportFragmentManager().popBackStack();
             }
-            else if (fragmentName.equals("authenticator") && (entryPage == EntryPage.WELCOME || entryPage == EntryPage.ACCOUNT_CHOOSER))
+            else if (fragmentName.equals("authenticator") && (entryPage == EntryPage.WELCOME ||
+                    entryPage == EntryPage.ACCOUNT_CHOOSER))
             {
                 getSupportFragmentManager().popBackStack();
             }
@@ -254,7 +261,8 @@ public class MainActivity
             MenuItem menuItem = menu.getItem(i);
             String title = menuItem.getTitle().toString();
             Spannable newTitle = new SpannableString(title);
-            newTitle.setSpan(new ForegroundColorSpan(Color.WHITE), 0, newTitle.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            newTitle.setSpan(new ForegroundColorSpan(Color.WHITE), 0, newTitle.length(),
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             menuItem.setTitle(newTitle);
         }
         return true;
@@ -366,8 +374,10 @@ public class MainActivity
         Bundle bundle = new Bundle();
         bundle.putSerializable("account", AccountManager.getInstance().getAccount(email));
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        bundle.putBoolean("play_time_running_out_sound", sharedPreferences.getBoolean("play_time_running_out_sound", true));
-        bundle.putInt("time_running_out_start", sharedPreferences.getInt("time_running_out_start", 5));
+        bundle.putBoolean("play_time_running_out_sound", sharedPreferences.getBoolean(
+                "play_time_running_out_sound", true));
+        bundle.putInt("time_running_out_start", sharedPreferences.getInt(
+                "time_running_out_start", 5));
         AuthenticatorFragment authenticatorFragment = new AuthenticatorFragment();
         sharedPreferences.registerOnSharedPreferenceChangeListener(authenticatorFragment);
         authenticatorFragment.setArguments(bundle);
@@ -402,6 +412,13 @@ public class MainActivity
     private void showTestDeviceFragment()
     {
         TestDeviceFragment testDeviceFragment = new TestDeviceFragment();
+        Bundle bundle = new Bundle();
+        if (centurion == null)
+        {
+            centurion = new RealCenturion();
+        }
+        bundle.putSerializable("centurion", centurion);
+        testDeviceFragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.main_fragment_container,
                 testDeviceFragment, "test-device")
@@ -412,6 +429,10 @@ public class MainActivity
     private void startLinkAccountActivity()
     {
         Intent intent = new Intent(this, LinkAccountActivity.class);
+        if (centurion == null) {
+            centurion = new RealCenturion();
+        }
+        intent.putExtra("centurion", centurion);
         startActivity(intent);
     }
 
@@ -496,12 +517,14 @@ public class MainActivity
                 "#5C6BC0",
                 R.drawable.ic_keyboard_white_36dp,
                 "Every 30 seconds, this app automatically generates a random 6-digit " +
-                        "code. When two-factor authentication is enabled, this code is required when logging in to your account or performing " +
-                        "sensitive actions (such as withdrawing funds or posting an order). Exactly which " +
-                        "actions require entering a code is completely configurable and uses sensible defaults. Requiring a code adds an extra layer " +
-                        "of security on to your account. In other words, even if your username and password were " +
-                        "compromised, an attacker would still need your mobile phone to even attempt to " +
-                        "gain access to your account."));
+                        "code. When two-factor authentication is enabled, this code is required when " +
+                        "logging in to your account or performing sensitive actions (such as " +
+                        "withdrawing funds or posting an order). Exactly which actions require " +
+                        "entering a code is completely configurable and uses sensible defaults. " +
+                        "Requiring a code adds an extra layer of security on to your account. In " +
+                        "other words, even if your username and password were compromised, an " +
+                        "attacker would still need your mobile phone to even attempt to gain " +
+                        "access to your account."));
 
         pageMap.put(2, HowItWorksPageFragment.newInstance(2,
                 "#43A047",
@@ -509,9 +532,9 @@ public class MainActivity
                 "Codes are generated using a 32-byte shared secret key that is stored securely on your " +
                         "device. The process of generating a code uses a cryptographically secure standard " +
                         "called TOTP (Time-based One-time Password Algorithm) which internally uses the same " +
-                        "cryptographic hash function as Bitcoin (SHA-256). " +
-                        "In accordance with our transparent security practices, you can run this app against the set of tests listed in the TOTP " +
-                        "specification via the \"Test Device\" option on the main menu."));
+                        "cryptographic hash function as Bitcoin (SHA-256). In accordance with our " +
+                        "transparent security practices, you can run this app against the set of " +
+                        "tests listed in the TOTP specification via the \"Test Device\" option on the main menu."));
     }
 
     @Override

@@ -89,7 +89,8 @@ public class TimestepIntervalWheel extends View
     {
         super.onDraw(canvas);
         canvas.drawArc(enclosingSquare, 0, 360, false, trackPaint);
-        double chunkToRemovePercentage = 1d - ((double) secondsRemainingInInterval / (double) intervalInSeconds);
+        double chunkToRemovePercentage = 1d - ((double) secondsRemainingInInterval /
+                (double) intervalInSeconds);
         int chunkToRemoveInDegrees = (int) (360d * chunkToRemovePercentage);
         canvas.drawArc(enclosingSquare, 270, -360 + chunkToRemoveInDegrees, false, fillPaint);
         float textWidth = numberPaint.measureText(String.valueOf(secondsRemainingInInterval));
@@ -122,7 +123,8 @@ public class TimestepIntervalWheel extends View
             size = widthWithoutPadding;
         }
 
-        setMeasuredDimension(size + getPaddingLeft() + getPaddingRight(), size + getPaddingTop() + getPaddingBottom());
+        setMeasuredDimension(size + getPaddingLeft() + getPaddingRight(),
+                size + getPaddingTop() + getPaddingBottom());
     }
 
     public boolean decrementSecondsRemaining()

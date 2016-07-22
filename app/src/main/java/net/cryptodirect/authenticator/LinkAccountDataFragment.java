@@ -17,6 +17,9 @@ import android.widget.TextView;
 import net.cryptodirect.authenticator.crypto.Base32;
 import net.cryptodirect.authenticator.crypto.Base64;
 
+import static net.cryptodirect.authenticator.Utils.MaterialDesignColors.MD_GREEN_300;
+import static net.cryptodirect.authenticator.Utils.MaterialDesignColors.MD_RED_300;
+
 /**
  * Takes the account key data that was obtained from either
  * scanning a QR code (in ScanQRCodeFragment) or manually
@@ -64,19 +67,23 @@ public class LinkAccountDataFragment extends Fragment
 
         if (email == null)
         {
-            throw new IllegalArgumentException("LinkAccountDataFragment was not given decoded email");
+            throw new IllegalArgumentException("bundle: " + state + " does not contain " +
+                    "String \"new_email\"");
         }
         if (rawKey == null)
         {
-            throw new IllegalArgumentException("LinkAccountDataFragment was not given decoded key");
+            throw new IllegalArgumentException("bundle: " + state + " does not contain " +
+                    "byte-array \"new_key\"");
         }
         if (issuer == null)
         {
-            throw new IllegalArgumentException("LinkAccountDataFragment was not given decoded issuer");
+            throw new IllegalArgumentException("bundle: " + state + " does not contain " +
+                    "String \"new_issuer\"");
         }
         if (base == 0)
         {
-            throw new IllegalArgumentException("LinkAccountDataFragment was not given decoded base");
+            throw new IllegalArgumentException("bundle: " + state + " does not contain " +
+                    "int \"new_base\"");
         }
 
 
@@ -98,7 +105,7 @@ public class LinkAccountDataFragment extends Fragment
                 key = Base64.getEncoder().encodeToString(rawKey);
                 break;
             default:
-                throw new IllegalArgumentException("Unsupported base: " + base);
+                throw new IllegalArgumentException("unsupported base: " + base);
         }
 
         keyTextField.setText(key);
@@ -106,7 +113,8 @@ public class LinkAccountDataFragment extends Fragment
         boolean keyValid = true;
         if (base == 64)
         {
-            if (TextUtils.isEmpty(key) || !Utils.BASE64_KEY_REGEX.matcher(key).matches() || key.length() != 44)
+            if (TextUtils.isEmpty(key) || !Utils.BASE64_KEY_REGEX.matcher(key).matches() ||
+                    key.length() != 44)
             {
                 // base64 key is invalid
                 keyValid = false;
@@ -123,16 +131,22 @@ public class LinkAccountDataFragment extends Fragment
 
         if (!keyValid)
         {
-            Drawable errorDrawable = ContextCompat.getDrawable(getActivity().getBaseContext(), R.drawable.ic_close_white_24dp);
-            errorDrawable.setBounds(0, 0, errorDrawable.getIntrinsicWidth(), errorDrawable.getIntrinsicHeight());
-            errorDrawable.setColorFilter(Utils.MaterialDesignColors.MD_RED_600.getColor(), PorterDuff.Mode.SRC_IN);
+            Drawable errorDrawable = ContextCompat.getDrawable(getActivity().getBaseContext(),
+                    R.drawable.ic_close_white_24dp);
+            errorDrawable.setBounds(0, 0, errorDrawable.getIntrinsicWidth(),
+                    errorDrawable.getIntrinsicHeight());
+            errorDrawable.setColorFilter(Utils.MaterialDesignColors.MD_RED_600.getColor(),
+                    PorterDuff.Mode.SRC_IN);
             keyTextField.setError(getResources().getString(R.string.invalid_key), errorDrawable);
         }
         else
         {
-            Drawable validDrawable = ContextCompat.getDrawable(getActivity().getBaseContext(), R.drawable.ic_check_white_24dp);
-            validDrawable.setBounds(0, 0, validDrawable.getIntrinsicWidth(), validDrawable.getIntrinsicHeight());
-            validDrawable.setColorFilter(Utils.MaterialDesignColors.MD_GREEN_500.getColor(), PorterDuff.Mode.SRC_IN);
+            Drawable validDrawable = ContextCompat.getDrawable(getActivity().getBaseContext(),
+                    R.drawable.ic_check_white_24dp);
+            validDrawable.setBounds(0, 0, validDrawable.getIntrinsicWidth(),
+                    validDrawable.getIntrinsicHeight());
+            validDrawable.setColorFilter(Utils.MaterialDesignColors.MD_GREEN_500.getColor(),
+                    PorterDuff.Mode.SRC_IN);
             keyTextField.setCompoundDrawablesWithIntrinsicBounds(null, null, validDrawable, null);
         }
 
@@ -147,7 +161,9 @@ public class LinkAccountDataFragment extends Fragment
         Button correctButton = (Button) view.findViewById(R.id.correct_button);
         Button incorrectButton = (Button) view.findViewById(R.id.incorrect_button);
 
-        correctButton.getCompoundDrawables()[0].setColorFilter(Utils.MaterialDesignColors.MD_GREEN_300.getColor(), PorterDuff.Mode.SRC_IN);
-        incorrectButton.getCompoundDrawables()[0].setColorFilter(Utils.MaterialDesignColors.MD_RED_300.getColor(), PorterDuff.Mode.SRC_IN);
+        correctButton.getCompoundDrawables()[0].setColorFilter(MD_GREEN_300.getColor(),
+                PorterDuff.Mode.SRC_IN);
+        incorrectButton.getCompoundDrawables()[0].setColorFilter(MD_RED_300.getColor(),
+                PorterDuff.Mode.SRC_IN);
     }
 }
