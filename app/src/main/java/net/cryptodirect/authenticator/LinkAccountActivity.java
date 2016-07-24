@@ -37,8 +37,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -165,7 +163,7 @@ public class LinkAccountActivity
         {
             scannedAccount = Account.parse(scannedCode);
         }
-        catch (URISyntaxException e)
+        catch (InvalidOptAuthUriException e)
         {
             reasonInvalid = "The scanned QR code was not formatted correctly - make sure you are " +
                     "scanning a Cryptodash provided QR code.";
@@ -206,8 +204,8 @@ public class LinkAccountActivity
         else
         {
             Bundle bundle = new Bundle();
-            bundle.putString("new_email", scannedAccount.getEmail());
-            bundle.putString("new_issuer", scannedAccount.getIssuer());
+            bundle.putString("new_label", scannedAccount.getLabel());
+            bundle.putInt("new_issuer", scannedAccount.getIssuer().getId());
             bundle.putByteArray("new_key", scannedAccount.getSecretKey());
             bundle.putInt("new_base", scannedAccount.getCodeParams().getBase() == Base.BASE32 ? 32 : 64);
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -222,16 +220,24 @@ public class LinkAccountActivity
 
     private void showQRCodeFragment()
     {
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        Bundle bundle = new Bundle();
-        bundle.putBoolean("play_scan_sound", sharedPreferences.getBoolean("play_scan_sound", true));
-        ScanQRCodeFragment scanQRCodeFragment = new ScanQRCodeFragment();
-        scanQRCodeFragment.setArguments(bundle);
-        fragmentTransaction.add(R.id.register_account_fragment_container,
-                scanQRCodeFragment, "qr-code")
-                .addToBackStack("qr-code")
-                .commit();
+        Intent intent = getIntent();
+        if (intent.hasExtra("mockScannedCode"))
+        {
+            onQRCodeScanned(BarcodeFormat.QR_CODE, intent.getStringExtra("mockScannedCode"));
+        }
+        else
+        {
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            Bundle bundle = new Bundle();
+            bundle.putBoolean("play_scan_sound", sharedPreferences.getBoolean("play_scan_sound", true));
+            ScanQRCodeFragment scanQRCodeFragment = new ScanQRCodeFragment();
+            scanQRCodeFragment.setArguments(bundle);
+            fragmentTransaction.add(R.id.register_account_fragment_container,
+                    scanQRCodeFragment, "qr-code")
+                    .addToBackStack("qr-code")
+                    .commit();
+        }
     }
 
     /**
@@ -259,7 +265,7 @@ public class LinkAccountActivity
                 getSupportFragmentManager().getBackStackEntryCount() - 2);
         wasManualEntry = backEntry.getName().equals("manual-entry");
 
-        if (wasManualEntry || scannedAccount.getIssuer().toUpperCase(Locale.US).equals("CRYPTODASH"))
+        if (wasManualEntry || scannedAccount.getIssuer() == Issuer.CRYPTODASH)
         {
             ProgressDialog progressDialog = new ProgressDialog(LinkAccountActivity.this);
             progressDialog.setTitle(getResources().getString(R.string.verifying_credentials_title));
@@ -334,7 +340,7 @@ public class LinkAccountActivity
             if (enteredEmail != null && enteredKey != null)
             {
                 // TODO currently we default to a Cryptodash provided code if manual entry was used
-                Account newAccount = new Account(enteredEmail, "Cryptodash",
+                Account newAccount = new Account(enteredEmail, Issuer.CRYPTODASH,
                         Base64.getDecoder().decode(enteredKey),
                         new CodeParams.Builder(CodeType.TOTP).base(64).algorithm(Algorithm.SHA256).build());
                 AccountManager.getInstance().registerAccount(newAccount, true, setAsDefaultAccountCheckBox.isChecked());
@@ -408,9 +414,9 @@ public class LinkAccountActivity
 
         // TODO need to implement issuer for manual entry for non-Cryptodash accounts
         Bundle bundle = new Bundle();
-        bundle.putString("new_email", emailTextField.getText().toString());
+        bundle.putString("new_label", emailTextField.getText().toString());
         bundle.putByteArray("new_key", Base64.getDecoder().decode(keyTextField.getText().toString()));
-        bundle.putString("new_issuer", "Cryptodash");
+        bundle.putInt("new_issuer", Issuer.CRYPTODASH.getId());
         bundle.putInt("new_base", 64);
         enteredEmail = emailTextField.getText().toString();
         enteredKey = keyTextField.getText().toString();

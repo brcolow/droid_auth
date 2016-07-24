@@ -84,8 +84,8 @@ public class AccountManager
             JSONObject accountJsonObject = accountsJsonArray.getJSONObject(i);
             JSONObject codeParamsJsonObject = accountJsonObject.getJSONObject("codeParams");
             int base = codeParamsJsonObject.getInt("base");
-            Account account = new Account(accountJsonObject.getString("email"),
-                    accountJsonObject.getString("issuer"),
+            Account account = new Account(accountJsonObject.getString("label"),
+                    Issuer.getIssuer(accountJsonObject.getInt("issuer")),
                     Base64.getDecoder().decode(accountJsonObject.getString("key")),
                     new CodeParams.Builder(
                             CodeType.getCodeType(codeParamsJsonObject.getString("codeType")))
@@ -97,7 +97,7 @@ public class AccountManager
                             .base(base)
                             .build());
 
-            accounts.put(accountJsonObject.getString("email"), account);
+            accounts.put(accountJsonObject.getString("label"), account);
         }
 
         if (accounts.size() != numAccounts)
@@ -109,14 +109,14 @@ public class AccountManager
         }
     }
 
-    public Account getAccount(String email)
+    public Account getAccount(String label)
     {
-        if (email == null)
+        if (label == null)
         {
-            throw new IllegalArgumentException("email must not be null");
+            throw new IllegalArgumentException("label must not be null");
         }
 
-        return accounts.get(email);
+        return accounts.get(label);
     }
 
     public Collection<Account> getAccounts()
@@ -129,9 +129,9 @@ public class AccountManager
        return accounts.values().iterator().next();
     }
 
-    public boolean accountExists(String email)
+    public boolean accountExists(String label)
     {
-        return accounts.containsKey(email);
+        return accounts.containsKey(label);
     }
 
     public int getNumAccounts()
@@ -146,14 +146,14 @@ public class AccountManager
             throw new IllegalArgumentException("account must not be null");
         }
 
-        if (accounts.containsKey(account.getEmail()) && !overwriteExisting)
+        if (accounts.containsKey(account.getLabel()) && !overwriteExisting)
         {
             return false;
         }
 
         try
         {
-            accounts.put(account.getEmail(), account);
+            accounts.put(account.getLabel(), account);
             FileOutputStream accountsFileOutputStream = baseContext.openFileOutput(
                     ACCOUNTS_FILE, Context.MODE_PRIVATE);
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(
@@ -172,7 +172,7 @@ public class AccountManager
             prefsEditor.putInt("numAccounts", accounts.size());
             if (setAsDefault)
             {
-                prefsEditor.putString("default_account", account.getEmail());
+                prefsEditor.putString("default_account", account.getLabel());
             }
             prefsEditor.apply();
 
@@ -198,10 +198,10 @@ public class AccountManager
     private void writeAccount(JsonWriter writer, Account account) throws IOException
     {
         writer.beginObject();
-        writer.name("email");
-        writer.value(account.getEmail());
+        writer.name("label");
+        writer.value(account.getLabel());
         writer.name("issuer");
-        writer.value(account.getIssuer());
+        writer.value(account.getIssuer().getId());
         writer.name("key");
         writer.value(account.getBase64EncodedSecretKey());
         writer.name("codeParams");

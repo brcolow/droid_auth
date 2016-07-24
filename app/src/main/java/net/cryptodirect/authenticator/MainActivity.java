@@ -48,6 +48,7 @@ public class MainActivity
     private static final Map<Integer, HowItWorksPageFragment> pageMap = new LinkedHashMap<>(3);
     private static EntryPage entryPage;
     private Centurion centurion;
+    private String mockScannedCode;
 
     static
     {
@@ -60,6 +61,7 @@ public class MainActivity
         super.onCreate(state);
         Intent intent = getIntent();
         centurion = (Centurion) intent.getSerializableExtra("net.cryptodirect.authenticator.Centurion");
+        mockScannedCode = intent.getStringExtra("net.cryptodirect.authenticator.MockScannedCode");
 
         setContentView(R.layout.activity_main);
         if (findViewById(R.id.main_fragment_container) != null && state != null)
@@ -178,7 +180,7 @@ public class MainActivity
                 {
                     // we have data for only one account
                     entryPage = EntryPage.ONE_ACCOUNT_AUTHENTICATOR;
-                    showAuthenticatorFragment(AccountManager.getInstance().getFirstAccount().getEmail(), 30);
+                    showAuthenticatorFragment(AccountManager.getInstance().getFirstAccount().getLabel(), 30);
                 }
             }
             else
@@ -369,10 +371,10 @@ public class MainActivity
                 .commit();
     }
 
-    private void showAuthenticatorFragment(String email, int ts)
+    private void showAuthenticatorFragment(String label, int ts)
     {
         Bundle bundle = new Bundle();
-        bundle.putSerializable("account", AccountManager.getInstance().getAccount(email));
+        bundle.putSerializable("account", AccountManager.getInstance().getAccount(label));
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         bundle.putBoolean("play_time_running_out_sound", sharedPreferences.getBoolean(
                 "play_time_running_out_sound", true));
@@ -429,10 +431,15 @@ public class MainActivity
     private void startLinkAccountActivity()
     {
         Intent intent = new Intent(this, LinkAccountActivity.class);
-        if (centurion == null) {
+        if (centurion == null)
+        {
             centurion = new RealCenturion();
         }
         intent.putExtra("centurion", centurion);
+        if (mockScannedCode != null)
+        {
+            intent.putExtra("mockScannedCode", mockScannedCode);
+        }
         startActivity(intent);
     }
 

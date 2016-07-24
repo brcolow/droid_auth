@@ -14,6 +14,11 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
+/**
+ * Allows for sending HTTP reqeusts to a real Centurion instance (i.e.
+ * one that is running locally if this is a debug build or remotely if
+ * this is a release build).
+ */
 public class RealCenturion extends Centurion
 {
     private final String baseUrl;

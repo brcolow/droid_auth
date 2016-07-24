@@ -178,5 +178,6 @@ public class CodeParams implements Serializable
         public static final Algorithm ALGORITHM = Algorithm.SHA1;
         public static final int DIGITS = 6;
         public static final int TOTP_PERIOD = 30;
+        public static final int BASE = 32;
     }
 }

@@ -7,16 +7,14 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.View;
 
 /**
- * Allows the user to set settings.
+ * Allows the user to configure various application settings.
  */
 public class SettingsFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener
 {
     private String initialMessage;
-    private static final String TAG = SettingsFragment.class.getSimpleName();
 
     @Override
     public void onCreate(Bundle state)
@@ -35,7 +33,8 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         Preference timeRunningOutStartPref = findPreference("time_running_out_start");
         timeRunningOutStartPref.setOnPreferenceChangeListener(this);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String message = initialMessage.split("X")[0] + prefs.getInt("time_running_out_start", 5) + initialMessage.split("X")[1];
+        String message = initialMessage.split("X")[0] + prefs.getInt("time_running_out_start", 5) +
+                initialMessage.split("X")[1];
         timeRunningOutStartPref.setSummary(message);
     }
 
@@ -48,9 +47,8 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue)
     {
-        Log.i(TAG, "Preference " + preference + " has changed value to: " + newValue);
-        String message = initialMessage.split("X")[0] + newValue + initialMessage.split("X")[1];
-        preference.setSummary(message);
+        preference.setSummary(initialMessage.split("X")[0] + newValue +
+                initialMessage.split("X")[1]);
         return true;
     }
 }

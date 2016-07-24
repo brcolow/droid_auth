@@ -17,15 +17,16 @@
     <string name="flash_off">Flash [OFF]</string>
     <string name="auto_focus_on">Auto Focus [ON]</string>
     <string name="auto_focus_off">Auto Focus [OFF]</string>
+    <string name="select_camera">Choose Camera</string>
     <string name="select_method_blurb">The easiest way to link your Cryptodash account is by scanning the provided QR code.
         If you don\'t have a working camera, you can still enter the code manually.</string>
     <string name="register_account_data_blurb">Verify that the following information is correct to continue:</string>
-    <string name="email">Email:</string>
+    <string name="label">Email:</string>
     <string name="key">Key:</string>
     <string name="sample_key">Ne2WwwXegWzlHuD0eriSXx1EaxmQiEW8QMCRcn5RJ78=</string>
     <string name="information_correct">Correct</string>
     <string name="information_incorrect">Incorrect</string>
-    <string name="manual_entry_blurb">Enter the email address associated with your Cryptodash account and the two-factor key provided to you.</string>
+    <string name="manual_entry_blurb">Enter the label address associated with your Cryptodash account and the two-factor key provided to you.</string>
     <string name="okay">Okay</string>
     <string name="no">No</string>
     <string name="email_hint">Your Email</string>
@@ -43,7 +44,7 @@
     <string name="rescan">Rescan</string>
     <string name="enter_manually">Enter Manually</string>
     <string name="set_as_default">Set as default account</string>
-    <string name="centurion_invalid_args">The email address and/or key you provided is invalid. Please verify
+    <string name="centurion_invalid_args">The label address and/or key you provided is invalid. Please verify
     that they are correct, and try again.</string>
     <string name="done">Done</string>
     <string name="no_accounts">You have no linked accounts!</string>
@@ -74,4 +75,5 @@
     <string name="crash_dialog_text">Sorry, an unexpected error has occurred that we can\'t recover from. We would greatly
     appreciate you reporting this error to us so that we can fix it.</string>
     <string name="crash_dialog_ok_toast">Thank you for reporting the error!</string>
+    <string name="cancel">cancel</string>
 </resources>

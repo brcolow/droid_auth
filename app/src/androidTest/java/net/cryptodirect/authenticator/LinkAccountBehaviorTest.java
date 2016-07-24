@@ -3,16 +3,15 @@ package net.cryptodirect.authenticator;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.support.test.espresso.intent.rule.IntentsTestRule;
+import android.support.test.filters.MediumTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.test.suitebuilder.annotation.MediumTest;
 
 import net.cryptodirect.authenticator.crypto.Base64;
 import net.cryptodirect.authenticator.crypto.CodeParams;
 import net.cryptodirect.authenticator.crypto.CodeType;
-import net.cryptodirect.authenticator.crypto.TOTP;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -35,17 +34,17 @@ import static net.cryptodirect.authenticator.CustomMatchers.withCompoundDrawable
 import static net.cryptodirect.authenticator.crypto.Algorithm.SHA256;
 import static net.cryptodirect.authenticator.crypto.TOTP.generateTOTP;
 import static net.cryptodirect.authenticator.crypto.TOTP.getTC;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.hasValue;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
 
 @RunWith(AndroidJUnit4.class)
 @MediumTest
 public class LinkAccountBehaviorTest
 {
     @Rule
-    public ActivityTestRule<MainActivity> rule = new ActivityTestRule<>(MainActivity.class,
+    public ActivityTestRule<MainActivity> rule = new IntentsTestRule<>(MainActivity.class,
             true, false);
 
     @SuppressLint("CommitPrefEdits")
@@ -61,7 +60,7 @@ public class LinkAccountBehaviorTest
     }
 
     @Test
-    public void shouldLinkValidManuallyEnteredAccount() throws Exception
+    public void shouldLinkValidManuallyEnteredCryptodashAccount() throws Exception
     {
         // given
         String email = "test@gmail.com";
@@ -90,9 +89,9 @@ public class LinkAccountBehaviorTest
 
         // then
         // manually entered account should be added to AccountManager
-        assertEquals(AccountManager.getInstance().getAccount(email),
-                new Account(email, "Cryptodash", Base64.getDecoder().decode(key),
-                        new CodeParams.Builder(CodeType.TOTP).base(64).algorithm(SHA256).build()));
+        assertThat(AccountManager.getInstance().getAccount(email),
+                is(new Account(email, Issuer.CRYPTODASH, Base64.getDecoder().decode(key),
+                        new CodeParams.Builder(CodeType.TOTP).base(64).algorithm(SHA256).build())));
 
         // The current TOTP code and time-wheel should be displayed for the newly linked account
         onView(withId(R.id.code_box)).check(matches(isDisplayed()));
@@ -101,10 +100,44 @@ public class LinkAccountBehaviorTest
     }
 
     @Test
-    public void shouldLinkAccountUponScanningValidQRCode()
+    public void shouldLinkAccountUponScanningValidCryptodashQRCode()
     {
+        // given
+        String email = "test@gmail.com";
+        String key = "Ne2WwwXegWzlHuD0eriSXx1EaxmQiEW8QMCRcn5RJ78=";
+        String urlEncodedKey = "Ne2WwwXegWzlHuD0eriSXx1EaxmQiEW8QMCRcn5RJ78%3D";
+        Intent intent = new Intent();
+        // for now this is the best we can do as trying to fake the camera preview image
+        // so that a QR code is scanned by the BarcodeScannerView is just not practical
+        intent.putExtra("net.cryptodirect.authenticator.MockScannedCode", String.format(
+                "otpauth://totp/%s?secret=%s&issuer=Cryptodash&base=64&algorithm=SHA256",
+                email, urlEncodedKey));
+        MockCenturion centurion = new MockCenturion();
+        centurion.setPostResponse("twofactor/notify-linked",
+                String.format("{\"email\": \"%s\", \"totpKeyBase64\": \"%s\"}", email, key),
+                "{\"success\": true, \"httpResponseCode\": 200}");
+        intent.putExtra("net.cryptodirect.authenticator.Centurion", centurion);
+        rule.launchActivity(intent);
+
         // when
-        onView(withText("Scan QR Code")).perform(click());
-        onView(withId(R.id.manual_entry_button)).perform(click());
+        onView(withText("Link Account")).perform(click());
+        onView(withId(R.id.scan_qr_code_button)).perform(click());
+
+        // Key EditText should have a check-mark drawable indicating it is valid
+        onView(allOf(withId(R.id.key_edit_text), not(isClickable()))).check(matches(
+                withCompoundDrawable(R.drawable.ic_check_white_24dp)));
+
+        onView(withId(R.id.correct_button)).perform(click());
+
+        // then
+        // manually entered account should be added to AccountManager
+        assertThat(AccountManager.getInstance().getAccount(email), is(new Account(email,
+                Issuer.CRYPTODASH, Base64.getDecoder().decode(key),
+                new CodeParams.Builder(CodeType.TOTP).base(64).algorithm(SHA256).build())));
+
+        // The current TOTP code and time-wheel should be displayed for the newly linked account
+        onView(withId(R.id.code_box)).check(matches(isDisplayed()));
+        onView(withId(R.id.code_box)).check(matches(withText(generateTOTP(
+                Base64.getDecoder().decode(key), getTC(30), 6, SHA256))));
     }
 }

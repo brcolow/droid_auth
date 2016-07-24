@@ -1,13 +1,14 @@
 package net.cryptodirect.authenticator.crypto;
 
-import static net.cryptodirect.authenticator.StandardCharsets.US_ASCII;
+import org.junit.Test;
 
+import static net.cryptodirect.authenticator.StandardCharsets.US_ASCII;
 import static net.cryptodirect.authenticator.crypto.Algorithm.SHA1;
 import static net.cryptodirect.authenticator.crypto.Algorithm.SHA256;
 import static net.cryptodirect.authenticator.crypto.Algorithm.SHA512;
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
+import static net.cryptodirect.authenticator.crypto.TOTP.generateTOTP;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Based on test vectors provided in Table 1: TOTP Table of RFC 6238.
@@ -23,33 +24,33 @@ public class TOTPTest
     @Test
     public void testTOTPSha1()
     {
-        assertEquals(TOTP.generateTOTP(KEY_20_BYTES, TOTP.getTC(59, 30), 8, SHA1), "94287082");
-        assertEquals(TOTP.generateTOTP(KEY_20_BYTES, TOTP.getTC(1111111109L, 30), 8, SHA1), "07081804");
-        assertEquals(TOTP.generateTOTP(KEY_20_BYTES, TOTP.getTC(1111111111L, 30), 8, SHA1), "14050471");
-        assertEquals(TOTP.generateTOTP(KEY_20_BYTES, TOTP.getTC(1234567890L, 30), 8, SHA1), "89005924");
-        assertEquals(TOTP.generateTOTP(KEY_20_BYTES, TOTP.getTC(2000000000L, 30), 8, SHA1), "69279037");
-        assertEquals(TOTP.generateTOTP(KEY_20_BYTES, TOTP.getTC(20000000000L, 30), 8, SHA1), "65353130");
+        assertThat(generateTOTP(KEY_20_BYTES, TOTP.getTC(59, 30), 8, SHA1), is("94287082"));
+        assertThat(generateTOTP(KEY_20_BYTES, TOTP.getTC(1111111109L, 30), 8, SHA1), is("07081804"));
+        assertThat(generateTOTP(KEY_20_BYTES, TOTP.getTC(1111111111L, 30), 8, SHA1), is("14050471"));
+        assertThat(generateTOTP(KEY_20_BYTES, TOTP.getTC(1234567890L, 30), 8, SHA1), is("89005924"));
+        assertThat(generateTOTP(KEY_20_BYTES, TOTP.getTC(2000000000L, 30), 8, SHA1), is("69279037"));
+        assertThat(generateTOTP(KEY_20_BYTES, TOTP.getTC(20000000000L, 30), 8, SHA1), is("65353130"));
     }
 
     @Test
     public void testTOTPSha256()
     {
-        assertEquals(TOTP.generateTOTP(KEY_32_BYTES, TOTP.getTC(59, 30), 8, SHA256), "46119246");
-        assertEquals(TOTP.generateTOTP(KEY_32_BYTES, TOTP.getTC(1111111109L, 30), 8, SHA256), "68084774");
-        assertEquals(TOTP.generateTOTP(KEY_32_BYTES, TOTP.getTC(1111111111L, 30), 8, SHA256), "67062674");
-        assertEquals(TOTP.generateTOTP(KEY_32_BYTES, TOTP.getTC(1234567890L, 30), 8, SHA256), "91819424");
-        assertEquals(TOTP.generateTOTP(KEY_32_BYTES, TOTP.getTC(2000000000L, 30), 8, SHA256), "90698825");
-        assertEquals(TOTP.generateTOTP(KEY_32_BYTES, TOTP.getTC(20000000000L, 30), 8, SHA256), "77737706");
+        assertThat(generateTOTP(KEY_32_BYTES, TOTP.getTC(59, 30), 8, SHA256), is("46119246"));
+        assertThat(generateTOTP(KEY_32_BYTES, TOTP.getTC(1111111109L, 30), 8, SHA256), is("68084774"));
+        assertThat(generateTOTP(KEY_32_BYTES, TOTP.getTC(1111111111L, 30), 8, SHA256), is("67062674"));
+        assertThat(generateTOTP(KEY_32_BYTES, TOTP.getTC(1234567890L, 30), 8, SHA256), is("91819424"));
+        assertThat(generateTOTP(KEY_32_BYTES, TOTP.getTC(2000000000L, 30), 8, SHA256), is("90698825"));
+        assertThat(generateTOTP(KEY_32_BYTES, TOTP.getTC(20000000000L, 30), 8, SHA256), is("77737706"));
     }
 
     @Test
     public void testTOTPSha512()
     {
-        assertEquals(TOTP.generateTOTP(KEY_64_BYTES, TOTP.getTC(59, 30), 8, SHA512), "90693936");
-        assertEquals(TOTP.generateTOTP(KEY_64_BYTES, TOTP.getTC(1111111109L, 30), 8, SHA512), "25091201");
-        assertEquals(TOTP.generateTOTP(KEY_64_BYTES, TOTP.getTC(1111111111L, 30), 8, SHA512), "99943326");
-        assertEquals(TOTP.generateTOTP(KEY_64_BYTES, TOTP.getTC(1234567890L, 30), 8, SHA512), "93441116");
-        assertEquals(TOTP.generateTOTP(KEY_64_BYTES, TOTP.getTC(2000000000L, 30), 8, SHA512), "38618901");
-        assertEquals(TOTP.generateTOTP(KEY_64_BYTES, TOTP.getTC(20000000000L, 30), 8, SHA512), "47863826");
+        assertThat(generateTOTP(KEY_64_BYTES, TOTP.getTC(59, 30), 8, SHA512), is("90693936"));
+        assertThat(generateTOTP(KEY_64_BYTES, TOTP.getTC(1111111109L, 30), 8, SHA512), is("25091201"));
+        assertThat(generateTOTP(KEY_64_BYTES, TOTP.getTC(1111111111L, 30), 8, SHA512), is("99943326"));
+        assertThat(generateTOTP(KEY_64_BYTES, TOTP.getTC(1234567890L, 30), 8, SHA512), is("93441116"));
+        assertThat(generateTOTP(KEY_64_BYTES, TOTP.getTC(2000000000L, 30), 8, SHA512), is("38618901"));
+        assertThat(generateTOTP(KEY_64_BYTES, TOTP.getTC(20000000000L, 30), 8, SHA512), is("47863826"));
     }
 }

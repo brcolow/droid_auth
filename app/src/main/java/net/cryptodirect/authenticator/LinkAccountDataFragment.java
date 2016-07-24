@@ -24,8 +24,7 @@ import static net.cryptodirect.authenticator.Utils.MaterialDesignColors.MD_RED_3
  * Takes the account key data that was obtained from either
  * scanning a QR code (in ScanQRCodeFragment) or manually
  * entering a key (in ManualEntryFragment) and saves that
- * account key with an associated email address in internal
- * storage so that the account data is persisted.
+ * account key with its associated account data.
  */
 public class LinkAccountDataFragment extends Fragment
 {
@@ -60,12 +59,12 @@ public class LinkAccountDataFragment extends Fragment
         setHasOptionsMenu(false);
         View view = inflater.inflate(R.layout.fragment_link_account_data, container, false);
 
-        final String email = getArguments().getString("new_email");
+        final String label = getArguments().getString("new_label");
         final byte[] rawKey = getArguments().getByteArray("new_key");
-        final String issuer = getArguments().getString("new_issuer");
+        final Issuer issuer = Issuer.getIssuer(getArguments().getInt("new_issuer"));
         final int base = getArguments().getInt("new_base");
 
-        if (email == null)
+        if (label == null)
         {
             throw new IllegalArgumentException("bundle: " + state + " does not contain " +
                     "String \"new_email\"");
@@ -78,7 +77,7 @@ public class LinkAccountDataFragment extends Fragment
         if (issuer == null)
         {
             throw new IllegalArgumentException("bundle: " + state + " does not contain " +
-                    "String \"new_issuer\"");
+                    "int \"new_issuer\"");
         }
         if (base == 0)
         {
@@ -88,9 +87,9 @@ public class LinkAccountDataFragment extends Fragment
 
 
         TextView emailTextField = (TextView) view.findViewById(R.id.email_edit_text);
-        // we set the email field to anonymous pro for consistency with key text field
+        // we set the label field to anonymous pro for consistency with key text field
         emailTextField.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
-        emailTextField.setText(email);
+        emailTextField.setText(label);
 
         TextView keyTextField = (TextView) view.findViewById(R.id.key_edit_text);
         keyTextField.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));

@@ -61,7 +61,7 @@ public class AuthenticatorFragment extends Fragment implements SharedPreferences
         playTimeRunningOutSound = getArguments().getBoolean("play_time_running_out_sound");
         timeRunningOutStart = getArguments().getInt("time_running_out_start");
 
-        ((TextView) rootView.findViewById(R.id.email_label)).setText(account.getEmail());
+        ((TextView) rootView.findViewById(R.id.email_label)).setText(account.getLabel());
 
         // Set up TimestepIntervalWheel with current time
         int ts = account.getCodeParams().getTotpPeriod();

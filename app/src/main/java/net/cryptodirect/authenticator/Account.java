@@ -22,30 +22,30 @@ import static net.cryptodirect.authenticator.StandardCharsets.UTF_8;
 
 /**
  * Represents a registered Cryptodash account, consisting of
- * an email and secret key bytes to generate the TOTP codes.
+ * an label and secret key bytes to generate the TOTP codes.
  */
 public class Account implements Serializable
 {
-    private final String email;
-    private final String issuer;
+    private final String label;
+    private final Issuer issuer;
     private final byte[] secretKey;
     private final CodeParams codeParams;
     static final long serialVersionUID = 1L;
 
-    public Account(String email, String issuer, byte[] secretKey, CodeParams codeParams)
+    public Account(String label, Issuer issuer, byte[] secretKey, CodeParams codeParams)
     {
-        this.email = email;
+        this.label = label;
         this.issuer = issuer;
         this.secretKey = secretKey;
         this.codeParams = codeParams;
     }
 
-    public String getEmail()
+    public String getLabel()
     {
-        return email;
+        return label;
     }
 
-    public String getIssuer()
+    public Issuer getIssuer()
     {
         return issuer;
     }
@@ -79,8 +79,8 @@ public class Account implements Serializable
 
         Account account = (Account) o;
 
-        return email.equals(account.email) &&
-                issuer.equals(account.issuer) &&
+        return label.equals(account.label) &&
+                issuer == account.issuer &&
                 Arrays.equals(secretKey, account.secretKey) &&
                 codeParams.equals(account.codeParams);
     }
@@ -88,7 +88,7 @@ public class Account implements Serializable
     @Override
     public int hashCode()
     {
-        int result = email.hashCode();
+        int result = label.hashCode();
         result = 31 * result + issuer.hashCode();
         result = 31 * result + Arrays.hashCode(secretKey);
         result = 31 * result + codeParams.hashCode();
@@ -99,7 +99,7 @@ public class Account implements Serializable
     public String toString()
     {
         return "Account{" +
-                "email='" + email + '\'' +
+                "label='" + label + '\'' +
                 ", issuer='" + issuer + '\'' +
                 ", secretKey=" + Arrays.toString(secretKey) +
                 ", codeParams=" + codeParams +
@@ -119,91 +119,110 @@ public class Account implements Serializable
      *
      * @param uriString the optauth URI String
      * @return the Account instance corresponding to the given uri
-     * @throws URISyntaxException if the given uriString is invalid
+     * @throws InvalidOptAuthUriException if the given uriString is invalid
      */
-    public static Account parse(String uriString) throws URISyntaxException
+    public static Account parse(String uriString) throws InvalidOptAuthUriException
     {
-        // otpauth://totp/test@gmail.com?secret=OEbnsWQidFxYp3TUcAqzREIuywzD7Gz3wFZhLz8qXEI%3D&issuer=Cryptodash&base=64&algorithm=SHA1&digits=6&period=30
-        URI uri = new URI(uriString);
-        if (!uri.getScheme().equals("otpauth"))
+        URI uri;
+        try
         {
-            throw new URISyntaxException(uriString, "Does not have scheme \"otpauth\" " +
-                    "but was: " + uri.getScheme());
+            uri = new URI(uriString);
+        }
+        catch (URISyntaxException e)
+        {
+            throw new InvalidOptAuthUriException(UriErrorCode.PARSE_ERROR);
+        }
+        if (!uri.getScheme().equalsIgnoreCase("otpauth"))
+        {
+            throw new InvalidOptAuthUriException(UriErrorCode.INVALID_PROTOCOL)
+                    .set("protocol", uri.getScheme());
         }
 
         CodeType codeType;
-        if (!uri.getHost().equals("totp") && !uri.getHost().equals("hotp"))
+        if (!uri.getHost().equalsIgnoreCase("totp") && !uri.getHost().equalsIgnoreCase("hotp"))
         {
-            throw new URISyntaxException(uriString, "Does not have host of either " +
-                    "\"totp\" or \"hotp\" but was: " + uri.getHost());
+            throw new InvalidOptAuthUriException(UriErrorCode.INVALID_HOST)
+                    .set("host", uri.getHost());
         }
         else
         {
-            codeType = uri.getHost().equals("totp") ? CodeType.TOTP : CodeType.HOTP;
+            codeType = uri.getHost().equalsIgnoreCase("totp") ? CodeType.TOTP : CodeType.HOTP;
         }
 
-        String accountLabel = uri.getPath().substring(1);
-        while (accountLabel.charAt(0) == '/') {
+        String accountLabel = uri.getPath();
+        while (accountLabel.charAt(0) == '/')
+        {
             accountLabel = accountLabel.substring(1);
         }
 
-        if (accountLabel.isEmpty()) {
-            throw new URISyntaxException(uriString, "Path must be non-empty");
+        if (accountLabel.isEmpty())
+        {
+            throw new InvalidOptAuthUriException(UriErrorCode.EMPTY_PATH)
+                    .set("uri", uri.toString());
         }
 
         Map<String, List<String>> queryParams = splitQuery(uri);
 
+        // Try and detect who issued this code
+        Issuer issuer = Issuer.detect(accountLabel, queryParams);
+
+        if (issuer == Issuer.UNKNOWN)
+        {
+            throw new InvalidOptAuthUriException(UriErrorCode.UNKNOWN_ISSUER);
+        }
+
         int counter = -1;
         if (codeType == CodeType.HOTP)
         {
-            if (queryParams.containsKey("counter") || queryParams.get("counter").size() != 1)
+            if (!queryParams.containsKey("counter"))
             {
-                throw new URISyntaxException(uriString, "Counter query parameter must be " +
-                        "specified exactly once when using HOTP code type");
+                throw new InvalidOptAuthUriException(UriErrorCode.HOTP_MISSING_COUNTER);
+            }
+            else if (queryParams.get("counter").size() != 1)
+            {
+                throw new InvalidOptAuthUriException(UriErrorCode.HOTP_MULTIPLE_COUNTERS)
+                        .set("counters", queryParams.get("counter"));
             }
             else
             {
                 counter = Integer.valueOf(queryParams.get("counter").get(0));
                 if (counter < 0)
                 {
-                    throw new URISyntaxException(uriString, "Counter query parameter must be " +
-                            "positive but was: " + counter);
+                    throw new InvalidOptAuthUriException(UriErrorCode.HOTP_NEGATIVE_COUNTER)
+                            .set("counter", counter);
                 }
             }
         }
 
-        if (!queryParams.containsKey("secret") || queryParams.get("secret").size() != 1)
+        if (!queryParams.containsKey("secret"))
         {
-            throw new URISyntaxException(uriString, "Invalid secret query parameter");
+            throw new InvalidOptAuthUriException(UriErrorCode.MISSING_SECRET);
+        }
+        else if (queryParams.get("secret").size() != 1)
+        {
+            throw new InvalidOptAuthUriException(UriErrorCode.MULTIPLE_SECRETS);
         }
 
-        int base = -1;
+        int base = CodeParams.Defaults.BASE;
         if (queryParams.containsKey("base"))
         {
             if (queryParams.get("base").size() != 1)
             {
-                throw new URISyntaxException(uriString,
-                        "Base query parameter specified more than once");
+                throw new InvalidOptAuthUriException(UriErrorCode.MULTIPLE_BASES);
             }
             else
             {
                 if (!queryParams.get("base").get(0).equals("32") &&
                         !queryParams.get("base").get(0).equals("64"))
                 {
-                    throw new URISyntaxException(uriString, "Unsupported base for key param: " +
-                            queryParams.get("base").get(0));
+                    throw new InvalidOptAuthUriException(UriErrorCode.UNSUPPORTED_BASE)
+                            .set("base", queryParams.get("base").get(0));
                 }
                 else
                 {
-                    base = queryParams.get("base").get(0).equals("32") ? 32 : 64;
+                    base = Integer.valueOf(queryParams.get("base").get(0));
                 }
             }
-        }
-
-        if (base == -1)
-        {
-            // use default base 32
-            base = 32;
         }
 
         byte[] key;
@@ -229,18 +248,13 @@ public class Account implements Serializable
         }
         */
 
-        String issuer = "Unknown";
-        if (queryParams.containsKey("issuer"))
-        {
-            issuer = queryParams.get("issuer").get(0);
-        }
-
         Algorithm algorithm = CodeParams.Defaults.ALGORITHM;
         if (queryParams.containsKey("algorithm"))
         {
             if (queryParams.get("algorithm").size() != 1)
             {
-                throw new URISyntaxException(uriString, "Algorithm query parameter specified more than once");
+                throw new InvalidOptAuthUriException(UriErrorCode.MULTIPLE_ALGORITHMS)
+                        .set("algorithms", queryParams.get("algorithm"));
             }
             else
             {
@@ -257,8 +271,8 @@ public class Account implements Serializable
                         algorithm = Algorithm.SHA512;
                         break;
                     default:
-                        throw new URISyntaxException(uriString, "Unsupported algorithm: " + algo +
-                                " - must be one of [SHA1, SHA256, SHA512]");
+                        throw new InvalidOptAuthUriException(UriErrorCode.UNSUPPORTED_ALGORITHM)
+                                .set("algorithm", algo);
                 }
 
             }
@@ -269,7 +283,8 @@ public class Account implements Serializable
         {
             if (queryParams.get("digits").size() != 1)
             {
-                throw new URISyntaxException(uriString, "Digits query parameter specified more than once");
+                throw new InvalidOptAuthUriException(UriErrorCode.MULTIPLE_DIGITS)
+                        .set("digits", queryParams.get("digits"));
             }
             else
             {
@@ -282,8 +297,8 @@ public class Account implements Serializable
                         digits = d;
                         break;
                     default:
-                        throw new URISyntaxException(uriString, "Unsupported number of digits: " +
-                                digits + " - must 6, 7, or 8");
+                        throw new InvalidOptAuthUriException(UriErrorCode.UNSUPPORTED_DIGITS)
+                                .set("digits", d);
                 }
             }
         }
@@ -293,14 +308,16 @@ public class Account implements Serializable
         {
             if (queryParams.get("period").size() != 1)
             {
-                throw new URISyntaxException(uriString, "Period query parameter specified more than once");
+                throw new InvalidOptAuthUriException(UriErrorCode.MULTIPLE_PERIODS)
+                        .set("periods", queryParams.get("period"));
             }
             else
             {
                 int p = Integer.valueOf(queryParams.get("period").get(0));
                 if (p <= 0)
                 {
-                    throw new URISyntaxException(uriString, "Period query parameter must be greater than 0");
+                    throw new InvalidOptAuthUriException(UriErrorCode.TOTP_NON_POSITIVE_PERIOD)
+                            .set("period", p);
                 }
                 else
                 {
@@ -318,13 +335,14 @@ public class Account implements Serializable
     {
         final Map<String, List<String>> keyValuePairs = new LinkedHashMap<>();
         final String[] pairs = uri.getQuery().split("&");
-        for (String pair : pairs) {
+        for (String pair : pairs)
+        {
             final int index = pair.indexOf("=");
             final String key;
             try
             {
                 key = index > 0 ? URLDecoder.decode(pair.substring(0, index), UTF_8.name())
-                        .replace(' ', '+') : pair;
+                        .toLowerCase(Locale.US).replace(' ', '+') : pair.toLowerCase(Locale.US);
                 if (!keyValuePairs.containsKey(key)) {
                     keyValuePairs.put(key, new LinkedList<String>());
                 }

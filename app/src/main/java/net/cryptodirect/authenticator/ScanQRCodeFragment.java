@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.view.LayoutInflater;
@@ -21,28 +22,25 @@ import java.util.Collections;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
 /**
- * Allows the user to scan an externally provided QR code to
- * register an account. That QR code was most likely generated
- * by Centurion, and it encodes the email concatenated with
- * the key (encoded in Base 64) separated by the '|' character.
- * <p/>
- * Example:
- * <p/>
- * tom@gmail.com|OEbnsWQidFxYp3TUcAqzREIuywzD7Gz3wFZhLz8qXEI=
+ * Allows the user to scan a QR code that encodes an otpauth
+ * URL which contains the necessary information for providing
+ * TOTP codes.
  */
-public class ScanQRCodeFragment extends Fragment implements ZXingScannerView.ResultHandler, SharedPreferences.OnSharedPreferenceChangeListener
+public class ScanQRCodeFragment extends Fragment implements ZXingScannerView.ResultHandler,
+        SharedPreferences.OnSharedPreferenceChangeListener,
+        CameraSelectorDialogFragment.CameraSelectorDialogListener
 {
     private boolean flash;
     private boolean autoFocus;
     private boolean playScanSound;
+    private int cameraId = -1;
+
     private ZXingScannerView scannerView;
     private OnQRCodeScannedListener listener;
+
     private static final String FLASH_STATE = "FLASH_STATE";
     private static final String AUTO_FOCUS_STATE = "AUTO_FOCUS_STATE";
-
-    public ScanQRCodeFragment()
-    {
-    }
+    private static final String CAMERA_ID = "CAMERA_ID";
 
     @Override
     public void onCreate(Bundle state)
@@ -60,12 +58,14 @@ public class ScanQRCodeFragment extends Fragment implements ZXingScannerView.Res
             flash = state.getBoolean(FLASH_STATE, false);
             autoFocus = state.getBoolean(AUTO_FOCUS_STATE, true);
             playScanSound = state.getBoolean("play_scan_sound");
+            cameraId = state.getInt(CAMERA_ID, -1);
         }
         else
         {
             flash = false;
             autoFocus = true;
             playScanSound = true;
+            cameraId = -1;
         }
         scannerView.setFormats(Collections.singletonList(BarcodeFormat.QR_CODE));
         return scannerView;
@@ -79,6 +79,8 @@ public class ScanQRCodeFragment extends Fragment implements ZXingScannerView.Res
                 flash ? R.string.flash_on : R.string.flash_off), MenuItem.SHOW_AS_ACTION_IF_ROOM);
         MenuItemCompat.setShowAsAction(menu.add(Menu.NONE, R.id.menu_auto_focus, 0,
                 autoFocus ? R.string.auto_focus_on : R.string.auto_focus_off), MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        MenuItemCompat.setShowAsAction(menu.add(Menu.NONE, R.id.menu_camera_selector, 0,
+                R.string.select_camera), MenuItem.SHOW_AS_ACTION_NEVER);
     }
 
     @Override
@@ -109,6 +111,11 @@ public class ScanQRCodeFragment extends Fragment implements ZXingScannerView.Res
                     item.setTitle(R.string.auto_focus_off);
                 }
                 scannerView.setAutoFocus(autoFocus);
+                return true;
+            case R.id.menu_camera_selector:
+                scannerView.stopCamera();
+                DialogFragment cFragment = CameraSelectorDialogFragment.newInstance(this, cameraId);
+                cFragment.show(getActivity().getSupportFragmentManager(), "camera_selector");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -146,6 +153,7 @@ public class ScanQRCodeFragment extends Fragment implements ZXingScannerView.Res
         outState.putBoolean(FLASH_STATE, flash);
         outState.putBoolean(AUTO_FOCUS_STATE, autoFocus);
         outState.putBoolean("play_scan_sound", playScanSound);
+        outState.putInt(CAMERA_ID, cameraId);
     }
 
     @Override
@@ -173,6 +181,15 @@ public class ScanQRCodeFragment extends Fragment implements ZXingScannerView.Res
         {
             playScanSound = sharedPreferences.getBoolean("play_scan_sound", true);
         }
+    }
+
+    @Override
+    public void onCameraSelected(int cameraId)
+    {
+        this.cameraId = cameraId;
+        scannerView.startCamera(cameraId);
+        scannerView.setFlash(flash);
+        scannerView.setAutoFocus(autoFocus);
     }
 
     public interface OnQRCodeScannedListener

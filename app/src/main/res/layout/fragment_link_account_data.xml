@@ -33,7 +33,7 @@
         android:layout_marginRight="22dp"
         android:layout_marginStart="22dp"
         android:layout_marginTop="16dp"
-        android:text="@string/email"
+        android:text="@string/label"
         android:textColor="#f2f2f2"
         android:textSize="20sp"/>
 

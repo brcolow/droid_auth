@@ -167,11 +167,10 @@ public class Base32 {
                 }
             }
 
-
-
             if (padding) {
                 if (bs.size() % 8 != 0) {
-                    throw new IllegalArgumentException("Invalid number of bytes for encoded string: " + new String(bs.toByteArray()));
+                    throw new IllegalArgumentException("Length of encoded string was not a " +
+                            "multiple of 8 but was " + src.length());
                 }
             } else {
                 while (bs.size() % 8 != 0)
@@ -194,12 +193,13 @@ public class Base32 {
                         break;
                     s[j] = (short) alphabet.indexOf(in[i * 8 + j]);
                     if (s[j] < 0)
-                        throw new IllegalArgumentException("Invalid Base32 character: " + s[j]);
+                        throw new IllegalArgumentException("Invalid Base32 character " +
+                                ((char) in[i * 8 + j]) + " at index " + (i * 8 + j));
                     padlen--;
                 }
                 int blocklen = paddingToBlockLen(padlen);
                 if (blocklen < 0) {
-                    throw new IllegalArgumentException("blocklen must be non-negative");
+                    throw new IllegalArgumentException("Invalid padding of length " + (8 + blocklen));
                 }
 
                 // all 5 bits of 1st, high 3 (of 5) of 2nd
@@ -237,7 +237,7 @@ public class Base32 {
                 case 0:
                     return 5;
                 default:
-                    return -1;
+                    return -(8 - padlen);
             }
         }
     }
