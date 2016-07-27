@@ -23,7 +23,7 @@ public enum UriErrorCode
 
     private final int errorCode;
 
-    private UriErrorCode(int errorCode)
+    UriErrorCode(int errorCode)
     {
         this.errorCode = errorCode;
     }

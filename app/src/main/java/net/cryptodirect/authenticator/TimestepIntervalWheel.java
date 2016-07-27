@@ -5,7 +5,17 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.os.Handler;
 import android.view.View;
+import android.widget.TextView;
+
+import net.cryptodirect.authenticator.crypto.TOTP;
+
+import java.util.Timer;
+import java.util.TimerTask;
+
+import static net.cryptodirect.authenticator.crypto.TOTP.generateTOTP;
+import static net.cryptodirect.authenticator.crypto.TOTP.getTC;
 
 /**
  * A visual indication of how many seconds are left in the
@@ -32,20 +42,29 @@ public class TimestepIntervalWheel extends View
     private Paint trackPaint;
     private Paint fillPaint;
     private Paint numberPaint;
-    private final int intervalInSeconds;
     private int secondsRemainingInInterval;
     private RectF enclosingSquare;
+    private final Account account;
     private final int displayWidth;
+    private final Handler handler;
+    private final Timer timer;
+    private final WheelTask currentTask;
+    private final TextView codeTextView;
+    private volatile boolean tickingSoundPlaying = false;
 
-    public TimestepIntervalWheel(Context context, int intervalInSeconds, int secondsRemainingInInterval, int displayWidth)
+    public TimestepIntervalWheel(Context context, Account account, TextView codeTextView,
+                                 int displayWidth)
     {
         super(context);
         this.displayWidth = displayWidth;
-        this.intervalInSeconds = intervalInSeconds;
-        this.secondsRemainingInInterval = secondsRemainingInInterval;
-        this.trackWidth = (int) (displayWidth * 0.01f);
-        this.fillWidth = (int) (displayWidth * 0.03f);
-        numberSize = displayWidth * 0.08f;
+        this.account = account;
+        this.codeTextView = codeTextView;
+        this.trackWidth = Math.max(5, (int) (displayWidth * 0.01f));
+        this.fillWidth = Math.max(10, (int) (displayWidth * 0.03f));
+        handler = new Handler();
+        timer = new Timer("Wheel Timer (" +  account.getLabel() + ")", true);
+        numberSize = Math.max(26, displayWidth * 0.08f);
+        currentTask = new WheelTask();
     }
 
     @Override
@@ -68,6 +87,17 @@ public class TimestepIntervalWheel extends View
         numberPaint.setColor(numberColor);
         numberPaint.setAntiAlias(true);
         numberPaint.setTextSize(numberSize);
+        secondsRemainingInInterval = account.getCodeParams().getTotpPeriod() -
+                TOTP.getCurrentSpotInTSInterval(account);
+        timer.schedule(currentTask, 0, 1000);
+    }
+
+    @Override
+    protected void onDetachedFromWindow()
+    {
+        currentTask.cancel();
+        timer.cancel();
+        super.onDetachedFromWindow();
     }
 
     @Override
@@ -78,8 +108,8 @@ public class TimestepIntervalWheel extends View
         enclosingSquare = new RectF(
                 (Math.max(trackWidth, fillWidth) / 2) + (width / 2) - trackRadius / 2,
                 (Math.max(trackWidth, fillWidth) / 2) + (height / 2) - trackRadius / 2,
-                (Math.max(trackWidth, fillWidth) / 2) + (width / 2) + trackRadius / 2,
-                (Math.max(trackWidth, fillWidth) / 2) + (height / 2) + trackRadius / 2
+                (Math.max(trackWidth, fillWidth) / 2) + (width / 2) + (trackRadius / 2) + 2,
+                (Math.max(trackWidth, fillWidth) / 2) + (height / 2) + (trackRadius / 2) + 2
         );
         postInvalidate();
     }
@@ -90,7 +120,7 @@ public class TimestepIntervalWheel extends View
         super.onDraw(canvas);
         canvas.drawArc(enclosingSquare, 0, 360, false, trackPaint);
         double chunkToRemovePercentage = 1d - ((double) secondsRemainingInInterval /
-                (double) intervalInSeconds);
+                (double) account.getCodeParams().getTotpPeriod());
         int chunkToRemoveInDegrees = (int) (360d * chunkToRemovePercentage);
         canvas.drawArc(enclosingSquare, 270, -360 + chunkToRemoveInDegrees, false, fillPaint);
         float textWidth = numberPaint.measureText(String.valueOf(secondsRemainingInInterval));
@@ -127,12 +157,12 @@ public class TimestepIntervalWheel extends View
                 size + getPaddingTop() + getPaddingBottom());
     }
 
-    public boolean decrementSecondsRemaining()
+    private boolean decrementSecondsRemaining()
     {
         boolean newCycle = false;
         if (secondsRemainingInInterval == 0)
         {
-            secondsRemainingInInterval = intervalInSeconds;
+            secondsRemainingInInterval = account.getCodeParams().getTotpPeriod();
             newCycle = true;
         }
         else
@@ -143,8 +173,37 @@ public class TimestepIntervalWheel extends View
         return newCycle;
     }
 
-    public int getSecondsRemainingInInterval()
+    private class WheelTask extends TimerTask
     {
-        return secondsRemainingInInterval;
+        @Override
+        public void run()
+        {
+            if (decrementSecondsRemaining())
+            {
+                handler.post(new SetNewCodeTask(codeTextView, generateTOTP(account.getSecretKey(),
+                        (long) getTC(account.getCodeParams().getTotpPeriod()),
+                        account.getCodeParams().getDigits(),
+                        account.getCodeParams().getAlgorithm())));
+
+                // SoundPoolManager.getInstance().stopSound("TICKTOCK");
+                // tickingSoundPlaying = false;
+            }
+            else
+            {
+                if (!tickingSoundPlaying)
+                {
+                    // TODO might need to cache this value and implement a prefchangedlistener
+                    boolean playTimeRunningOutSound = false;
+                    if (playTimeRunningOutSound)
+                    {
+                        if (secondsRemainingInInterval <= -1)
+                        {
+                            tickingSoundPlaying = true;
+                            // SoundPoolManager.getInstance().playSound("TICKTOCK", false);
+                        }
+                    }
+                }
+            }
+        }
     }
 }

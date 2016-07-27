@@ -23,7 +23,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -34,7 +36,7 @@ public class AccountManager
     private Context baseContext;
     private static final AccountManager INSTANCE = new AccountManager();
     public static final String ACCOUNTS_FILE = "accounts.json";
-    private final Map<String, Account> accounts = new ConcurrentHashMap<>();
+    private final Map<Issuer, Account> accounts = new ConcurrentHashMap<>();
 
     private AccountManager()
     {
@@ -50,7 +52,7 @@ public class AccountManager
         return INSTANCE;
     }
 
-    public synchronized void init(int numAccounts) throws IOException, JSONException
+    public synchronized void init(int numAccounts, boolean verify) throws IOException, JSONException
     {
         File file = baseContext.getFileStreamPath(ACCOUNTS_FILE);
 
@@ -61,10 +63,14 @@ public class AccountManager
                     ACCOUNTS_FILE, Context.MODE_PRIVATE);
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(
                     accountsFileOutputStream);
-            String jsonSkeleton = "{ \"accounts\" : [] }";
+            String jsonSkeleton =
+                    "{ " +
+                    "  \"accounts\" : [] " +
+                    "}";
             outputStreamWriter.write(jsonSkeleton);
             outputStreamWriter.flush();
             outputStreamWriter.close();
+            return;
         }
 
         FileInputStream accountsFileInputStream = baseContext.openFileInput(ACCOUNTS_FILE);
@@ -97,10 +103,14 @@ public class AccountManager
                             .base(base)
                             .build());
 
-            accounts.put(accountJsonObject.getString("label"), account);
+            accounts.put(account.getIssuer(), account);
         }
 
-        if (accounts.size() != numAccounts)
+        bufferedReader.close();
+        inputStreamReader.close();
+        accountsFileInputStream.close();
+
+        if (verify && accounts.size() != numAccounts)
         {
             // data corruption
             throw new DataMismatchException("SharedPreferences said we have " + numAccounts +
@@ -109,29 +119,19 @@ public class AccountManager
         }
     }
 
-    public Account getAccount(String label)
+    public Account getAccount(int accountId)
     {
-        if (label == null)
-        {
-            throw new IllegalArgumentException("label must not be null");
-        }
-
-        return accounts.get(label);
-    }
-
-    public Collection<Account> getAccounts()
-    {
-        return accounts.values();
+        return accounts.get(Issuer.getIssuer(accountId));
     }
 
     public Account getFirstAccount()
     {
-       return accounts.values().iterator().next();
+        return accounts.values().iterator().next();
     }
 
-    public boolean accountExists(String label)
+    public boolean accountExists(int accountId)
     {
-        return accounts.containsKey(label);
+        return accounts.containsKey(Issuer.getIssuer(accountId));
     }
 
     public int getNumAccounts()
@@ -146,14 +146,14 @@ public class AccountManager
             throw new IllegalArgumentException("account must not be null");
         }
 
-        if (accounts.containsKey(account.getLabel()) && !overwriteExisting)
+        if (accounts.containsKey(account.getIssuer()) && !overwriteExisting)
         {
             return false;
         }
 
         try
         {
-            accounts.put(account.getLabel(), account);
+            accounts.put(account.getIssuer(), account);
             FileOutputStream accountsFileOutputStream = baseContext.openFileOutput(
                     ACCOUNTS_FILE, Context.MODE_PRIVATE);
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(
@@ -172,7 +172,7 @@ public class AccountManager
             prefsEditor.putInt("numAccounts", accounts.size());
             if (setAsDefault)
             {
-                prefsEditor.putString("default_account", account.getLabel());
+                prefsEditor.putString("default_account", String.valueOf(account.getIssuer().getId()));
             }
             prefsEditor.apply();
 
@@ -226,9 +226,21 @@ public class AccountManager
      * Allows to easily use the account data in a ListPreference, by returning
      * the pair of entries, and entry values.
      */
-    public CharSequence[] getAccountEmails()
+    public CharSequence[] getAccountLabels()
     {
-        return accounts.keySet().toArray(new CharSequence[accounts.size()]);
+        CharSequence[] result = new CharSequence[accounts.size()];
+        int i = 0;
+        for (Issuer issuer : accounts.keySet())
+        {
+            result[i] = issuer.toString();
+            i++;
+        }
+        return result;
+    }
+
+    public Collection<Account> getAccounts()
+    {
+        return accounts.values();
     }
 
     public static class DataMismatchException extends JSONException

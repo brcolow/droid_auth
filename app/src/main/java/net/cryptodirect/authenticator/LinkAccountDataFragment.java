@@ -2,7 +2,9 @@ package net.cryptodirect.authenticator;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,11 +14,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import net.cryptodirect.authenticator.crypto.Base32;
 import net.cryptodirect.authenticator.crypto.Base64;
 
+import static android.support.v4.content.ContextCompat.getDrawable;
 import static net.cryptodirect.authenticator.Utils.MaterialDesignColors.MD_GREEN_300;
 import static net.cryptodirect.authenticator.Utils.MaterialDesignColors.MD_RED_300;
 
@@ -59,9 +63,25 @@ public class LinkAccountDataFragment extends Fragment
         setHasOptionsMenu(false);
         View view = inflater.inflate(R.layout.fragment_link_account_data, container, false);
 
+        String linkMethodString = getArguments().getString("method");
+        if (linkMethodString == null)
+        {
+            throw new IllegalArgumentException("bundle: " + state + " does not contain " +
+                    "String \"method\"");
+        }
+
+        final LinkMethod linkMethod = LinkMethod.valueOf(linkMethodString);
         final String label = getArguments().getString("new_label");
         final byte[] rawKey = getArguments().getByteArray("new_key");
-        final Issuer issuer = Issuer.getIssuer(getArguments().getInt("new_issuer"));
+
+        int issuerId = getArguments().getInt("new_issuer", -999);
+        if (issuerId == -999)
+        {
+            throw new IllegalArgumentException("bundle: " + state + " does not contain " +
+                    "int \"new_issuer\"");
+        }
+
+        final Issuer issuer = Issuer.getIssuer(issuerId);
         final int base = getArguments().getInt("new_base");
 
         if (label == null)
@@ -85,11 +105,31 @@ public class LinkAccountDataFragment extends Fragment
                     "int \"new_base\"");
         }
 
+        TextView verifyBlurb = (TextView) view.findViewById(R.id.verify_blurb);
+        switch (linkMethod)
+        {
+            case MANUAL_ENTRY:
+                verifyBlurb.setText(R.string.verify_manual_blurb);
+                break;
+            case QRCODE:
+                verifyBlurb.setText(R.string.verify_qrcode_blurb);
+                break;
+        }
 
-        TextView emailTextField = (TextView) view.findViewById(R.id.email_edit_text);
-        // we set the label field to anonymous pro for consistency with key text field
-        emailTextField.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
-        emailTextField.setText(label);
+        EditText providerEditText = (EditText) view.findViewById(R.id.account_provider_edittext);
+        providerEditText.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
+        Drawable providerDrawable = getDrawable(getContext(), issuer.getDrawable());
+        Bitmap providerBitmap = ((BitmapDrawable) providerDrawable).getBitmap();
+        Drawable scaledDrawable = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(
+                providerBitmap, 100, 100, true));
+        providerEditText.setText(issuer.toString());
+        providerEditText.setCompoundDrawablesWithIntrinsicBounds(scaledDrawable, null, null, null);
+
+        TextView accountLabel = (TextView) view.findViewById(R.id.account_label_textview);
+        accountLabel.setText(issuer.getLabel());
+        EditText accountLabelTextField = (EditText) view.findViewById(R.id.account_label_edittext);
+        accountLabelTextField.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
+        accountLabelTextField.setText(issuer.getDisplayableLabel(label));
 
         TextView keyTextField = (TextView) view.findViewById(R.id.key_edit_text);
         keyTextField.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
@@ -99,9 +139,12 @@ public class LinkAccountDataFragment extends Fragment
         {
             case 32:
                 key = Base32.getEncoder().encode(rawKey);
+                keyTextField.setMinLines(1);
+                keyTextField.setMaxLines(1);
                 break;
             case 64:
                 key = Base64.getEncoder().encodeToString(rawKey);
+                keyTextField.setMaxLines(2);
                 break;
             default:
                 throw new IllegalArgumentException("unsupported base: " + base);

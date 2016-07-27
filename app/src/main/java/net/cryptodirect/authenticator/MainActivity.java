@@ -2,15 +2,15 @@ package net.cryptodirect.authenticator;
 
 import android.animation.ArgbEvaluator;
 import android.app.AlertDialog;
-import android.os.Build;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -60,31 +60,32 @@ public class MainActivity
     {
         super.onCreate(state);
         Intent intent = getIntent();
-        centurion = (Centurion) intent.getSerializableExtra("net.cryptodirect.authenticator.Centurion");
+        centurion = (Centurion) intent.getSerializableExtra(
+                "net.cryptodirect.authenticator.Centurion");
         mockScannedCode = intent.getStringExtra("net.cryptodirect.authenticator.MockScannedCode");
-
+        boolean verify = intent.getBooleanExtra("verifyAccountsFile", true);
         setContentView(R.layout.activity_main);
         if (findViewById(R.id.main_fragment_container) != null && state != null)
         {
             return;
         }
 
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         final int numAccounts = settings.getInt("numAccounts", 0);
         try
         {
             AccountManager.getInstance().setBaseContext(getBaseContext());
-            AccountManager.getInstance().init(numAccounts);
+            AccountManager.getInstance().init(numAccounts, verify);
         }
         catch (AccountManager.DataMismatchException e)
         {
             // report data corruption
             ACRA.getErrorReporter().handleSilentException(e);
             AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this, R.style.Theme_Dialog);
-            alertBuilder.setMessage("The stored account data is corrupted. There should be data " +
-                    "for " + numAccounts + " accounts but there were only " + e.getNumMissingAccounts()
-                    + ". Please check which accounts are still registered. This incident has been reported.");
+            alertBuilder.setMessage("The stored account data is corrupted. We are missing data " +
+                    "for " + e.getNumMissingAccounts() + " account " + (e.getNumMissingAccounts() > 1 ? "s" : "") +
+                    ". Please check which accounts are still registered. This error has " +
+                    "been reported.");
             alertBuilder.setCancelable(false);
             alertBuilder.setPositiveButton(getString(R.string.check_accounts), new DialogInterface.OnClickListener()
             {
@@ -111,26 +112,28 @@ public class MainActivity
             throw new RuntimeException(e);
         }
 
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         FontManager.getInstance().init(getApplicationContext());
         SoundPoolManager.getInstance().init(getApplicationContext());
 
         if (getSupportActionBar() != null)
         {
-            getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_USE_LOGO | ActionBar.DISPLAY_SHOW_TITLE);
+            getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_USE_LOGO |
+                    ActionBar.DISPLAY_SHOW_TITLE);
         }
 
         getSupportFragmentManager().addOnBackStackChangedListener(this);
-        if (!settings.getString("default_account", "").isEmpty()
-                && !settings.getString("default_account", "").equalsIgnoreCase("none")
-                && settings.getBoolean("skip_choose", true))
+        if (!settings.getString("default_account", "").isEmpty() &&
+                !settings.getString("default_account", "").equalsIgnoreCase("none") &&
+                settings.getBoolean("skip_choose", true))
         {
             // the user has saved a default account preference and skip choose is set to true
-            String defaultAccount = settings.getString("default_account", "");
+            int defaultAccount = Integer.valueOf(settings.getString("default_account", ""));
             if (AccountManager.getInstance().accountExists(defaultAccount))
             {
                 // go to authenticator for default account preference
                 entryPage = EntryPage.DEFAULT_ACCOUNT_AUTHENTICATOR;
-                showAuthenticatorFragment(defaultAccount, 30);
+                showAuthenticatorFragment(defaultAccount);
             }
             else
             {
@@ -180,7 +183,8 @@ public class MainActivity
                 {
                     // we have data for only one account
                     entryPage = EntryPage.ONE_ACCOUNT_AUTHENTICATOR;
-                    showAuthenticatorFragment(AccountManager.getInstance().getFirstAccount().getLabel(), 30);
+                    showAuthenticatorFragment(AccountManager.getInstance().getFirstAccount()
+                            .getIssuer().getId());
                 }
             }
             else
@@ -363,7 +367,10 @@ public class MainActivity
 
     private void showAccountChooserFragment()
     {
+        Bundle bundle = new Bundle();
+        bundle.putCharSequenceArray("accountLabels", AccountManager.getInstance().getAccountLabels());
         AccountChooserFragment accountChooserFragment = new AccountChooserFragment();
+        accountChooserFragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.main_fragment_container,
                 accountChooserFragment, "choose-account")
@@ -371,17 +378,17 @@ public class MainActivity
                 .commit();
     }
 
-    private void showAuthenticatorFragment(String label, int ts)
+    private void showAuthenticatorFragment(int accountId)
     {
         Bundle bundle = new Bundle();
-        bundle.putSerializable("account", AccountManager.getInstance().getAccount(label));
+        bundle.putSerializable("account", AccountManager.getInstance().getAccount(accountId));
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         bundle.putBoolean("play_time_running_out_sound", sharedPreferences.getBoolean(
                 "play_time_running_out_sound", true));
         bundle.putInt("time_running_out_start", sharedPreferences.getInt(
                 "time_running_out_start", 5));
         AuthenticatorFragment authenticatorFragment = new AuthenticatorFragment();
-        sharedPreferences.registerOnSharedPreferenceChangeListener(authenticatorFragment);
+        //sharedPreferences.registerOnSharedPreferenceChangeListener(authenticatorFragment);
         authenticatorFragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.main_fragment_container,
@@ -393,7 +400,10 @@ public class MainActivity
     private void showSettingsFragment()
     {
         setTheme(R.style.SettingsFragmentStyle);
+        Bundle bundle = new Bundle();
+        bundle.putCharSequenceArray("accountLabels", AccountManager.getInstance().getAccountLabels());
         SettingsFragment settingsFragment = new SettingsFragment();
+        settingsFragment.setArguments(bundle);
         android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.main_fragment_container,
                 settingsFragment, "settings")
@@ -446,7 +456,7 @@ public class MainActivity
     @Override
     public void onAccountChosen(String chosenAccount)
     {
-        showAuthenticatorFragment(chosenAccount, 30);
+        showAuthenticatorFragment(Issuer.valueOf(chosenAccount).getId());
     }
 
     /**

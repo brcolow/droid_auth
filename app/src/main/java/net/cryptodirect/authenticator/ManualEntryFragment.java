@@ -40,7 +40,7 @@ public class ManualEntryFragment extends Fragment
     {
         View view = inflater.inflate(R.layout.fragment_manual_entry, container, false);
 
-        final EditText emailEditText = (EditText) view.findViewById(R.id.email_edit_text);
+        final EditText emailEditText = (EditText) view.findViewById(R.id.account_label_edittext);
         // we set the email field to anonymous pro for consistency with key text field
         emailEditText.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
 

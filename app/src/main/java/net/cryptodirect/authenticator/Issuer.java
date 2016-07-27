@@ -1,26 +1,75 @@
 package net.cryptodirect.authenticator;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public enum Issuer
 {
-    BITFINEX(0),
-    BITSTAMP(1),
-    COINBASE(2),
-    CRYPTODASH(3),
-    UNKNOWN(-1);
+    BITFINEX(0, R.drawable.bitfinex),
+    BITSTAMP(1, R.drawable.bitstamp),
+    COINBASE(2, R.drawable.coinbase),
+    CRYPTODASH(3, R.drawable.cryptodash),
+    UNKNOWN(-1, -1);
 
     private final int id;
+    private final int drawable;
 
-    Issuer(int id)
+    Issuer(int id, int drawable)
     {
         this.id = id;
+        this.drawable = drawable;
     }
 
     public int getId()
     {
         return id;
+    }
+
+    public int getDrawable()
+    {
+        return drawable;
+    }
+
+    public String getLabel()
+    {
+        switch (this)
+        {
+            case BITFINEX:
+                return "QR Code Generated On:";
+            case BITSTAMP:
+                return "Bitstamp Account Id:";
+            case COINBASE:
+                return "Coinbase Account Email:";
+            case CRYPTODASH:
+                return "Cryptodash Account Email:";
+            case UNKNOWN:
+            default:
+                return null;
+        }
+    }
+
+    public String getDisplayableLabel(String label)
+    {
+        switch (this)
+        {
+            case BITFINEX:
+                return label.substring(label.indexOf('-') + 1);
+            case BITSTAMP:
+                return label.split("@")[0];
+            case COINBASE:
+            case CRYPTODASH:
+                return label;
+            case UNKNOWN:
+            default:
+                return null;
+        }
+    }
+
+    @Override
+    public String toString()
+    {
+        return name().substring(0, 1) + name().substring(1).toLowerCase(Locale.US);
     }
 
     public static Issuer getIssuer(int id)
@@ -90,4 +139,6 @@ public enum Issuer
             return Issuer.UNKNOWN;
         }
     }
+
+
 }

@@ -20,10 +20,15 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     public void onCreate(Bundle state)
     {
         super.onCreate(state);
+        CharSequence[] accountEmailsArray = getArguments().getCharSequenceArray("accountLabels");
+        if (accountEmailsArray == null)
+        {
+            throw new IllegalArgumentException("bundle: " + state + " did not have CharSequence " +
+                    "array \"accountLabels\"");
+        }
         initialMessage = getActivity().getApplicationContext().getString(R.string.time_running_out_start_summ);
         addPreferencesFromResource(R.xml.preferences);
         ListPreference defaultAccountPref = (ListPreference) findPreference("default_account");
-        CharSequence[] accountEmailsArray = AccountManager.getInstance().getAccountEmails();
         defaultAccountPref.setEntries(accountEmailsArray);
         defaultAccountPref.setEntryValues(accountEmailsArray);
         if (accountEmailsArray.length == 1)

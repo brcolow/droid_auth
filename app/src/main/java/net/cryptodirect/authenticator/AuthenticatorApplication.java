@@ -9,6 +9,7 @@ import org.acra.ACRA;
 import org.acra.config.ACRAConfiguration;
 import org.acra.config.ACRAConfigurationException;
 import org.acra.config.ConfigurationBuilder;
+import org.acra.security.BaseKeyStoreFactory;
 import org.acra.security.KeyStoreFactory;
 import org.acra.sender.HttpSender;
 
@@ -90,24 +91,17 @@ public class AuthenticatorApplication extends Application
         }
     }
 
-    public static class MyKeyStoreFactory implements KeyStoreFactory
+    public static class MyKeyStoreFactory extends BaseKeyStoreFactory
     {
-        @Nullable
         @Override
-        public KeyStore create(@NonNull Context context)
+        protected InputStream getInputStream(@NonNull Context context)
         {
-            try
-            {
-                KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-                InputStream keyStream = context.getResources().openRawResource(R.raw.keystore);
-                keyStore.load(keyStream, "123456".toCharArray());
-                keyStream.close();
-                return keyStore;
-            }
-            catch (CertificateException | NoSuchAlgorithmException | KeyStoreException | IOException e)
-            {
-                throw new RuntimeException(e);
-            }
+            return context.getResources().openRawResource(R.raw.keystore);
+        }
+
+        @Override
+        protected char[] getPassword() {
+            return "123456".toCharArray();
         }
     }
 

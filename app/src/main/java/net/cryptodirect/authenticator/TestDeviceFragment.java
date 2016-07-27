@@ -88,19 +88,19 @@ public class TestDeviceFragment extends Fragment
                     if (i < 6)
                     {
                         testSuccessful[i] = TOTP.generateTOTP(KEY_20_BYTES,
-                                TOTP.getTC(testTimeParams[i], 30), 8, Algorithm.SHA1)
+                                (long) TOTP.getTC(testTimeParams[i], 30), 8, Algorithm.SHA1)
                                 .equals(testCorrectResults[i]);
                     }
                     else if (i < 12)
                     {
                         testSuccessful[i] = TOTP.generateTOTP(KEY_32_BYTES,
-                                TOTP.getTC(testTimeParams[i % 6], 30), 8, Algorithm.SHA256)
+                                (long) TOTP.getTC(testTimeParams[i % 6], 30), 8, Algorithm.SHA256)
                                 .equals(testCorrectResults[i]);
                     }
                     else
                     {
                         testSuccessful[i] = TOTP.generateTOTP(KEY_64_BYTES,
-                                TOTP.getTC(testTimeParams[i % 6], 30), 8, Algorithm.SHA512)
+                                (long) TOTP.getTC(testTimeParams[i % 6], 30), 8, Algorithm.SHA512)
                                 .equals(testCorrectResults[i]);
                     }
                 }

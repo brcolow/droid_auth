@@ -23,7 +23,7 @@
         autofit:minTextSize="18sp"/>
 
     <TextView
-        android:id="@+id/email_label"
+        android:id="@+id/account_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -39,7 +39,7 @@
         android:id="@+id/code_box"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/email_label"
+        android:layout_below="@+id/account_label"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         android:background="@drawable/code_box_gradient"

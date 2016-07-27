@@ -3,6 +3,8 @@ package net.cryptodirect.authenticator.crypto;
 import android.util.AndroidRuntimeException;
 import android.util.Log;
 
+import net.cryptodirect.authenticator.Account;
+
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
 
@@ -27,7 +29,7 @@ public class TOTP
      * @param TS the duration in seconds
      * @return the corresponding TC counter value
      */
-    public static long getTC(int TS)
+    public static double getTC(int TS)
     {
         return getTC((System.currentTimeMillis() / 1000L), TS, 0);
     }
@@ -42,7 +44,7 @@ public class TOTP
      * @param TS the duration in seconds
      * @return the corresponding TC counter value
      */
-    public static long getTC(long time, int TS)
+    public static double getTC(long time, int TS)
     {
         return getTC(time, TS, 0);
     }
@@ -57,9 +59,9 @@ public class TOTP
      * @param T0 the initial time epoch
      * @return the corresponding TC counter value
      */
-    public static long getTC(long time, int TS, int T0)
+    public static double getTC(long time, int TS, int T0)
     {
-        return (time - T0) / TS;
+        return (double) (time - T0) / (double) TS;
     }
 
     /**
@@ -111,4 +113,9 @@ public class TOTP
         }
     }
 
+    public static int getCurrentSpotInTSInterval(Account account)
+    {
+        double tc = getTC(account.getCodeParams().getTotpPeriod());
+        return (int) ((double) 30 * (tc - (long) tc));
+    }
 }

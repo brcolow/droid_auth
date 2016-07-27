@@ -19,11 +19,10 @@ import java.util.Locale;
 import java.util.Map;
 
 import static net.cryptodirect.authenticator.StandardCharsets.UTF_8;
+import static net.cryptodirect.authenticator.crypto.Algorithm.SHA1;
+import static net.cryptodirect.authenticator.crypto.TOTP.generateTOTP;
+import static net.cryptodirect.authenticator.crypto.TOTP.getTC;
 
-/**
- * Represents a registered Cryptodash account, consisting of
- * an label and secret key bytes to generate the TOTP codes.
- */
 public class Account implements Serializable
 {
     private final String label;
@@ -32,7 +31,7 @@ public class Account implements Serializable
     private final CodeParams codeParams;
     static final long serialVersionUID = 1L;
 
-    public Account(String label, Issuer issuer, byte[] secretKey, CodeParams codeParams)
+    Account(String label, Issuer issuer, byte[] secretKey, CodeParams codeParams)
     {
         this.label = label;
         this.issuer = issuer;
@@ -63,6 +62,12 @@ public class Account implements Serializable
     public CodeParams getCodeParams()
     {
         return codeParams;
+    }
+
+    public String getOneTimePasscode()
+    {
+        return generateTOTP(secretKey, (long) getTC(getCodeParams().getTotpPeriod()),
+                codeParams.getDigits(), codeParams.getAlgorithm());
     }
 
     @Override

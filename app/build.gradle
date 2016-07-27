@@ -21,7 +21,6 @@ android {
         buildConfigField 'String', 'BUILD_TIME', "\"${buildTime()}\""
         buildConfigField 'String', 'GIT_SHA', "\"${gitSha()}\""
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
 
     compileOptions {

@@ -11,7 +11,7 @@
     <string name="welcome_blurb">Welcome to Cryptodash Authenticator. To get started right away, tap the "Link Account" button.
         If you want to learn more about what this app is and how it works, tap the "How it Works" button.</string>
     <string name="how_it_works">How it Works</string>
-    <string name="authenticator_description">Below is your authentication code to use when prompted by Cryptodash:</string>
+    <string name="authenticator_description">Below is your current one-time code for %1$s:</string>
     <string name="title_activity_register_account">Link Account</string>
     <string name="flash_on">Flash [ON]</string>
     <string name="flash_off">Flash [OFF]</string>
@@ -76,4 +76,7 @@
     appreciate you reporting this error to us so that we can fix it.</string>
     <string name="crash_dialog_ok_toast">Thank you for reporting the error!</string>
     <string name="cancel">cancel</string>
+    <string name="verify_manual_blurb">Please verify that the information you entered matches what\'s entered below:</string>
+    <string name="verify_qrcode_blurb">Please verify that the information below matches the QR code you scanned.</string>
+    <string name="provider">Provider:</string>
 </resources>

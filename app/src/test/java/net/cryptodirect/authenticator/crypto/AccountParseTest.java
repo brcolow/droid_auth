@@ -4,6 +4,8 @@ import net.cryptodirect.authenticator.Account;
 
 import org.junit.Test;
 
+import static net.cryptodirect.authenticator.Issuer.BITFINEX;
+import static net.cryptodirect.authenticator.Issuer.BITSTAMP;
 import static net.cryptodirect.authenticator.Issuer.COINBASE;
 import static net.cryptodirect.authenticator.Issuer.CRYPTODASH;
 import static net.cryptodirect.authenticator.crypto.Algorithm.SHA1;
@@ -15,7 +17,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
- * Account optauth URI string parsing tests
+ * Tests that the various optauth URIs provided by the Issuers we support
+ * are correctly parsed by {@link Account#parse(String)}.
  */
 public class AccountParseTest
 {
@@ -59,14 +62,29 @@ public class AccountParseTest
     {
         // otpauth://totp/872472@Bitstamp?secret=KJCDKRSZKNKFOWSU
         Account account = Account.parse("otpauth://totp/872472@Bitstamp?secret=KJCDKRSZKNKFOWSU");
-        assertThat(account.getLabel(), is("test@gmail.com"));
-
-
+        assertThat(account.getLabel(), is("872472@Bitstamp"));
+        assertThat(account.getIssuer(), is(BITSTAMP));
+        assertThat(account.getSecretKey(), is(new byte[]{82, 68, 53, 70, 89, 83, 84, 87, 90, 84}));
+        assertThat(account.getCodeParams().getAlgorithm(), is(SHA1));
+        assertThat(account.getCodeParams().getBase(), is(BASE32));
+        assertThat(account.getCodeParams().getCodeType(), is(TOTP));
+        assertThat(account.getCodeParams().getDigits(), is(6));
+        assertThat(account.getCodeParams().getTotpPeriod(), is(30));
     }
 
     @Test
-    public void shouldCorrectlyParseBitfinexStyleUri()
+    public void shouldCorrectlyParseBitfinexStyleUri() throws Exception
     {
         // otpauth://totp/Bitfinex-Jul-23-2016?secret=qpni5ijdl54kd7xv
+        Account account = Account.parse("otpauth://totp/Bitfinex-Jul-23-2016?secret=qpni5ijdl54kd7xv");
+        assertThat(account.getLabel(), is("Bitfinex-Jul-23-2016"));
+        assertThat(account.getIssuer(), is(BITFINEX));
+        assertThat(account.getSecretKey(), is(new byte[]{-125, -38, -114, -95, 35, 95, 120, -95,
+                -2, -11}));
+        assertThat(account.getCodeParams().getAlgorithm(), is(SHA1));
+        assertThat(account.getCodeParams().getBase(), is(BASE32));
+        assertThat(account.getCodeParams().getCodeType(), is(TOTP));
+        assertThat(account.getCodeParams().getDigits(), is(6));
+        assertThat(account.getCodeParams().getTotpPeriod(), is(30));
     }
 }

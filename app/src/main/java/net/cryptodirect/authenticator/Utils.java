@@ -1,7 +1,10 @@
 package net.cryptodirect.authenticator;
 
 import android.graphics.Color;
+import android.os.Build;
+import android.view.View;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 public class Utils
@@ -35,6 +38,32 @@ public class Utils
         public int getColor()
         {
             return color;
+        }
+    }
+
+    private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
+
+    public static int generateViewId()
+    {
+        if (Build.VERSION.SDK_INT < 17)
+        {
+            for (; ; )
+            {
+                final int result = sNextGeneratedId.get();
+                int newValue = result + 1;
+                if (newValue > 0x00FFFFFF)
+                {
+                    newValue = 1; // Roll over to 1, not 0.
+                }
+                if (sNextGeneratedId.compareAndSet(result, newValue))
+                {
+                    return result;
+                }
+            }
+        }
+        else
+        {
+            return View.generateViewId();
         }
     }
 }

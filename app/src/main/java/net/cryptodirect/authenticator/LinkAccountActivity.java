@@ -204,6 +204,7 @@ public class LinkAccountActivity
         else
         {
             Bundle bundle = new Bundle();
+            bundle.putString("method", LinkMethod.QRCODE.name());
             bundle.putString("new_label", scannedAccount.getLabel());
             bundle.putInt("new_issuer", scannedAccount.getIssuer().getId());
             bundle.putByteArray("new_key", scannedAccount.getSecretKey());
@@ -247,7 +248,7 @@ public class LinkAccountActivity
      */
     public void handleCorrectButtonClicked(View view)
     {
-        TextView emailTextField = (TextView) findViewById(R.id.email_edit_text);
+        TextView emailTextField = (TextView) findViewById(R.id.account_label_edittext);
         TextView keyTextField = (TextView) findViewById(R.id.key_edit_text);
         CheckBox setAsDefaultAccountCheckBox = (CheckBox) findViewById(
                 R.id.set_as_default_account_box);
@@ -343,7 +344,8 @@ public class LinkAccountActivity
                 Account newAccount = new Account(enteredEmail, Issuer.CRYPTODASH,
                         Base64.getDecoder().decode(enteredKey),
                         new CodeParams.Builder(CodeType.TOTP).base(64).algorithm(Algorithm.SHA256).build());
-                AccountManager.getInstance().registerAccount(newAccount, true, setAsDefaultAccountCheckBox.isChecked());
+                AccountManager.getInstance().registerAccount(newAccount, true,
+                        setAsDefaultAccountCheckBox.isChecked());
             }
             else
             {
@@ -396,7 +398,7 @@ public class LinkAccountActivity
      */
     public void handleOkayButtonClicked(View view)
     {
-        EditText emailTextField = (EditText) findViewById(R.id.email_edit_text);
+        EditText emailTextField = (EditText) findViewById(R.id.account_label_edittext);
         EditText keyTextField = (EditText) findViewById(R.id.key_edit_text);
 
         String errorMessage = isEnteredKeyValid(keyTextField);
@@ -414,6 +416,7 @@ public class LinkAccountActivity
 
         // TODO need to implement issuer for manual entry for non-Cryptodash accounts
         Bundle bundle = new Bundle();
+        bundle.putString("method", LinkMethod.MANUAL_ENTRY.name());
         bundle.putString("new_label", emailTextField.getText().toString());
         bundle.putByteArray("new_key", Base64.getDecoder().decode(keyTextField.getText().toString()));
         bundle.putInt("new_issuer", Issuer.CRYPTODASH.getId());

@@ -33,6 +33,26 @@ public class CustomMatchers {
         };
     }
 
+    public static Matcher<View> withScaledCompoundDrawable(final int resourceId, final int width, final int height) {
+        return new BoundedMatcher<View, TextView>(TextView.class) {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("has scaled compound drawable resource " + resourceId +
+                        " with size: " + width + ", " + height);
+            }
+
+            @Override
+            public boolean matchesSafely(TextView textView) {
+                for (Drawable drawable : textView.getCompoundDrawables()) {
+                    if (sameBitmap(textView.getContext(), drawable, resourceId, width, height)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        };
+    }
+
     private static boolean sameBitmap(Context context, Drawable drawable, int resourceId) {
         Drawable otherDrawable = context.getResources().getDrawable(resourceId);
         if (drawable == null || otherDrawable == null) {
@@ -46,6 +66,23 @@ public class CustomMatchers {
             Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
             Bitmap otherBitmap = ((BitmapDrawable) otherDrawable).getBitmap();
             return bitmap.sameAs(otherBitmap);
+        }
+        return false;
+    }
+
+    private static boolean sameBitmap(Context context, Drawable drawable, int resourceId,
+                                      int width, int height) {
+        Drawable otherDrawable = context.getResources().getDrawable(resourceId);
+        if (drawable == null || otherDrawable == null) {
+            return false;
+        }
+        if (drawable instanceof BitmapDrawable) {
+            Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+            Bitmap otherBitmap = ((BitmapDrawable) otherDrawable).getBitmap();
+            Drawable scaledDrawable = new BitmapDrawable(context.getResources(),
+                    Bitmap.createScaledBitmap(otherBitmap, width, height, true));
+            Bitmap scaledBitmap = ((BitmapDrawable) scaledDrawable).getBitmap();
+            return bitmap.sameAs(scaledBitmap);
         }
         return false;
     }
