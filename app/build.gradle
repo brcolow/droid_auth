@@ -65,9 +65,9 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:24.1.1'
-    compile 'com.android.support:support-v13:24.1.1'
-    compile 'me.dm7.barcodescanner:zxing:1.8.4'
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support:support-v13:24.2.1'
+    compile 'me.dm7.barcodescanner:zxing:1.9'
     compile 'ch.acra:acra:4.9.0'
     compile 'me.grantland:autofittextview:0.2.1'
     testCompile 'junit:junit:4.12'
@@ -76,7 +76,7 @@ dependencies {
     androidTestCompile "com.crittercism.dexmaker:dexmaker-dx:1.4"
     androidTestCompile "com.crittercism.dexmaker:dexmaker-mockito:1.4"
     androidTestCompile 'com.android.support.test:runner:0.5'
-    androidTestCompile 'com.android.support:support-annotations:24.1.1'
+    androidTestCompile 'com.android.support:support-annotations:24.2.1'
     androidTestCompile 'com.android.support.test:rules:0.5'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
     androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.2'
@@ -117,7 +117,6 @@ task writeVersionToAboutFile << {
     replacePatternInFile(file){
         it.replaceAll(patternToFind, replacePatternWith)
     }
-
 }
 
 tasks.whenTaskAdded { theTask ->

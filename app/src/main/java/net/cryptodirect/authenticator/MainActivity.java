@@ -173,7 +173,6 @@ public class MainActivity
             // there is no default account setting
             if (AccountManager.getInstance().getNumAccounts() > 0)
             {
-                // we have data for at least one account
                 if (AccountManager.getInstance().getNumAccounts() > 1)
                 {
                     entryPage = EntryPage.ACCOUNT_CHOOSER;
@@ -181,7 +180,6 @@ public class MainActivity
                 }
                 else
                 {
-                    // we have data for only one account
                     entryPage = EntryPage.ONE_ACCOUNT_AUTHENTICATOR;
                     showAuthenticatorFragment(AccountManager.getInstance().getFirstAccount()
                             .getIssuer().getId());
@@ -189,7 +187,6 @@ public class MainActivity
             }
             else
             {
-                // we have no stored account data
                 entryPage = EntryPage.WELCOME;
                 WelcomeFragment welcomeFragment = new WelcomeFragment();
                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -249,7 +246,7 @@ public class MainActivity
             {
                 if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
                 {
-                    this.finishAffinity();
+                    finishAffinity();
                 }
                 else
                 {

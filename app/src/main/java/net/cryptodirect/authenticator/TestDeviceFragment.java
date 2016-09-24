@@ -167,7 +167,8 @@ public class TestDeviceFragment extends Fragment
                 TestDeviceFragment.this.getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
                 int height = metrics.heightPixels;
                 // The -200f value centers the table on Nexus 6, so we use that as the reference
-                resultsContainer.setTranslationY((-200f) * ((height * metrics.densityDpi) / (float) (NEXUS_6_HEIGHT_PIXELS * NEXUS_6_DPI)));
+                resultsContainer.setTranslationY((-200f) * ((height * metrics.densityDpi) /
+                        (float) (NEXUS_6_HEIGHT_PIXELS * NEXUS_6_DPI)));
             }
         });
         return view;

@@ -1,7 +1,6 @@
 package net.cryptodirect.authenticator;
 
 import android.content.Intent;
-import android.os.SystemClock;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.filters.MediumTest;
 import android.support.test.rule.ActivityTestRule;
@@ -21,9 +20,14 @@ import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static net.cryptodirect.authenticator.crypto.Algorithm.SHA1;
 import static net.cryptodirect.authenticator.crypto.Algorithm.SHA256;
+import static net.cryptodirect.authenticator.crypto.TOTP.generateTOTP;
+import static net.cryptodirect.authenticator.crypto.TOTP.getTC;
 
 @RunWith(AndroidJUnit4.class)
 @MediumTest
@@ -69,7 +73,11 @@ public class ChooseAccountBehaviorTest
         // when
         openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
         onView(withText("Accounts")).perform(click());
-        SystemClock.sleep(60000);
+        onView(withText("Coinbase")).perform(click());
 
+        // The current TOTP code and time-wheel should be displayed for the newly linked account
+        onView(withId(R.id.code_box)).check(matches(isDisplayed()));
+        onView(withId(R.id.code_box)).check(matches(withText(generateTOTP(
+                coinbaseAccount.getSecretKey(), (long) getTC(30), 6, SHA1))));
     }
 }
