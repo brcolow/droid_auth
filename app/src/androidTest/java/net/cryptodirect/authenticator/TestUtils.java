@@ -14,7 +14,7 @@ public class TestUtils
 {
     private TestUtils() {}
 
-    @SuppressLint("CommitPrefEdits")
+    @SuppressLint({"CommitPrefEdits", "ApplySharedPref"})
     public static void clearSharedPreferences()
     {
         File sharedPreferencesDirectory = new File(InstrumentationRegistry.getTargetContext()

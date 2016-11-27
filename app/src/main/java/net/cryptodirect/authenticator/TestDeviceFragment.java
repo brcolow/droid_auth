@@ -24,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Locale;
 
 /**
  * Allows the user to test their device by running TOTP
@@ -144,7 +145,7 @@ public class TestDeviceFragment extends Fragment
                     cell.setBackgroundColor(Color.parseColor("#212121"));
                     cell.setLayoutParams(layoutParams);
                     testNumber = new TextView(TestDeviceFragment.this.getActivity());
-                    testNumber.setText(String.format("Test %d", i + 1));
+                    testNumber.setText(String.format(Locale.US, "Test %d", i + 1));
                     testNumber.setTextColor(Color.WHITE);
                     testNumber.setPadding(0, 0, 4, 3);
                     cell.addView(testNumber);

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<lint>
+    <issue id="AppLinksAutoVerifyWarning" severity="warning" />
+    <issue id="EasterEgg" severity="warning" />
+    <issue id="FieldGetter" severity="warning" />
+    <issue id="NegativeMargin" severity="warning" />
+    <issue id="NewerVersionAvailable" severity="warning" />
+    <issue id="PermissionImpliesUnsupportedChromeOsHardware" severity="warning" />
+    <issue id="UnsupportedChromeOsHardware" severity="warning" />
+    <issue id="Registered" severity="warning" />
+    <issue id="SelectableText" severity="warning" />
+    <issue id="GoogleAppIndexingApiWarning" severity="warning" />
+    <issue id="IconExpectedSize" severity="warning" />
+    <issue id="TypographyQuotes" severity="warning" />
+    <issue id="UnusedIds" severity="warning" />
+</lint>

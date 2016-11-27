@@ -27,8 +27,6 @@
     <string name="information_correct">Correct</string>
     <string name="information_incorrect">Incorrect</string>
     <string name="manual_entry_blurb">Enter the label address associated with your Cryptodash account and the two-factor key provided to you.</string>
-    <string name="okay">Okay</string>
-    <string name="no">No</string>
     <string name="email_hint">Your Email</string>
     <string name="scan_qrcode">Scan QR Code</string>
     <string name="manual_entry">Manual Entry</string>
@@ -75,7 +73,6 @@
     <string name="crash_dialog_text">Sorry, an unexpected error has occurred that we can\'t recover from. We would greatly
     appreciate you reporting this error to us so that we can fix it.</string>
     <string name="crash_dialog_ok_toast">Thank you for reporting the error!</string>
-    <string name="cancel">cancel</string>
     <string name="verify_manual_blurb">Please verify that the information you entered matches what\'s entered below:</string>
     <string name="verify_qrcode_blurb">Please verify that the information below matches the QR code you scanned.</string>
     <string name="provider">Provider:</string>

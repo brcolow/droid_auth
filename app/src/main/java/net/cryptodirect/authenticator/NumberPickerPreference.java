@@ -1,30 +1,14 @@
-/*
- * Copyright (C) 2011 The CyanogenMod Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package net.cryptodirect.authenticator;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.NumberPicker;
 
 import java.lang.reflect.Field;
 
@@ -38,6 +22,7 @@ public class NumberPickerPreference extends DialogPreference
     public NumberPickerPreference(Context context, AttributeSet attrs)
     {
         super(context, attrs);
+        setDialogLayoutResource(R.layout.number_picker_dialog);
         TypedArray numberPickerType = context.obtainStyledAttributes(attrs,
                 R.styleable.NumberPickerPreference, 0, 0);
 
@@ -54,6 +39,7 @@ public class NumberPickerPreference extends DialogPreference
     @Override
     protected View onCreateDialogView()
     {
+        View view = super.onCreateDialogView();
         int max = mMax;
         int min = mMin;
 
@@ -67,18 +53,18 @@ public class NumberPickerPreference extends DialogPreference
             min = getSharedPreferences().getInt(mMinExternalKey, mMin);
         }
 
-        LayoutInflater inflater =
-                (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.number_picker_dialog, null);
+        //LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        //View view = inflater.inflate(R.layout.number_picker_dialog, null);
         setWidgetLayoutResource(R.layout._current_number);
         notifyChanged();
         mNumberPicker = (NumberPicker) view.findViewById(R.id.number_picker);
 
         if (mNumberPicker == null)
         {
-            throw new RuntimeException("mNumberPicker is null!");
+            throw new RuntimeException("mNumberPicker is null");
         }
 
+        setNumberPickerTextColor(mNumberPicker, "#b8943b");
         // Initialize state
         mNumberPicker.setWrapSelectorWheel(false);
         mNumberPicker.setMaxValue(max);
@@ -130,5 +116,39 @@ public class NumberPickerPreference extends DialogPreference
         {
             Log.d(TAG, "NumberPickerPreference disableTextInput error", e);
         }
+    }
+
+    private static boolean setNumberPickerTextColor(NumberPicker numberPicker, String colorString)
+    {
+        final int count = numberPicker.getChildCount();
+        for (int i = 0; i < count; i++)
+        {
+            View child = numberPicker.getChildAt(i);
+            if (child instanceof EditText)
+            {
+                try
+                {
+                    Field selectorWheelPaintField = numberPicker.getClass()
+                            .getDeclaredField("mSelectorWheelPaint");
+                    selectorWheelPaintField.setAccessible(true);
+                    int color = Color.parseColor(colorString);
+                    ((Paint) selectorWheelPaintField.get(numberPicker)).setColor(color);
+                    ((EditText) child).setTextColor(color);
+
+                    Field selectorWheelTextSizeField = numberPicker.getClass()
+                            .getDeclaredField("mTextSize");
+                    selectorWheelTextSizeField.setAccessible(true);
+                    selectorWheelTextSizeField.setInt(numberPicker, 24);
+                    ((EditText) child).setTextSize(24f);
+                    numberPicker.invalidate();
+                    return true;
+                }
+                catch(NoSuchFieldException | IllegalAccessException | IllegalArgumentException e)
+                {
+                    Log.w(TAG, e);
+                }
+            }
+        }
+        return false;
     }
 }

@@ -8,6 +8,8 @@ transaction.
 Codes are provided for Cryptodash as well as third-party exchanges and wallets
 that Cryptodash supports.
 
+## Developers
+
 ### Checking For New Dependencies
 
 Run `gradle dependencyUpdates` to see if any of the dependencies have

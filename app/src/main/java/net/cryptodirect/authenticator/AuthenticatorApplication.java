@@ -64,8 +64,8 @@ public class AuthenticatorApplication extends Application
                     .setResDialogIcon(android.R.drawable.ic_dialog_info)
                     .setResDialogTitle(R.string.crash_dialog_title)
                     .setResDialogOkToast(R.string.crash_dialog_ok_toast)
-                    .setResDialogPositiveButtonText(R.string.okay)
-                    .setResDialogNegativeButtonText(R.string.no)
+                    .setResDialogPositiveButtonText(android.R.string.ok)
+                    .setResDialogNegativeButtonText(android.R.string.no)
                     .setHttpMethod(HttpSender.Method.PUT)
                     .setReportType(HttpSender.Type.JSON)
                     .build();

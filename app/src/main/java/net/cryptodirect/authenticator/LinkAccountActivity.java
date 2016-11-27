@@ -312,7 +312,7 @@ public class LinkAccountActivity
                     AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this, R.style.Theme_Dialog);
                     alertBuilder.setMessage(R.string.centurion_invalid_args);
                     alertBuilder.setCancelable(false);
-                    alertBuilder.setPositiveButton(getString(R.string.okay), new DialogInterface.OnClickListener()
+                    alertBuilder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
                     {
                         @Override
                         public void onClick(DialogInterface dialog, int id)
