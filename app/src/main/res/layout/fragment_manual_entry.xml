@@ -115,7 +115,7 @@
         android:drawableTint="@color/md_green_800"
         android:onClick="handleOkayButtonClicked"
         android:padding="22dp"
-        android:text="@string/okay"
+        android:text="@android:string/ok"
         android:textColor="#f3f3f3"
         android:textSize="16sp"
         />
