@@ -1,14 +1,18 @@
 package net.cryptodirect.authenticator;
 
+import android.Manifest;
 import android.animation.ArgbEvaluator;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
@@ -22,6 +26,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.Toast;
 
 import org.acra.ACRA;
 import org.json.JSONException;
@@ -43,10 +48,11 @@ public class MainActivity
         DialogInterface.OnCancelListener
 {
     private static final String TAG = MainActivity.class.getSimpleName();
-    private ViewPager howItWorksPager;
-    private int currSelectedPage = 0;
     private static final Map<Integer, HowItWorksPageFragment> pageMap = new LinkedHashMap<>(3);
     private static EntryPage entryPage;
+
+    private ViewPager howItWorksPager;
+    private int currSelectedPage = 0;
     private Centurion centurion;
     private String mockScannedCode;
 
@@ -447,6 +453,7 @@ public class MainActivity
         {
             intent.putExtra("mockScannedCode", mockScannedCode);
         }
+
         startActivity(intent);
     }
 

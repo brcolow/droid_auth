@@ -37,7 +37,7 @@ public class AuthenticatorFragment extends Fragment
         }
 
         Account account = (Account) getArguments().getSerializable("account");
-        TextView authenticatorBlurb = (TextView) rootView.findViewById(R.id.authenticator_blurb);
+        TextView authenticatorBlurb = rootView.findViewById(R.id.authenticator_blurb);
         authenticatorBlurb.setText(getResources().getString(R.string.authenticator_description,
                 account.getIssuer().toString()));
         ((TextView) rootView.findViewById(R.id.account_label)).setText(account.getLabel());
@@ -57,7 +57,7 @@ public class AuthenticatorFragment extends Fragment
         intervalWheelLayoutParams.width = displayRect.width();
 
         // Set initial codebox to initial TOTP token
-        EditText codeBox = ((EditText) rootView.findViewById(R.id.code_box));
+        EditText codeBox = rootView.findViewById(R.id.code_box);
         codeBox.setText(TOTP.generateTOTP(account.getSecretKey(), (long) tc,
                 account.getCodeParams().getDigits(), account.getCodeParams().getAlgorithm()));
 

@@ -105,7 +105,7 @@ public class LinkAccountDataFragment extends Fragment
                     "int \"new_base\"");
         }
 
-        TextView verifyBlurb = (TextView) view.findViewById(R.id.verify_blurb);
+        TextView verifyBlurb = view.findViewById(R.id.verify_blurb);
         switch (linkMethod)
         {
             case MANUAL_ENTRY:
@@ -116,7 +116,7 @@ public class LinkAccountDataFragment extends Fragment
                 break;
         }
 
-        EditText providerEditText = (EditText) view.findViewById(R.id.account_provider_edittext);
+        EditText providerEditText = view.findViewById(R.id.account_provider_edittext);
         providerEditText.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
         Drawable providerDrawable = getDrawable(getContext(), issuer.getDrawable());
         Bitmap providerBitmap = ((BitmapDrawable) providerDrawable).getBitmap();
@@ -125,13 +125,13 @@ public class LinkAccountDataFragment extends Fragment
         providerEditText.setText(issuer.toString());
         providerEditText.setCompoundDrawablesWithIntrinsicBounds(scaledDrawable, null, null, null);
 
-        TextView accountLabel = (TextView) view.findViewById(R.id.account_label_textview);
+        TextView accountLabel = view.findViewById(R.id.account_label_textview);
         accountLabel.setText(issuer.getLabel());
-        EditText accountLabelTextField = (EditText) view.findViewById(R.id.account_label_edittext);
+        EditText accountLabelTextField = view.findViewById(R.id.account_label_edittext);
         accountLabelTextField.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
         accountLabelTextField.setText(issuer.getDisplayableLabel(label));
 
-        TextView keyTextField = (TextView) view.findViewById(R.id.key_edit_text);
+        TextView keyTextField = view.findViewById(R.id.key_edit_text);
         keyTextField.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
         final String key;
 
@@ -200,8 +200,8 @@ public class LinkAccountDataFragment extends Fragment
     {
         super.onViewCreated(view, savedInstanceState);
 
-        Button correctButton = (Button) view.findViewById(R.id.correct_button);
-        Button incorrectButton = (Button) view.findViewById(R.id.incorrect_button);
+        Button correctButton = view.findViewById(R.id.correct_button);
+        Button incorrectButton = view.findViewById(R.id.incorrect_button);
 
         correctButton.getCompoundDrawables()[0].setColorFilter(MD_GREEN_300.getColor(),
                 PorterDuff.Mode.SRC_IN);

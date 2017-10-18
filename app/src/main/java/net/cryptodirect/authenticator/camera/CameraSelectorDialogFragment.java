@@ -1,11 +1,13 @@
-package net.cryptodirect.authenticator;
+package net.cryptodirect.authenticator.camera;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.hardware.Camera;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+
+import net.cryptodirect.authenticator.R;
 
 public class CameraSelectorDialogFragment extends DialogFragment
 {
@@ -31,35 +33,21 @@ public class CameraSelectorDialogFragment extends DialogFragment
         return fragment;
     }
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState)
     {
         if (listener == null)
         {
             dismiss();
-            return null;
+            return new Dialog(getContext());
         }
 
-        int numberOfCameras = Camera.getNumberOfCameras();
-        String[] cameraNames = new String[numberOfCameras];
+        CameraSupport camera = CameraSupport.getCamera(getActivity(), getContext());
         int checkedIndex = 0;
 
-        for (int i = 0; i < numberOfCameras; i++)
+        for (int i = 0; i < camera.getNumberOfCameras(); i++)
         {
-            Camera.CameraInfo info = new Camera.CameraInfo();
-            Camera.getCameraInfo(i, info);
-            if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT)
-            {
-                cameraNames[i] = "Front Camera";
-            }
-            else if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK)
-            {
-                cameraNames[i] = "Back Camera";
-            }
-            else
-            {
-                cameraNames[i] = "Camera ID: " + i;
-            }
             if (i == cameraId)
             {
                 checkedIndex = i;
@@ -71,7 +59,7 @@ public class CameraSelectorDialogFragment extends DialogFragment
         builder.setTitle(R.string.select_camera)
                 // Specify the list array, the items to be selected by default (null for none),
                 // and the listener through which to receive callbacks when items are selected
-                .setSingleChoiceItems(cameraNames, checkedIndex,
+                .setSingleChoiceItems(camera.getCameras(), checkedIndex,
                         new DialogInterface.OnClickListener()
                         {
                             @Override

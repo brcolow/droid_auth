@@ -57,7 +57,7 @@ public class NumberPickerPreference extends DialogPreference
         //View view = inflater.inflate(R.layout.number_picker_dialog, null);
         setWidgetLayoutResource(R.layout._current_number);
         notifyChanged();
-        mNumberPicker = (NumberPicker) view.findViewById(R.id.number_picker);
+        mNumberPicker = view.findViewById(R.id.number_picker);
 
         if (mNumberPicker == null)
         {

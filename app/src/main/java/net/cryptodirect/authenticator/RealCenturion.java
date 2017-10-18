@@ -21,6 +21,8 @@ import javax.net.ssl.HttpsURLConnection;
  */
 public class RealCenturion extends Centurion
 {
+    private static final long serialVersionUID = 1942L;
+
     private final String baseUrl;
     private static final String USER_AGENT = "Cryptodash Authenticator (Android) " +
             BuildConfig.BUILD_TIME + "-" + BuildConfig.GIT_SHA;

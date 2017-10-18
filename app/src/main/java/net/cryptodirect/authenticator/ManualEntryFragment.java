@@ -40,11 +40,11 @@ public class ManualEntryFragment extends Fragment
     {
         View view = inflater.inflate(R.layout.fragment_manual_entry, container, false);
 
-        final EditText emailEditText = (EditText) view.findViewById(R.id.account_label_edittext);
+        final EditText emailEditText = view.findViewById(R.id.account_label_edittext);
         // we set the email field to anonymous pro for consistency with key text field
         emailEditText.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
 
-        final EditText keyEditText = (EditText) view.findViewById(R.id.key_edit_text);
+        final EditText keyEditText = view.findViewById(R.id.key_edit_text);
         keyEditText.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
 
         // allow enter to be clicked when inside key edit text, and it hides keyboard
@@ -172,7 +172,7 @@ public class ManualEntryFragment extends Fragment
     public void onViewCreated(View view, Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        Button okayButton = (Button) view.findViewById(R.id.okay_button);
+        Button okayButton = view.findViewById(R.id.okay_button);
         okayButton.getCompoundDrawables()[0].setColorFilter(MD_GREEN_300.getColor(),
                 PorterDuff.Mode.SRC_IN);
     }

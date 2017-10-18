@@ -1,15 +1,19 @@
 package net.cryptodirect.authenticator;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -21,6 +25,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,6 +51,8 @@ public class LinkAccountActivity
         implements ScanQRCodeFragment.OnQRCodeScannedListener,
         FragmentManager.OnBackStackChangedListener
 {
+    private static final int REQUEST_CAMERA = 0;
+
     private Centurion centurion;
     private Account scannedAccount = null;
     private String enteredEmail = null;
@@ -123,6 +130,11 @@ public class LinkAccountActivity
     public void handleScanQRCodeClicked(View view)
     {
         // FIXME this handles invisible buttons from the previous fragment
+        if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(this, new String[]{ Manifest.permission.CAMERA }, REQUEST_CAMERA);
+        }
+
         if (getSupportFragmentManager().getBackStackEntryCount() > 1)
         {
             return;
@@ -269,6 +281,9 @@ public class LinkAccountActivity
         if (wasManualEntry || scannedAccount.getIssuer() == Issuer.CRYPTODASH)
         {
             ProgressDialog progressDialog = new ProgressDialog(LinkAccountActivity.this);
+            ProgressBar progressBar = new ProgressBar(LinkAccountActivity.this, null,
+                    android.R.attr.progressBarStyleHorizontal);
+
             progressDialog.setTitle(getResources().getString(R.string.verifying_credentials_title));
             progressDialog.setMessage(getResources().getString(R.string.verifying_credentials));
             progressDialog.show();
@@ -370,6 +385,23 @@ public class LinkAccountActivity
         enteredKey = null;
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        switch (requestCode)
+        {
+            case REQUEST_CAMERA:
+                if (grantResults[0] != PackageManager.PERMISSION_GRANTED)
+                {
+                    Toast.makeText(this, "Cannot run application because camera service permission has not been granted", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                break;
+        }
     }
 
     /**

@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
     package="net.cryptodirect.authenticator"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
+    <uses-feature android:name="android.hardware.camera" android:required="false"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
@@ -35,12 +38,14 @@
                 android:value="net.cryptodirect.authenticator.MainActivity" />
         </activity>
         <activity
-            android:name="org.acra.CrashReportDialog"
+            android:name="org.acra.dialog.CrashReportDialog"
             android:excludeFromRecents="true"
             android:finishOnTaskLaunch="true"
             android:launchMode="singleInstance"
             android:process=":error_report"
-            android:theme="@style/Theme.Dialog"/>
+            android:theme="@style/Theme.Dialog"
+            tools:replace="android:process,android:theme"/>
+
     </application>
 
 </manifest>

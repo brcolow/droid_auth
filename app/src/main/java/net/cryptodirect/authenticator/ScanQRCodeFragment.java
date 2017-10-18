@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,6 +15,8 @@ import android.view.ViewGroup;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
+
+import net.cryptodirect.authenticator.camera.CameraSelectorDialogFragment;
 
 import java.util.Collections;
 
@@ -67,6 +68,7 @@ public class ScanQRCodeFragment extends Fragment implements ZXingScannerView.Res
             playScanSound = true;
             cameraId = -1;
         }
+
         scannerView.setFormats(Collections.singletonList(BarcodeFormat.QR_CODE));
         return scannerView;
     }
@@ -75,12 +77,13 @@ public class ScanQRCodeFragment extends Fragment implements ZXingScannerView.Res
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
         super.onCreateOptionsMenu(menu, inflater);
-        MenuItemCompat.setShowAsAction(menu.add(Menu.NONE, R.id.menu_flash, 0,
-                flash ? R.string.flash_on : R.string.flash_off), MenuItem.SHOW_AS_ACTION_IF_ROOM);
-        MenuItemCompat.setShowAsAction(menu.add(Menu.NONE, R.id.menu_auto_focus, 0,
-                autoFocus ? R.string.auto_focus_on : R.string.auto_focus_off), MenuItem.SHOW_AS_ACTION_IF_ROOM);
-        MenuItemCompat.setShowAsAction(menu.add(Menu.NONE, R.id.menu_camera_selector, 0,
-                R.string.select_camera), MenuItem.SHOW_AS_ACTION_NEVER);
+        menu.add(Menu.NONE, R.id.menu_flash, 0, flash ? R.string.flash_on : R.string.flash_off)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        menu.add(Menu.NONE, R.id.menu_auto_focus, 0,
+                autoFocus ? R.string.auto_focus_on : R.string.auto_focus_off)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        menu.add(Menu.NONE, R.id.menu_camera_selector, 0, R.string.select_camera)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
     }
 
     @Override
@@ -141,7 +144,7 @@ public class ScanQRCodeFragment extends Fragment implements ZXingScannerView.Res
     {
         super.onResume();
         scannerView.setResultHandler(this);
-        scannerView.startCamera();
+        scannerView.startCamera(cameraId);
         scannerView.setFlash(flash);
         scannerView.setAutoFocus(autoFocus);
     }

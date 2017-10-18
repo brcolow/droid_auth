@@ -26,14 +26,14 @@ public class HowItWorksPageFragment extends Fragment implements View.OnClickList
         // this must be set for things to work!
         view.setId(id);
 
-        Button skipButton = (Button) view.findViewById(R.id.skip_button);
+        Button skipButton = view.findViewById(R.id.skip_button);
         skipButton.setOnClickListener(this);
         backgroundColor = Color.parseColor(getArguments().getString("backgroundColor"));
         view.setBackgroundColor(backgroundColor);
 
         if (id == 2)
         {
-            ImageButton nextButton = (ImageButton) view.findViewById(R.id.next_button);
+            ImageButton nextButton = view.findViewById(R.id.next_button);
             skipButton.setLayoutParams(nextButton.getLayoutParams());
             skipButton.setText(R.string.done);
             nextButton.setVisibility(View.INVISIBLE);
@@ -65,11 +65,11 @@ public class HowItWorksPageFragment extends Fragment implements View.OnClickList
         }
 
         circle.setAlpha(0.75f);
-        ImageView imageView = (ImageView) view.findViewById(R.id.how_it_works_page_image);
+        ImageView imageView = view.findViewById(R.id.how_it_works_page_image);
         imageView.setImageDrawable(ContextCompat.getDrawable(getActivity().getBaseContext(),
                 getArguments().getInt("drawable", R.drawable.ic_keyboard_white_36dp)));
 
-        AutofitTextView textView = (AutofitTextView) view.findViewById(R.id.how_it_works_page_text);
+        AutofitTextView textView = view.findViewById(R.id.how_it_works_page_text);
         switch (id)
         {
             case 0:

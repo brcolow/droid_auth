@@ -23,7 +23,6 @@ import net.cryptodirect.authenticator.crypto.TOTP;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.Locale;
 
 /**
@@ -62,9 +61,9 @@ public class TestDeviceFragment extends Fragment
                     "\"centurion\"");
         }
         View view = inflater.inflate(R.layout.fragment_test_device, container, false);
-        final Button button = (Button) view.findViewById(R.id.begin_tests_button);
-        final LinearLayout resultsContainer = (LinearLayout) view.findViewById(R.id.results_container);
-        final TableLayout resultsTable = (TableLayout) view.findViewById(R.id.results_table);
+        final Button button = view.findViewById(R.id.begin_tests_button);
+        final LinearLayout resultsContainer = view.findViewById(R.id.results_container);
+        final TableLayout resultsTable = view.findViewById(R.id.results_table);
 
         button.setOnClickListener(new View.OnClickListener()
         {

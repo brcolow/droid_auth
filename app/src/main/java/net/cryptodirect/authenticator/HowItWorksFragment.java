@@ -21,7 +21,7 @@ public class HowItWorksFragment extends Fragment
     public void onViewCreated(View view, Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        pager = (ViewPagerCustomDuration) view.findViewById(R.id.view_pager);
+        pager = view.findViewById(R.id.view_pager);
 
         if (android.os.Build.VERSION.SDK_INT >= 17)
         {

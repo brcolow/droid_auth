@@ -19,7 +19,7 @@ public class AboutFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle state)
     {
         View view = inflater.inflate(R.layout.fragment_about, container, false);
-        webView = (WebView) view.findViewById(R.id.aboutWebView);
+        webView = view.findViewById(R.id.aboutWebView);
         webView.loadUrl("file:///android_asset/about.html");
         return view;
     }

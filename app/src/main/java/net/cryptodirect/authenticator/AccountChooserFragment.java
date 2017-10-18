@@ -45,7 +45,7 @@ public class AccountChooserFragment extends Fragment
                     "array \"accountLabels\"");
         }
         View view = inflater.inflate(R.layout.fragment_account_chooser, container, false);
-        final ListView accountsListView = (ListView) view.findViewById(R.id.accounts_list);
+        final ListView accountsListView = view.findViewById(R.id.accounts_list);
 
         final ArrayAdapter<Account> adapter = new ArrayAdapter<Account>(getActivity().getApplicationContext(),
                 android.R.layout.simple_list_item_1, android.R.id.text1,

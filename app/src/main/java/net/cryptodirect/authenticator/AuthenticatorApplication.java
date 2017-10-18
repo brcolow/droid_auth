@@ -3,22 +3,19 @@ package net.cryptodirect.authenticator;
 import android.app.Application;
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import net.cryptodirect.authenticator.acra.DebugSenderFactory;
 
 import org.acra.ACRA;
 import org.acra.config.ACRAConfiguration;
 import org.acra.config.ACRAConfigurationException;
 import org.acra.config.ConfigurationBuilder;
 import org.acra.security.BaseKeyStoreFactory;
-import org.acra.security.KeyStoreFactory;
 import org.acra.sender.HttpSender;
+import org.acra.sender.HttpSenderFactory;
+import org.acra.sender.ReportSenderFactory;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
@@ -55,6 +52,17 @@ public class AuthenticatorApplication extends Application
         final ACRAConfiguration config;
         try
         {
+
+            final Class<? extends ReportSenderFactory>[] senderFactories;
+            if (BuildConfig.DEBUG)
+            {
+                senderFactories = new Class[] { HttpSenderFactory.class, DebugSenderFactory.class };
+            }
+            else
+            {
+                senderFactories = new Class[] { HttpSenderFactory.class };
+            }
+
             config = new ConfigurationBuilder(this)
                     .setFormUri(BuildConfig.DEBUG ? "https://10.0.2.2:4463/acra/report" : "https://cryptodash.net:4463/acra/report")
                     .setDeleteOldUnsentReportsOnApplicationStart(BuildConfig.DEBUG)
@@ -68,6 +76,7 @@ public class AuthenticatorApplication extends Application
                     .setResDialogNegativeButtonText(android.R.string.no)
                     .setHttpMethod(HttpSender.Method.PUT)
                     .setReportType(HttpSender.Type.JSON)
+                    .setReportSenderFactoryClasses(senderFactories)
                     .build();
         }
         catch (ACRAConfigurationException e)

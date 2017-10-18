@@ -29,7 +29,7 @@ public class TOTP
      * @param TS the duration in seconds
      * @return the corresponding TC counter value
      */
-    public static double getTC(int TS)
+    public static long getTC(int TS)
     {
         return getTC((System.currentTimeMillis() / 1000L), TS, 0);
     }
@@ -44,7 +44,7 @@ public class TOTP
      * @param TS the duration in seconds
      * @return the corresponding TC counter value
      */
-    public static double getTC(long time, int TS)
+    public static long getTC(long time, int TS)
     {
         return getTC(time, TS, 0);
     }
@@ -59,9 +59,9 @@ public class TOTP
      * @param T0 the initial time epoch
      * @return the corresponding TC counter value
      */
-    public static double getTC(long time, int TS, int T0)
+    public static long getTC(long time, int TS, int T0)
     {
-        return (double) (time - T0) / (double) TS;
+        return (time - T0) / TS;
     }
 
     /**
