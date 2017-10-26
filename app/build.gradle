@@ -9,7 +9,7 @@ def versionBuild = 0 // bump for dogfood builds, public betas, etc.
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.0"
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
         applicationId "net.cryptodirect.authenticator"
@@ -21,9 +21,6 @@ android {
         buildConfigField 'String', 'BUILD_TIME', "\"${buildTime()}\""
         buildConfigField 'String', 'GIT_SHA', "\"${gitSha()}\""
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        jackOptions {
-            enabled true
-        }
     }
 
     compileOptions {
