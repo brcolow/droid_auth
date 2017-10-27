@@ -83,7 +83,7 @@ public class LinkAccountActivity
             }
             SelectRegisterMethodFragment selectMethodFragment = new SelectRegisterMethodFragment();
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.add(R.id.register_account_fragment_container,
+            fragmentTransaction.replace(R.id.register_account_fragment_container,
                     selectMethodFragment, "select-method")
                     .addToBackStack("select-method")
                     .commit();
@@ -92,6 +92,12 @@ public class LinkAccountActivity
     @Override
     public void onBackStackChanged()
     {
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0)
+        {
+            String fragmentTag = getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1).getName();
+            Log.e(LinkAccountActivity.class.getName(), "Fragment back stack changed to: " + fragmentTag);
+        }
+        Log.e(LinkAccountActivity.class.getName(), "Fragment stack count: " + getSupportFragmentManager().getBackStackEntryCount());
         // this is probably wrong but it works - most likely for the wrong reasons
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.register_account_fragment_container);
         currentFragmentIsScanQRCode = fragment instanceof ScanQRCodeFragment;
@@ -112,12 +118,9 @@ public class LinkAccountActivity
     public void onBackPressed()
     {
         super.onBackPressed();
-        if (getSupportFragmentManager().getBackStackEntryCount() > 0)
+        if (getSupportFragmentManager().getBackStackEntryCount() == 0)
         {
-            getSupportFragmentManager().popBackStack();
-        }
-        else
-        {
+
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         }
@@ -129,16 +132,11 @@ public class LinkAccountActivity
      */
     public void handleScanQRCodeClicked(View view)
     {
-        // FIXME this handles invisible buttons from the previous fragment
         if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
         {
             ActivityCompat.requestPermissions(this, new String[]{ Manifest.permission.CAMERA }, REQUEST_CAMERA);
         }
 
-        if (getSupportFragmentManager().getBackStackEntryCount() > 1)
-        {
-            return;
-        }
         showQRCodeFragment();
     }
 
@@ -148,13 +146,9 @@ public class LinkAccountActivity
      */
     public void handleManualEntryClicked(View view)
     {
-        if (getSupportFragmentManager().getBackStackEntryCount() > 1)
-        {
-            return;
-        }
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         ManualEntryFragment manualEntryFragment = new ManualEntryFragment();
-        fragmentTransaction.add(R.id.register_account_fragment_container,
+        fragmentTransaction.replace(R.id.register_account_fragment_container,
                 manualEntryFragment, "manual-entry")
                 .addToBackStack("manual-entry")
                 .commit();
@@ -204,7 +198,7 @@ public class LinkAccountActivity
                     FragmentTransaction fragmentTransaction = LinkAccountActivity.this
                             .getSupportFragmentManager().beginTransaction();
                     ManualEntryFragment manualEntryFragment = new ManualEntryFragment();
-                    fragmentTransaction.add(R.id.register_account_fragment_container,
+                    fragmentTransaction.replace(R.id.register_account_fragment_container,
                             manualEntryFragment, "manual-entry")
                             .addToBackStack("manual-entry")
                             .commit();
@@ -224,7 +218,7 @@ public class LinkAccountActivity
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             LinkAccountDataFragment linkAccountDataFragment = new LinkAccountDataFragment();
             linkAccountDataFragment.setArguments(bundle);
-            fragmentTransaction.add(R.id.register_account_fragment_container,
+            fragmentTransaction.replace(R.id.register_account_fragment_container,
                     linkAccountDataFragment, "register-account-data")
                     .addToBackStack("register-account-data")
                     .commit();
@@ -246,7 +240,7 @@ public class LinkAccountActivity
             bundle.putBoolean("play_scan_sound", sharedPreferences.getBoolean("play_scan_sound", true));
             ScanQRCodeFragment scanQRCodeFragment = new ScanQRCodeFragment();
             scanQRCodeFragment.setArguments(bundle);
-            fragmentTransaction.add(R.id.register_account_fragment_container,
+            fragmentTransaction.replace(R.id.register_account_fragment_container,
                     scanQRCodeFragment, "qr-code")
                     .addToBackStack("qr-code")
                     .commit();
@@ -260,10 +254,9 @@ public class LinkAccountActivity
      */
     public void handleCorrectButtonClicked(View view)
     {
-        TextView emailTextField = (TextView) findViewById(R.id.account_label_edittext);
-        TextView keyTextField = (TextView) findViewById(R.id.key_edit_text);
-        CheckBox setAsDefaultAccountCheckBox = (CheckBox) findViewById(
-                R.id.set_as_default_account_box);
+        TextView emailTextField = findViewById(R.id.account_label_edittext);
+        TextView keyTextField = findViewById(R.id.key_edit_text);
+        CheckBox setAsDefaultAccountCheckBox = findViewById(R.id.set_as_default_account_box);
 
         if (keyTextField.getError() != null)
         {
@@ -288,7 +281,7 @@ public class LinkAccountActivity
             progressDialog.setMessage(getResources().getString(R.string.verifying_credentials));
             progressDialog.show();
             NotifyAccountLinkedTask notifyAccountLinkedTask = new NotifyAccountLinkedTask(
-                    progressDialog, emailTextField.getText(), keyTextField.getText());
+                    centurion, progressDialog, emailTextField.getText(), keyTextField.getText());
             JSONObject response;
 
             // if this is a code provided by us, verify entered credentials via Centurion
@@ -458,21 +451,23 @@ public class LinkAccountActivity
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         LinkAccountDataFragment linkAccountDataFragment = new LinkAccountDataFragment();
         linkAccountDataFragment.setArguments(bundle);
-        fragmentTransaction.add(R.id.register_account_fragment_container,
+        fragmentTransaction.replace(R.id.register_account_fragment_container,
                 linkAccountDataFragment, "register-account-data")
                 .addToBackStack("register-account-data")
                 .commit();
     }
 
-    private class NotifyAccountLinkedTask extends AsyncTask<String, Void, JSONObject>
+    private static class NotifyAccountLinkedTask extends AsyncTask<String, Void, JSONObject>
     {
+        private final Centurion centurion;
         private final CharSequence email;
         private final CharSequence key;
         private final ProgressDialog progressDialog;
 
-        public NotifyAccountLinkedTask(ProgressDialog progressDialog, CharSequence email,
-                                       CharSequence key)
+        public NotifyAccountLinkedTask(Centurion centurion, ProgressDialog progressDialog,
+                                       CharSequence email, CharSequence key)
         {
+            this.centurion = centurion;
             this.progressDialog = progressDialog;
             this.email = email;
             this.key = key;

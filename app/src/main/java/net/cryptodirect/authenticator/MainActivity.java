@@ -196,7 +196,7 @@ public class MainActivity
                 entryPage = EntryPage.WELCOME;
                 WelcomeFragment welcomeFragment = new WelcomeFragment();
                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.add(R.id.main_fragment_container,
+                fragmentTransaction.replace(R.id.main_fragment_container,
                         welcomeFragment, "welcome")
                         .addToBackStack("welcome")
                         .commit();
@@ -375,7 +375,7 @@ public class MainActivity
         AccountChooserFragment accountChooserFragment = new AccountChooserFragment();
         accountChooserFragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.main_fragment_container,
+        fragmentTransaction.replace(R.id.main_fragment_container,
                 accountChooserFragment, "choose-account")
                 .addToBackStack("choose-account")
                 .commit();
@@ -394,7 +394,7 @@ public class MainActivity
         //sharedPreferences.registerOnSharedPreferenceChangeListener(authenticatorFragment);
         authenticatorFragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.main_fragment_container,
+        fragmentTransaction.replace(R.id.main_fragment_container,
                 authenticatorFragment, "authenticator")
                 .addToBackStack("authenticator")
                 .commit();
@@ -408,7 +408,7 @@ public class MainActivity
         SettingsFragment settingsFragment = new SettingsFragment();
         settingsFragment.setArguments(bundle);
         android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.main_fragment_container,
+        fragmentTransaction.replace(R.id.main_fragment_container,
                 settingsFragment, "settings")
                 .addToBackStack("settings")
                 .commit();
@@ -418,7 +418,7 @@ public class MainActivity
     {
         AboutFragment aboutFragment = new AboutFragment();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.main_fragment_container,
+        fragmentTransaction.replace(R.id.main_fragment_container,
                 aboutFragment, "about")
                 .addToBackStack("about")
                 .commit();
@@ -435,7 +435,7 @@ public class MainActivity
         bundle.putSerializable("centurion", centurion);
         testDeviceFragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.main_fragment_container,
+        fragmentTransaction.replace(R.id.main_fragment_container,
                 testDeviceFragment, "test-device")
                 .addToBackStack("test-device")
                 .commit();
@@ -482,7 +482,7 @@ public class MainActivity
     {
         android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         HowItWorksFragment howItWorksFragment = new HowItWorksFragment();
-        fragmentTransaction.add(R.id.main_fragment_container,
+        fragmentTransaction.replace(R.id.main_fragment_container,
                 howItWorksFragment, "how-it-works")
                 .addToBackStack("how-it-works")
                 .commit();
@@ -566,7 +566,7 @@ public class MainActivity
         // TODO not sure if this is the best thing to do if the dialog is cancelled
         WelcomeFragment welcomeFragment = new WelcomeFragment();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.main_fragment_container,
+        fragmentTransaction.replace(R.id.main_fragment_container,
                 welcomeFragment, "welcome")
                 .addToBackStack("welcome")
                 .commit();

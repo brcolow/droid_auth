@@ -7,7 +7,8 @@
               android:background="#212121"
               android:clickable="true"
               android:orientation="vertical"
-              tools:context="net.cryptodirect.authenticator.SelectRegisterMethodFragment">
+              tools:context="net.cryptodirect.authenticator.SelectRegisterMethodFragment"
+              android:focusable="true">
 
     <me.grantland.widget.AutofitTextView
         android:id="@+id/textView"
@@ -53,7 +54,8 @@
                 android:text="@string/scan_qrcode"
                 android:textColor="#f3f3f3"
                 android:textSize="20sp"
-                android:maxLines="1"/>
+                android:maxLines="1"
+                android:focusable="true"/>
         </TableRow>
 
         <TableRow
@@ -84,7 +86,8 @@
                 android:text="@string/manual_entry"
                 android:textColor="#f3f3f3"
                 android:textSize="20sp"
-                android:maxLines="1"/>
+                android:maxLines="1"
+                android:focusable="true"/>
         </TableRow>
     </TableLayout>
 </LinearLayout>

@@ -1,4 +1,6 @@
 import java.text.SimpleDateFormat
+import groovy.swing.SwingBuilder
+System.setProperty('java.awt.headless', 'false')
 
 apply plugin: 'com.android.application'
 
@@ -94,21 +96,45 @@ static def buildTime() {
     return df.format(new Date())
 }
 
-task askForPasswords << {
-    // Must create String because System.readPassword() returns char[]
-    // (and assigning that below fails silently)
-    System.console().println()
-    def storePw = new String(System.console().readPassword("Keystore password: "))
-    def keyPw  = new String(System.console().readPassword("Key password: "))
-
-    android.signingConfigs.release.storePassword = storePw
-    android.signingConfigs.release.keyPassword = keyPw
-}
-
 static def replacePatternInFile(file, Closure replaceText) {
     file.write(replaceText(file.text))
 }
 
+task askForPasswords << {
+    def console = System.console()
+    def storePw
+    def keyPw
+
+    // See: https://stackoverflow.com/questions/42222630/get-input-from-user-on-gradle-build-in-android-studio/42225803#42225803
+    if (console) {
+        // Must create String because System.readPassword() returns char[]
+        // (and assigning that below fails silently)
+        storePw = new String(console.readPassword("\nKeystore password: "))
+        keyPw = new String(console.readPassword("Key password: "))
+    } else {
+        // Gradle is running as a daemon - prompt user to enter passwords via popup UI
+        new SwingBuilder().edt {
+            dialog(modal: true, title: 'Enter credentials', alwaysOnTop: true, resizable: false,
+                    locationRelativeTo: null, pack: true, show: true
+            ) {
+                vbox {
+                    label(text: "Keystore passphrase:")
+                    textField id: "storeText", input = passwordField()
+                    label(text: "Key passphrase:")
+                    textField id: "keyText", input = passwordField()
+                    button(defaultButton: true, text: 'OK', actionPerformed: {
+                        storePw = storeText.text
+                        keyPw = keyText.text
+                        dispose()
+                    })
+                }
+            }
+        }
+    }
+
+    android.signingConfigs.release.storePassword = storePw
+    android.signingConfigs.release.keyPassword = keyPw
+}
 task writeVersionToAboutFile << {
     def file = new File('.\\app\\src\\main\\assets\\about.html')
 

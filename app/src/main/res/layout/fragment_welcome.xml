@@ -55,7 +55,8 @@
                 android:text="@string/title_activity_register_account"
                 android:textColor="#f3f3f3"
                 android:textSize="20sp"
-                android:maxLines="1"/>
+                android:maxLines="1"
+                android:focusable="true"/>
         </TableRow>
 
         <TableRow
@@ -85,7 +86,8 @@
                 android:text="@string/how_it_works"
                 android:textColor="#f3f3f3"
                 android:textSize="20sp"
-                android:maxLines="1"/>
+                android:maxLines="1"
+                android:focusable="true"/>
         </TableRow>
     </TableLayout>
 
