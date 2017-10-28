@@ -78,6 +78,6 @@ public class ChooseAccountBehaviorTest
         // The current TOTP code and time-wheel should be displayed for the newly linked account
         onView(withId(R.id.code_box)).check(matches(isDisplayed()));
         onView(withId(R.id.code_box)).check(matches(withText(generateTOTP(
-                coinbaseAccount.getSecretKey(), (long) getTC(30), 6, SHA1))));
+                coinbaseAccount.getSecretKey(), getTC(30), 6, SHA1))));
     }
 }

@@ -19,7 +19,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import static net.cryptodirect.authenticator.StandardCharsets.UTF_8;
-import static net.cryptodirect.authenticator.crypto.Algorithm.SHA1;
 import static net.cryptodirect.authenticator.crypto.TOTP.generateTOTP;
 import static net.cryptodirect.authenticator.crypto.TOTP.getTC;
 
@@ -66,7 +65,7 @@ public class Account implements Serializable
 
     public String getOneTimePasscode()
     {
-        return generateTOTP(secretKey, (long) getTC(getCodeParams().getTotpPeriod()),
+        return generateTOTP(secretKey, getTC(getCodeParams().getTotpPeriod()),
                 codeParams.getDigits(), codeParams.getAlgorithm());
     }
 
@@ -349,7 +348,7 @@ public class Account implements Serializable
                 key = index > 0 ? URLDecoder.decode(pair.substring(0, index), UTF_8.name())
                         .toLowerCase(Locale.US).replace(' ', '+') : pair.toLowerCase(Locale.US);
                 if (!keyValuePairs.containsKey(key)) {
-                    keyValuePairs.put(key, new LinkedList<String>());
+                    keyValuePairs.put(key, new LinkedList<>());
                 }
                 final String value = index > 0 && pair.length() > index + 1 ?
                         URLDecoder.decode(pair.substring(index + 1), UTF_8.name())

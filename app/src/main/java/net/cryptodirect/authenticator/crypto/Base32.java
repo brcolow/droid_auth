@@ -4,6 +4,8 @@ package net.cryptodirect.authenticator.crypto;
 
 import net.cryptodirect.authenticator.StandardCharsets;
 
+import org.acra.ACRA;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -218,6 +220,7 @@ public class Base32 {
                         ds.writeByte((byte) (t[j] & 0xFF));
                 }
                 catch (IOException e) {
+                    ACRA.getErrorReporter().handleException(e);
                 }
             }
 

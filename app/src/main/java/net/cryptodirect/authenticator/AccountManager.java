@@ -23,9 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -35,7 +33,7 @@ public class AccountManager
 {
     private Context baseContext;
     private static final AccountManager INSTANCE = new AccountManager();
-    public static final String ACCOUNTS_FILE = "accounts.json";
+    private static final String ACCOUNTS_FILE = "accounts.json";
     private final Map<Issuer, Account> accounts = new ConcurrentHashMap<>();
 
     private AccountManager()

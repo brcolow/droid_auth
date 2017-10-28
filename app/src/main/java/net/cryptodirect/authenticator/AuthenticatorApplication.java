@@ -89,17 +89,14 @@ public class AuthenticatorApplication extends Application
 
         if (BuildConfig.DEBUG)
         {
-            javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier()
-            {
-                @Override
-                public boolean verify(String hostname, SSLSession session)
-                {
-                    return hostname.equals("10.0.2.2");
-                }
-            });
+            javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(
+                    (hostname, session) -> hostname.equals("10.0.2.2"));
         }
     }
 
+    /**
+     * Must be public.
+     */
     public static class MyKeyStoreFactory extends BaseKeyStoreFactory
     {
         @Override

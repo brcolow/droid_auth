@@ -180,29 +180,21 @@ public class LinkAccountActivity
             AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this, R.style.Theme_Dialog);
             alertBuilder.setMessage(reasonInvalid);
             alertBuilder.setCancelable(false);
-            alertBuilder.setPositiveButton(getString(R.string.rescan), new DialogInterface.OnClickListener()
+            alertBuilder.setPositiveButton(getString(R.string.rescan), (dialog, id) ->
             {
-                @Override
-                public void onClick(DialogInterface dialog, int id)
-                {
-                    LinkAccountActivity.this.getSupportFragmentManager().popBackStack();
-                    LinkAccountActivity.this.showQRCodeFragment();
-                }
+                LinkAccountActivity.this.getSupportFragmentManager().popBackStack();
+                LinkAccountActivity.this.showQRCodeFragment();
             });
-            alertBuilder.setNegativeButton(getString(R.string.enter_manually), new DialogInterface.OnClickListener()
+            alertBuilder.setNegativeButton(getString(R.string.enter_manually), (dialog, id) ->
             {
-                @Override
-                public void onClick(DialogInterface dialog, int id)
-                {
-                    LinkAccountActivity.this.getSupportFragmentManager().popBackStack();
-                    FragmentTransaction fragmentTransaction = LinkAccountActivity.this
-                            .getSupportFragmentManager().beginTransaction();
-                    ManualEntryFragment manualEntryFragment = new ManualEntryFragment();
-                    fragmentTransaction.replace(R.id.register_account_fragment_container,
-                            manualEntryFragment, "manual-entry")
-                            .addToBackStack("manual-entry")
-                            .commit();
-                }
+                LinkAccountActivity.this.getSupportFragmentManager().popBackStack();
+                FragmentTransaction fragmentTransaction = LinkAccountActivity.this
+                        .getSupportFragmentManager().beginTransaction();
+                ManualEntryFragment manualEntryFragment = new ManualEntryFragment();
+                fragmentTransaction.replace(R.id.register_account_fragment_container,
+                        manualEntryFragment, "manual-entry")
+                        .addToBackStack("manual-entry")
+                        .commit();
             });
             AlertDialog alertDialog = alertBuilder.create();
             alertDialog.show();
@@ -320,15 +312,11 @@ public class LinkAccountActivity
                     AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this, R.style.Theme_Dialog);
                     alertBuilder.setMessage(R.string.centurion_invalid_args);
                     alertBuilder.setCancelable(false);
-                    alertBuilder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
+                    alertBuilder.setPositiveButton(android.R.string.ok, (dialog, id) ->
                     {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id)
-                        {
-                            // TODO maybe we should allow the user to go to
-                            // manual entry with the current text already entered
-                            dialog.dismiss();
-                        }
+                        // TODO maybe we should allow the user to go to
+                        // manual entry with the current text already entered
+                        dialog.dismiss();
                     });
                     AlertDialog alertDialog = alertBuilder.create();
                     alertDialog.show();
@@ -423,8 +411,8 @@ public class LinkAccountActivity
      */
     public void handleOkayButtonClicked(View view)
     {
-        EditText emailTextField = (EditText) findViewById(R.id.account_label_edittext);
-        EditText keyTextField = (EditText) findViewById(R.id.key_edit_text);
+        EditText emailTextField = findViewById(R.id.account_label_edittext);
+        EditText keyTextField = findViewById(R.id.key_edit_text);
 
         String errorMessage = isEnteredKeyValid(keyTextField);
 

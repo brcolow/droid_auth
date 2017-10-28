@@ -19,7 +19,7 @@ android {
         targetSdkVersion 26
         versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionPatch}+" +
-                String.format("%03d", versionBuild);
+                String.format("%03d", versionBuild)
         buildConfigField 'String', 'BUILD_TIME', "\"${buildTime()}\""
         buildConfigField 'String', 'GIT_SHA', "\"${gitSha()}\""
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -135,12 +135,13 @@ task askForPasswords << {
     android.signingConfigs.release.storePassword = storePw
     android.signingConfigs.release.keyPassword = keyPw
 }
+
 task writeVersionToAboutFile << {
     def file = new File('.\\app\\src\\main\\assets\\about.html')
 
     def patternToFind = ~/Version \d.\d.\d\+\d\d\d/
     def replacePatternWith = 'Version ' + versionMajor + "." + versionMinor + "." + versionPatch +
-            "+" + String.format("%03d", versionBuild);
+            "+" + String.format("%03d", versionBuild)
 
     replacePatternInFile(file){
         it.replaceAll(patternToFind, replacePatternWith)

@@ -90,11 +90,11 @@ public class TOTP
 
         int otp = binary % DIGITS_POWER[N];
         // prepend zeros to result to get N digits
-        String result = Integer.toString(otp);
+        StringBuilder result = new StringBuilder(Integer.toString(otp));
         while (result.length() < N) {
-            result = "0" + result;
+            result.insert(0, "0");
         }
-        return result;
+        return result.toString();
     }
 
     private static byte[] hmacSha(byte[] key, byte[] value, Algorithm algorithm)

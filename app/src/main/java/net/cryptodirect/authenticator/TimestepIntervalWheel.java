@@ -181,7 +181,7 @@ public class TimestepIntervalWheel extends View
             if (decrementSecondsRemaining())
             {
                 handler.post(new SetNewCodeTask(codeTextView, generateTOTP(account.getSecretKey(),
-                        (long) getTC(account.getCodeParams().getTotpPeriod()),
+                        getTC(account.getCodeParams().getTotpPeriod()),
                         account.getCodeParams().getDigits(),
                         account.getCodeParams().getAlgorithm())));
 

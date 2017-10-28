@@ -21,12 +21,6 @@ import net.cryptodirect.authenticator.crypto.TOTP;
 public class AuthenticatorFragment extends Fragment
 {
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle state)
     {
         View rootView = inflater.inflate(R.layout.fragment_authenticator, container, false);

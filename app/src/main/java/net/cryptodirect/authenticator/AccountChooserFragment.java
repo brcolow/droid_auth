@@ -114,15 +114,8 @@ public class AccountChooserFragment extends Fragment
         };
 
         accountsListView.setAdapter(adapter);
-        accountsListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-        {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-            {
-                listener.onAccountChosen(((Account) accountsListView.getItemAtPosition(position))
-                        .getIssuer().name());
-            }
-        });
+        accountsListView.setOnItemClickListener((parent, view1, position, id) ->
+                listener.onAccountChosen(((Account) accountsListView.getItemAtPosition(position)).getIssuer().name()));
 
         accountsListView.setEmptyView(view.findViewById(R.id.empty_list_view_layout));
         return view;

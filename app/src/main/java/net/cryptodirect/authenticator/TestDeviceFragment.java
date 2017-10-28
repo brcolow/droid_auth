@@ -65,112 +65,108 @@ public class TestDeviceFragment extends Fragment
         final LinearLayout resultsContainer = view.findViewById(R.id.results_container);
         final TableLayout resultsTable = view.findViewById(R.id.results_table);
 
-        button.setOnClickListener(new View.OnClickListener()
+        button.setOnClickListener(callback ->
         {
-            @Override
-            public void onClick(View callback)
+            /*
+            FetchTimeTask fetchTimeTask = new FetchTimeTask(centurion);
+            long serverTimeMillis;
+            try
             {
-                /*
-                FetchTimeTask fetchTimeTask = new FetchTimeTask(centurion);
-                long serverTimeMillis;
-                try
-                {
-                    serverTimeMillis = fetchTimeTask.execute().get(5000, TimeUnit.MILLISECONDS);
-                }
-                catch (InterruptedException | ExecutionException | TimeoutException e)
-                {
-                    serverTimeMillis = System.currentTimeMillis();
-                }
-                */
-                boolean[] testSuccessful = new boolean[18];
-                for (int i = 0; i < testSuccessful.length; i++)
-                {
-                    if (i < 6)
-                    {
-                        testSuccessful[i] = TOTP.generateTOTP(KEY_20_BYTES,
-                                TOTP.getTC(testTimeParams[i], 30), 8, Algorithm.SHA1)
-                                .equals(testCorrectResults[i]);
-                    }
-                    else if (i < 12)
-                    {
-                        testSuccessful[i] = TOTP.generateTOTP(KEY_32_BYTES,
-                                TOTP.getTC(testTimeParams[i % 6], 30), 8, Algorithm.SHA256)
-                                .equals(testCorrectResults[i]);
-                    }
-                    else
-                    {
-                        testSuccessful[i] = TOTP.generateTOTP(KEY_64_BYTES,
-                                TOTP.getTC(testTimeParams[i % 6], 30), 8, Algorithm.SHA512)
-                                .equals(testCorrectResults[i]);
-                    }
-                }
-                TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(
-                        TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
-                layoutParams.setMargins(0, 0, 0, 0);
-
-                LinearLayout testNumberHeaderCell = new LinearLayout(TestDeviceFragment.this.getActivity());
-                testNumberHeaderCell.setLayoutParams(layoutParams);
-                TextView testNumber = new TextView(TestDeviceFragment.this.getActivity());
-                testNumber.setText(R.string.test_number_sign);
-                testNumber.setTextColor(Color.parseColor("#212121"));
-                testNumber.setPadding(0, 0, 0, 0);
-                testNumberHeaderCell.addView(testNumber);
-
-                LinearLayout testResultHeaderCell = new LinearLayout(TestDeviceFragment.this.getActivity());
-                testResultHeaderCell.setLayoutParams(layoutParams);
-                TextView testResult = new TextView(TestDeviceFragment.this.getActivity());
-                testResult.setText(R.string.result);
-                testResult.setTextColor(Color.parseColor("#212121"));
-                testNumber.setPadding(0, 0, 0, 0);
-                testResultHeaderCell.addView(testResult);
-
-                TableRow resultsTableHeaderRow = new TableRow(TestDeviceFragment.this.getActivity());
-                resultsTableHeaderRow.addView(testNumberHeaderCell);
-                resultsTableHeaderRow.addView(testResultHeaderCell);
-                resultsTableHeaderRow.setBackgroundColor(Color.WHITE);
-                resultsTableHeaderRow.setPadding(0, 0, 0, 1); // Border between rows
-
-                resultsTable.addView(resultsTableHeaderRow);
-                layoutParams.setMargins(2, 0, 2, 0);
-
-                for (int i = 0; i < testSuccessful.length; i++)
-                {
-                    TableRow testResultRow = new TableRow(TestDeviceFragment.this.getActivity());
-
-                    testResultRow.setBackgroundColor(Color.WHITE);
-                    testResultRow.setPadding(0, 0, 0, 2); // Border between rows
-
-                    LinearLayout cell = new LinearLayout(TestDeviceFragment.this.getActivity());
-                    cell.setBackgroundColor(Color.parseColor("#212121"));
-                    cell.setLayoutParams(layoutParams);
-                    testNumber = new TextView(TestDeviceFragment.this.getActivity());
-                    testNumber.setText(String.format(Locale.US, "Test %d", i + 1));
-                    testNumber.setTextColor(Color.WHITE);
-                    testNumber.setPadding(0, 0, 4, 3);
-                    cell.addView(testNumber);
-
-                    LinearLayout cell2 = new LinearLayout(TestDeviceFragment.this.getActivity());
-                    cell2.setBackgroundColor(Color.parseColor("#212121"));
-                    cell2.setLayoutParams(layoutParams);
-                    testResult = new TextView(TestDeviceFragment.this.getActivity());
-                    testResult.setText(testSuccessful[i] ? "Passed" : "Failed");
-                    testResult.setTextColor(testSuccessful[i] ? PASSED_COLOR : FAILED_COLOR);
-                    testNumber.setPadding(0, 0, 4, 3);
-                    cell2.addView(testResult);
-
-                    testResultRow.addView(cell);
-                    testResultRow.addView(cell2);
-                    resultsTable.addView(testResultRow);
-                }
-                button.setVisibility(View.GONE);
-                resultsTable.setVisibility(View.VISIBLE);
-                DisplayMetrics metrics = new DisplayMetrics();
-                TestDeviceFragment.this.getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-                int height = metrics.heightPixels;
-                // The -200f value centers the table on Nexus 6, so we use that to scale the adjustment
-                // to the device we are running on
-                resultsContainer.setTranslationY(-200f * (height * metrics.densityDpi / (float) (NEXUS_6_HEIGHT_PIXELS * NEXUS_6_DPI)));
+                serverTimeMillis = fetchTimeTask.execute().get(5000, TimeUnit.MILLISECONDS);
             }
+            catch (InterruptedException | ExecutionException | TimeoutException e)
+            {
+                serverTimeMillis = System.currentTimeMillis();
+            }
+            */
+            boolean[] testSuccessful = new boolean[18];
+            for (int i = 0; i < testSuccessful.length; i++)
+            {
+                if (i < 6)
+                {
+                    testSuccessful[i] = TOTP.generateTOTP(KEY_20_BYTES,
+                            TOTP.getTC(testTimeParams[i], 30), 8, Algorithm.SHA1)
+                            .equals(testCorrectResults[i]);
+                }
+                else if (i < 12)
+                {
+                    testSuccessful[i] = TOTP.generateTOTP(KEY_32_BYTES,
+                            TOTP.getTC(testTimeParams[i % 6], 30), 8, Algorithm.SHA256)
+                            .equals(testCorrectResults[i]);
+                }
+                else
+                {
+                    testSuccessful[i] = TOTP.generateTOTP(KEY_64_BYTES,
+                            TOTP.getTC(testTimeParams[i % 6], 30), 8, Algorithm.SHA512)
+                            .equals(testCorrectResults[i]);
+                }
+            }
+            TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(
+                    TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+            layoutParams.setMargins(0, 0, 0, 0);
+
+            LinearLayout testNumberHeaderCell = new LinearLayout(TestDeviceFragment.this.getActivity());
+            testNumberHeaderCell.setLayoutParams(layoutParams);
+            TextView testNumber = new TextView(TestDeviceFragment.this.getActivity());
+            testNumber.setText(R.string.test_number_sign);
+            testNumber.setTextColor(Color.parseColor("#212121"));
+            testNumber.setPadding(0, 0, 0, 0);
+            testNumberHeaderCell.addView(testNumber);
+
+            LinearLayout testResultHeaderCell = new LinearLayout(TestDeviceFragment.this.getActivity());
+            testResultHeaderCell.setLayoutParams(layoutParams);
+            TextView testResult = new TextView(TestDeviceFragment.this.getActivity());
+            testResult.setText(R.string.result);
+            testResult.setTextColor(Color.parseColor("#212121"));
+            testNumber.setPadding(0, 0, 0, 0);
+            testResultHeaderCell.addView(testResult);
+
+            TableRow resultsTableHeaderRow = new TableRow(TestDeviceFragment.this.getActivity());
+            resultsTableHeaderRow.addView(testNumberHeaderCell);
+            resultsTableHeaderRow.addView(testResultHeaderCell);
+            resultsTableHeaderRow.setBackgroundColor(Color.WHITE);
+            resultsTableHeaderRow.setPadding(0, 0, 0, 1); // Border between rows
+
+            resultsTable.addView(resultsTableHeaderRow);
+            layoutParams.setMargins(2, 0, 2, 0);
+
+            for (int i = 0; i < testSuccessful.length; i++)
+            {
+                TableRow testResultRow = new TableRow(TestDeviceFragment.this.getActivity());
+
+                testResultRow.setBackgroundColor(Color.WHITE);
+                testResultRow.setPadding(0, 0, 0, 2); // Border between rows
+
+                LinearLayout cell = new LinearLayout(TestDeviceFragment.this.getActivity());
+                cell.setBackgroundColor(Color.parseColor("#212121"));
+                cell.setLayoutParams(layoutParams);
+                testNumber = new TextView(TestDeviceFragment.this.getActivity());
+                testNumber.setText(String.format(Locale.US, "Test %d", i + 1));
+                testNumber.setTextColor(Color.WHITE);
+                testNumber.setPadding(0, 0, 4, 3);
+                cell.addView(testNumber);
+
+                LinearLayout cell2 = new LinearLayout(TestDeviceFragment.this.getActivity());
+                cell2.setBackgroundColor(Color.parseColor("#212121"));
+                cell2.setLayoutParams(layoutParams);
+                testResult = new TextView(TestDeviceFragment.this.getActivity());
+                testResult.setText(testSuccessful[i] ? "Passed" : "Failed");
+                testResult.setTextColor(testSuccessful[i] ? PASSED_COLOR : FAILED_COLOR);
+                testNumber.setPadding(0, 0, 4, 3);
+                cell2.addView(testResult);
+
+                testResultRow.addView(cell);
+                testResultRow.addView(cell2);
+                resultsTable.addView(testResultRow);
+            }
+            button.setVisibility(View.GONE);
+            resultsTable.setVisibility(View.VISIBLE);
+            DisplayMetrics metrics = new DisplayMetrics();
+            TestDeviceFragment.this.getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+            int height = metrics.heightPixels;
+            // The -200f value centers the table on Nexus 6, so we use that to scale the adjustment
+            // to the device we are running on
+            resultsContainer.setTranslationY(-200f * (height * metrics.densityDpi / (float) (NEXUS_6_HEIGHT_PIXELS * NEXUS_6_DPI)));
         });
         return view;
     }

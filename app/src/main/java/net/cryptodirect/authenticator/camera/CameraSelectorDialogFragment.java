@@ -60,34 +60,20 @@ public class CameraSelectorDialogFragment extends DialogFragment
                 // Specify the list array, the items to be selected by default (null for none),
                 // and the listener through which to receive callbacks when items are selected
                 .setSingleChoiceItems(camera.getCameras(), checkedIndex,
-                        new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which)
-                            {
-                                cameraId = which;
-                            }
-                        })
+                        (dialog, which) -> cameraId = which)
                 // Set the action buttons
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
+                .setPositiveButton(android.R.string.ok, (dialog, id) ->
                 {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id)
+                    // User clicked OK, so save the mSelectedIndices results somewhere
+                    // or return them to the component that opened the dialog
+                    if (listener != null)
                     {
-                        // User clicked OK, so save the mSelectedIndices results somewhere
-                        // or return them to the component that opened the dialog
-                        if (listener != null)
-                        {
-                            listener.onCameraSelected(cameraId);
-                        }
+                        listener.onCameraSelected(cameraId);
                     }
                 })
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener()
+                .setNegativeButton(android.R.string.cancel, (dialog, id) ->
                 {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id)
-                    {
-                    }
+                    // TODO
                 });
 
         return builder.create();

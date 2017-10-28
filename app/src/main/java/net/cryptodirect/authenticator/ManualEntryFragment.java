@@ -48,62 +48,46 @@ public class ManualEntryFragment extends Fragment
         keyEditText.setTypeface(FontManager.getInstance().getTypeface("ANONYMOUS_PRO"));
 
         // allow enter to be clicked when inside key edit text, and it hides keyboard
-        emailEditText.setOnKeyListener(new View.OnKeyListener()
+        emailEditText.setOnKeyListener((view1, keyCode, event) ->
         {
-            @Override
-            public boolean onKey(View view, int keyCode, KeyEvent event)
+            if (keyCode == KeyEvent.KEYCODE_ENTER)
             {
-                if (keyCode == KeyEvent.KEYCODE_ENTER)
-                {
-                    keyEditText.requestFocus(View.FOCUS_DOWN);
-                }
-                return false;
+                keyEditText.requestFocus(View.FOCUS_DOWN);
             }
+            return false;
         });
 
-        emailEditText.setOnEditorActionListener(new TextView.OnEditorActionListener()
+        emailEditText.setOnEditorActionListener((textView, actionId, event) ->
         {
-            @Override
-            public boolean onEditorAction(TextView textView, int actionId, KeyEvent event)
+            if (actionId == EditorInfo.IME_ACTION_DONE)
             {
-                if (actionId == EditorInfo.IME_ACTION_DONE)
-                {
-                    keyEditText.requestFocus(View.FOCUS_DOWN);
-                }
-                return false;
+                keyEditText.requestFocus(View.FOCUS_DOWN);
             }
+            return false;
         });
 
 
-        keyEditText.setOnEditorActionListener(new TextView.OnEditorActionListener()
+        keyEditText.setOnEditorActionListener((textView, actionId, event) ->
         {
-            @Override
-            public boolean onEditorAction(TextView textView, int actionId, KeyEvent event)
+            if (actionId == EditorInfo.IME_ACTION_DONE)
             {
-                if (actionId == EditorInfo.IME_ACTION_DONE)
-                {
-                    InputMethodManager inputMethodManager = (InputMethodManager) ManualEntryFragment.this.getActivity()
-                            .getSystemService(Context.INPUT_METHOD_SERVICE);
-                    inputMethodManager.hideSoftInputFromWindow(keyEditText.getWindowToken(), 0);
-                }
-                return false;
+                InputMethodManager inputMethodManager = (InputMethodManager) ManualEntryFragment.this.getActivity()
+                        .getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(keyEditText.getWindowToken(), 0);
             }
+            return false;
         });
 
-        keyEditText.setOnKeyListener(new View.OnKeyListener()
+        keyEditText.setOnKeyListener((view1, keyCode, event) ->
         {
-            @Override
-            public boolean onKey(View view, int keyCode, KeyEvent event)
+            if (keyCode == KeyEvent.KEYCODE_ENTER)
             {
-                if (keyCode == KeyEvent.KEYCODE_ENTER)
-                {
-                    InputMethodManager inputMethodManager =
-                            (InputMethodManager) ManualEntryFragment.this.getActivity()
-                            .getSystemService(Context.INPUT_METHOD_SERVICE);
-                    inputMethodManager.hideSoftInputFromWindow(keyEditText.getWindowToken(), 0);
-                }
-                return false;
+                InputMethodManager inputMethodManager =
+                        (InputMethodManager) ManualEntryFragment.this.getActivity()
+                        .getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(keyEditText.getWindowToken(), 0);
             }
+            return false;
         });
 
         // on-the-fly key input validation

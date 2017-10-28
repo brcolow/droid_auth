@@ -1,18 +1,14 @@
 package net.cryptodirect.authenticator;
 
-import android.Manifest;
 import android.animation.ArgbEvaluator;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
@@ -26,7 +22,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.widget.Toast;
 
 import org.acra.ACRA;
 import org.json.JSONException;
@@ -93,22 +88,9 @@ public class MainActivity
                     ". Please check which accounts are still registered. This error has " +
                     "been reported.");
             alertBuilder.setCancelable(false);
-            alertBuilder.setPositiveButton(getString(R.string.check_accounts), new DialogInterface.OnClickListener()
-            {
-                @Override
-                public void onClick(DialogInterface dialog, int id)
-                {
-                    MainActivity.this.showAccountChooserFragment();
-                }
-            });
-            alertBuilder.setNegativeButton(getString(R.string.not_now), new DialogInterface.OnClickListener()
-            {
-                @Override
-                public void onClick(DialogInterface dialog, int id)
-                {
-                    dialog.cancel();
-                }
-            });
+            alertBuilder.setPositiveButton(getString(R.string.check_accounts),
+                    (dialog, id) -> MainActivity.this.showAccountChooserFragment());
+            alertBuilder.setNegativeButton(getString(R.string.not_now), (dialog, id) -> dialog.cancel());
             AlertDialog alertDialog = alertBuilder.create();
             alertDialog.show();
         }
@@ -150,23 +132,9 @@ public class MainActivity
                         "Sorry about that - please link the account again.");
                 alertBuilder.setCancelable(true);
                 alertBuilder.setPositiveButton(getString(R.string.register_new_account),
-                        new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int id)
-                            {
-                                MainActivity.this.startLinkAccountActivity();
-                            }
-                        });
+                        (dialog, id) -> MainActivity.this.startLinkAccountActivity());
                 alertBuilder.setNegativeButton(getString(R.string.not_now),
-                        new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialog, int id)
-                            {
-                                dialog.cancel();
-                            }
-                        });
+                        (dialog, id) -> dialog.cancel());
                 AlertDialog alertDialog = alertBuilder.create();
                 alertDialog.setOnCancelListener(this);
                 alertDialog.show();
@@ -296,7 +264,7 @@ public class MainActivity
                 }
                 catch (Exception e)
                 {
-                    throw new IllegalStateException(e);
+                    ACRA.getErrorReporter().handleException(e);
                 }
             }
         }
@@ -326,7 +294,7 @@ public class MainActivity
                 catch (Exception e)
                 {
                     Log.e(TAG, "onMenuOpened...unable to set icons for overflow menu", e);
-                    throw new IllegalStateException(e);
+                    ACRA.getErrorReporter().handleException(e);
                 }
             }
         }
