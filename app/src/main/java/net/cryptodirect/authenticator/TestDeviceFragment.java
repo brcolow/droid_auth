@@ -54,12 +54,12 @@ public class TestDeviceFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle state)
     {
-        Centurion centurion = state.getParcelable("centurion");
-        if (centurion == null)
+        if (!getArguments().containsKey("centurion"))
         {
-            throw new IllegalArgumentException("bundle: " + state + " did not contain parcelable " +
+            throw new IllegalArgumentException("arguments did not contain parcelable " +
                     "\"centurion\"");
         }
+        Centurion centurion = getArguments().getParcelable("centurion");
         View view = inflater.inflate(R.layout.fragment_test_device, container, false);
         final Button button = view.findViewById(R.id.begin_tests_button);
         final LinearLayout resultsContainer = view.findViewById(R.id.results_container);
@@ -68,39 +68,39 @@ public class TestDeviceFragment extends Fragment
         button.setOnClickListener(new View.OnClickListener()
         {
             @Override
-            public void onClick(View view)
+            public void onClick(View callback)
             {
-            /*
-            FetchTimeTask fetchTimeTask = new FetchTimeTask(centurion);
-            long serverTimeMillis;
-            try
-            {
-                serverTimeMillis = fetchTimeTask.execute().get(5000, TimeUnit.MILLISECONDS);
-            }
-            catch (InterruptedException | ExecutionException | TimeoutException e)
-            {
-                serverTimeMillis = System.currentTimeMillis();
-            }
-            */
+                /*
+                FetchTimeTask fetchTimeTask = new FetchTimeTask(centurion);
+                long serverTimeMillis;
+                try
+                {
+                    serverTimeMillis = fetchTimeTask.execute().get(5000, TimeUnit.MILLISECONDS);
+                }
+                catch (InterruptedException | ExecutionException | TimeoutException e)
+                {
+                    serverTimeMillis = System.currentTimeMillis();
+                }
+                */
                 boolean[] testSuccessful = new boolean[18];
                 for (int i = 0; i < testSuccessful.length; i++)
                 {
                     if (i < 6)
                     {
                         testSuccessful[i] = TOTP.generateTOTP(KEY_20_BYTES,
-                                (long) TOTP.getTC(testTimeParams[i], 30), 8, Algorithm.SHA1)
+                                TOTP.getTC(testTimeParams[i], 30), 8, Algorithm.SHA1)
                                 .equals(testCorrectResults[i]);
                     }
                     else if (i < 12)
                     {
                         testSuccessful[i] = TOTP.generateTOTP(KEY_32_BYTES,
-                                (long) TOTP.getTC(testTimeParams[i % 6], 30), 8, Algorithm.SHA256)
+                                TOTP.getTC(testTimeParams[i % 6], 30), 8, Algorithm.SHA256)
                                 .equals(testCorrectResults[i]);
                     }
                     else
                     {
                         testSuccessful[i] = TOTP.generateTOTP(KEY_64_BYTES,
-                                (long) TOTP.getTC(testTimeParams[i % 6], 30), 8, Algorithm.SHA512)
+                                TOTP.getTC(testTimeParams[i % 6], 30), 8, Algorithm.SHA512)
                                 .equals(testCorrectResults[i]);
                     }
                 }
@@ -163,18 +163,19 @@ public class TestDeviceFragment extends Fragment
                     resultsTable.addView(testResultRow);
                 }
                 button.setVisibility(View.GONE);
+                resultsTable.setVisibility(View.VISIBLE);
                 DisplayMetrics metrics = new DisplayMetrics();
                 TestDeviceFragment.this.getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
                 int height = metrics.heightPixels;
-                // The -200f value centers the table on Nexus 6, so we use that as the reference
-                resultsContainer.setTranslationY((-200f) * ((height * metrics.densityDpi) /
-                        (float) (NEXUS_6_HEIGHT_PIXELS * NEXUS_6_DPI)));
+                // The -200f value centers the table on Nexus 6, so we use that to scale the adjustment
+                // to the device we are running on
+                resultsContainer.setTranslationY(-200f * (height * metrics.densityDpi / (float) (NEXUS_6_HEIGHT_PIXELS * NEXUS_6_DPI)));
             }
         });
         return view;
     }
 
-    private class FetchTimeTask extends AsyncTask<String, Void, Long>
+    private static class FetchTimeTask extends AsyncTask<String, Void, Long>
     {
         private final Centurion centurion;
 
