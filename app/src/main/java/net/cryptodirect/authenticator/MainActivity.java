@@ -28,8 +28,8 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * The main activity of the authenticator application. This activity is the first
@@ -43,7 +43,7 @@ public class MainActivity
         DialogInterface.OnCancelListener
 {
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final Map<Integer, HowItWorksPageFragment> pageMap = new LinkedHashMap<>(3);
+    private static final List<HowItWorksPageFragment> helpPages = new LinkedList<>();
     private static EntryPage entryPage;
 
     private ViewPager howItWorksPager;
@@ -448,6 +448,7 @@ public class MainActivity
      */
     public void handleHowItWorksClicked(View view)
     {
+        currSelectedPage = 0;
         android.app.FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         HowItWorksFragment howItWorksFragment = new HowItWorksFragment();
         fragmentTransaction.replace(R.id.main_fragment_container,
@@ -489,7 +490,7 @@ public class MainActivity
 
     private static void initPageMap()
     {
-        pageMap.put(0, HowItWorksPageFragment.newInstance(0,
+        helpPages.add(HowItWorksPageFragment.newInstance(0,
                 "#EC407A",
                 R.drawable.ic_qrcode_white_36dp,
                 "In order to use this authenticator app, you need to link your Cryptodash account " +
@@ -502,7 +503,7 @@ public class MainActivity
                         "Once your account is linked, when you log in to Cryptodash or perform " +
                         "certain actions (which is configurable) you will be prompted to enter a verification code."));
 
-        pageMap.put(1, HowItWorksPageFragment.newInstance(1,
+        helpPages.add(HowItWorksPageFragment.newInstance(1,
                 "#5C6BC0",
                 R.drawable.ic_keyboard_white_36dp,
                 "Every 30 seconds, this app automatically generates a random 6-digit " +
@@ -515,7 +516,7 @@ public class MainActivity
                         "attacker would still need your mobile phone to even attempt to gain " +
                         "access to your account."));
 
-        pageMap.put(2, HowItWorksPageFragment.newInstance(2,
+        helpPages.add(HowItWorksPageFragment.newInstance(2,
                 "#43A047",
                 R.drawable.ic_restore_white_48dp,
                 "Codes are generated using a 32-byte shared secret key that is stored securely on your " +
@@ -550,21 +551,21 @@ public class MainActivity
                 {
                     if (position < 0)
                     {
-                        if (pageMap.get(view.getId() + 1) != null)
+                        if (helpPages.get(view.getId() + 1) != null)
                         {
                             int color = (Integer) new ArgbEvaluator().evaluate(Math.abs(position),
-                                    pageMap.get(view.getId()).getBackgroundColor(),
-                                    pageMap.get(view.getId() + 1).getBackgroundColor());
+                                    helpPages.get(view.getId()).getBackgroundColor(),
+                                    helpPages.get(view.getId() + 1).getBackgroundColor());
                             view.setBackgroundColor(color);
                         }
                     }
                     else
                     {
-                        if (pageMap.get(view.getId() - 1) != null)
+                        if (helpPages.get(view.getId() - 1) != null)
                         {
                             int color = (Integer) new ArgbEvaluator().evaluate(Math.abs(position),
-                                    pageMap.get(view.getId()).getBackgroundColor(),
-                                    pageMap.get(view.getId() - 1).getBackgroundColor());
+                                    helpPages.get(view.getId()).getBackgroundColor(),
+                                    helpPages.get(view.getId() - 1).getBackgroundColor());
                             view.setBackgroundColor(color);
                         }
                     }
@@ -581,8 +582,8 @@ public class MainActivity
         howItWorksPager.setCurrentItem(++currSelectedPage, true);
     }
 
-    static Map<Integer, HowItWorksPageFragment> getPageMap()
+    static List<HowItWorksPageFragment> getHelpPages()
     {
-        return pageMap;
+        return helpPages;
     }
 }

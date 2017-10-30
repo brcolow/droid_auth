@@ -101,16 +101,15 @@ static def replacePatternInFile(file, Closure replaceText) {
 }
 
 task askForPasswords << {
-    def console = System.console()
-    def storePw
-    def keyPw
+    def storePw = ''
+    def keyPw = ''
 
     // See: https://stackoverflow.com/questions/42222630/get-input-from-user-on-gradle-build-in-android-studio/42225803#42225803
-    if (console) {
+    if (System.console() != null) {
         // Must create String because System.readPassword() returns char[]
         // (and assigning that below fails silently)
-        storePw = new String(console.readPassword("\nKeystore password: "))
-        keyPw = new String(console.readPassword("Key password: "))
+        storePw = new String(System.console.readPassword("\nKeystore password: "))
+        keyPw = new String(System.console.readPassword("Key password: "))
     } else {
         // Gradle is running as a daemon - prompt user to enter passwords via popup UI
         new SwingBuilder().edt {

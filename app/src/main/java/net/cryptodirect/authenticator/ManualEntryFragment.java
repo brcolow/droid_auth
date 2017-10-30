@@ -17,7 +17,6 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import static net.cryptodirect.authenticator.Utils.MaterialDesignColors.MD_GREEN_300;
 import static net.cryptodirect.authenticator.Utils.MaterialDesignColors.MD_RED_600;

@@ -17,9 +17,6 @@ import org.acra.sender.ReportSenderFactory;
 
 import java.io.InputStream;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLSession;
-
 /**
  * Two-factor authentication application for Cryptodash users, based
  * on RFC 6238 - TOTP: Time-Based One-Time Password Algorithm.

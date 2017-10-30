@@ -6,12 +6,12 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -51,8 +51,9 @@ public class AccountChooserFragment extends Fragment
                 android.R.layout.simple_list_item_1, android.R.id.text1,
                 new ArrayList<>(AccountManager.getInstance().getAccounts()))
         {
+            @NonNull
             @Override
-            public View getView(int position, View convertView, ViewGroup parent)
+            public View getView(int position, View convertView, @NonNull ViewGroup parent)
             {
                 Account account = getItem(position);
                 RelativeLayout listItem = new RelativeLayout(getContext());

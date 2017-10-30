@@ -9,6 +9,7 @@ import org.acra.sender.ReportSenderFactory;
 
 public class DebugSenderFactory implements ReportSenderFactory
 {
+    @NonNull
     public ReportSender create(@NonNull Context context, @NonNull ACRAConfiguration config)
     {
         return new DebugSender();

@@ -23,7 +23,7 @@ public class HowItWorksPageFragment extends Fragment implements View.OnClickList
         View view = inflater.inflate(R.layout.fragment_how_it_works_page, container, false);
         int id = getArguments().getInt("id");
 
-        // this must be set for things to work!
+        // this must be set for the help pages to be retrieved
         view.setId(id);
 
         Button skipButton = view.findViewById(R.id.skip_button);

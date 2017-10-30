@@ -14,7 +14,7 @@ public class HowItWorksPagerAdapter extends FragmentPagerAdapter
     @Override
     public Fragment getItem(int position)
     {
-        return MainActivity.getPageMap().get(position);
+        return MainActivity.getHelpPages().get(position);
     }
 
     @Override
