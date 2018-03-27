@@ -1,8 +1,9 @@
-import java.text.SimpleDateFormat
-import groovy.swing.SwingBuilder
+apply plugin: 'com.android.application'
 System.setProperty('java.awt.headless', 'false')
 
-apply plugin: 'com.android.application'
+import java.text.SimpleDateFormat
+import groovy.swing.SwingBuilder
+
 
 def versionMajor = 1
 def versionMinor = 0
@@ -10,13 +11,13 @@ def versionPatch = 6
 def versionBuild = 0 // bump for dogfood builds, public betas, etc.
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
 
     defaultConfig {
         applicationId "net.cryptodirect.authenticator"
         minSdkVersion 15
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionPatch}+" +
                 String.format("%03d", versionBuild)
@@ -65,23 +66,26 @@ android {
     }
 }
 
+ext {
+    supportLibVersion = '27.1.0'
+}
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:26.1.0'
-    compile 'com.android.support:support-v13:26.1.0'
-    compile 'me.dm7.barcodescanner:zxing:1.9.8'
-    compile 'ch.acra:acra:4.9.2'
-    compile 'me.grantland:autofittextview:0.2.1'
-    testCompile 'junit:junit:4.12'
-    androidTestCompile 'org.mockito:mockito-core:1.10.19'
-    androidTestCompile 'com.crittercism.dexmaker:dexmaker:1.4'
-    androidTestCompile 'com.crittercism.dexmaker:dexmaker-dx:1.4'
-    androidTestCompile 'com.crittercism.dexmaker:dexmaker-mockito:1.4'
-    androidTestCompile 'com.android.support.test:runner:1.0.1'
-    androidTestCompile 'com.android.support:support-annotations:26.1.0'
-    androidTestCompile 'com.android.support.test:rules:1.0.1'
-    androidTestCompile 'com.android.support.test.espresso:espresso-intents:3.0.1'
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "com.android.support:appcompat-v7:${supportLibVersion}"
+    implementation "com.android.support:support-v13:${supportLibVersion}"
+    implementation 'me.dm7.barcodescanner:zxing:1.9.8'
+    implementation 'ch.acra:acra:4.9.2'
+    implementation 'me.grantland:autofittextview:0.2.1'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'org.mockito:mockito-core:2.16.0'
+    androidTestImplementation 'com.crittercism.dexmaker:dexmaker:1.4'
+    androidTestImplementation 'com.crittercism.dexmaker:dexmaker-dx:1.4'
+    androidTestImplementation 'com.crittercism.dexmaker:dexmaker-mockito:1.4'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation "com.android.support:support-annotations:${supportLibVersion}"
+    androidTestImplementation 'com.android.support.test:rules:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-intents:3.0.1'
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 }
@@ -168,6 +172,6 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.github.ben-manes:gradle-versions-plugin:0.15.0'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.17.0'
     }
 }
